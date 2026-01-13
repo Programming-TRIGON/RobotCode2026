@@ -2,9 +2,9 @@
     <img src="files/images/githublogo.png" alt="Logo" />
 </div>
 
-# RobotCodeXXXX
+# RobotCode2026
 
-TRIGON 5990's robot code for the XXXX season robot, "PLACEHOLDER".
+TRIGON 5990's robot code for the 2026 season robot, "PLACEHOLDER".
 
 # External Programs
 
