@@ -3,6 +3,7 @@ package frc.trigon.robot.misc.shootingphysics;
 import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
+import org.littletonrobotics.junction.Logger;
 
 public class ShootingCalculations {
     private static ShootingCalculations INSTANCE = null;
@@ -17,11 +18,11 @@ public class ShootingCalculations {
     private ShootingCalculations() {
     }
 
-    /**
-     * Updates the {@linkplain ShootingCalculations#targetShootingState} class variable to contain the target state for shooting at the speaker.
-     */
-    public void updateCalculationsForSpeakerShot() {
+    public void updateCalculations() {
         targetShootingState = calculateTargetShootingState();
+        Logger.recordOutput("Shooting/TargetShootingYawDegrees", targetShootingState.targetFieldRelativeYaw().get().getDegrees());
+        Logger.recordOutput("Shooting/TargetShootingPitchDegrees", targetShootingState.targetPitch().getDegrees());
+        Logger.recordOutput("Shooting/TargetShootingVelocityMPS", targetShootingState.targetShootingVelocityMetersPerSecond());
     }
 
     public ShootingState getTargetShootingState() {
@@ -71,8 +72,8 @@ public class ShootingCalculations {
     private Translation3d calculateRadialShotVector(Translation2d hubRelativeRobotVelocity, Rotation2d fuelAngleToHub, Translation2d fuelExitPosition) {
         final double distanceFromHub = ShootingConstants.HUB_POSITION.get().minus(fuelExitPosition).getNorm();
         final double targetShootingSpeedMetersPerSecond = ShootingConstants.SHOOTING_VELOCITY_MPS_POLYNOMIAL.evaluate(distanceFromHub, hubRelativeRobotVelocity.getX());
-        final double targetHoodAngleDegrees = ShootingConstants.HOOD_ANGLE_DEGREES_POLYNOMIAL.evaluate(distanceFromHub, hubRelativeRobotVelocity.getX());
-        return new Translation3d(targetShootingSpeedMetersPerSecond, new Rotation3d(0, -Math.toRadians(targetHoodAngleDegrees), fuelAngleToHub.getRadians()));
+        final double targetHoodAngleRadians = ShootingConstants.HOOD_ANGLE_RADIANS_POLYNOMIAL.evaluate(distanceFromHub, hubRelativeRobotVelocity.getX());
+        return new Translation3d(targetShootingSpeedMetersPerSecond, new Rotation3d(0, -targetHoodAngleRadians, fuelAngleToHub.getRadians()));
     }
 
     private Translation2d calculateVelocityRelativeToFieldPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {

@@ -16,7 +16,7 @@ public class ShootingConstants {
             1.565699698698e-02,
             -5.277858971999e-03
     ),
-            HOOD_ANGLE_DEGREES_POLYNOMIAL = new ShootingPolynomial(
+            HOOD_ANGLE_RADIANS_POLYNOMIAL = new ShootingPolynomial(
                     1.623183036320e+00,
                     2.955241202250e-01,
                     -3.475512327334e-01,
@@ -29,5 +29,5 @@ public class ShootingConstants {
                     -3.030190410998e-03
             );
 
-    public static final FlippableTranslation2d HUB_POSITION = new FlippableTranslation2d(8.23, 4.115, true);
+    public static final FlippableTranslation2d HUB_POSITION = new FlippableTranslation2d(4.636, 4, true); // TODO: Update to actual hub position
 }

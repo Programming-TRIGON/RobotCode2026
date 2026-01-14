@@ -1,11 +1,14 @@
 package frc.trigon.robot.misc.shootingphysics.shootingvisualization;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * A command to visualize note shooting.
@@ -31,6 +34,8 @@ public class VisualizeFuelShootingCommand extends Command {
         updateSpin(gravitySpeedVector);
         currentGamePieceVelocity = currentGamePieceVelocity.plus(gravitySpeedVector).plus(dragSpeedVector).plus(magnusSpeedVector);
         currentGamePiecePosition = currentGamePiecePosition.plus(currentGamePieceVelocity.times(FuelShootingVisualizationConstants.TIME_STEP_SECONDS));
+
+        Logger.recordOutput("Poses/GamePieces/ShotFuelPose", currentGamePiecePosition);
     }
 
     @Override
@@ -44,16 +49,16 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private Translation3d calculateFuelExitVelocityVector() {
         final Translation3d shootingVelocityVector = calculateShootingVelocityVector();
-        final Translation3d robotVelocityVector = new Translation3d(RobotContainer.SWERVE.getFieldRelativeVelocity()); // TODO: get from
+        final Translation3d robotVelocityVector = new Translation3d(RobotContainer.SWERVE.getFieldRelativeVelocity());
 
-        return shootingVelocityVector.minus(robotVelocityVector); // TODO: check direction
+        return shootingVelocityVector.plus(robotVelocityVector); // TODO: check direction
     }
 
     private Translation3d calculateShootingVelocityVector() {
-        final double fuelExitSpeedMetersPerSecond = 0; // TODO: get from shooter subsystem
-        final Rotation2d fuelExitAngle = new Rotation2d(); // TODO: get from hood subsystem
-        final Rotation2d turretFieldRelativeAngle = new Rotation2d(); // TODO: get from turret subsystem
-        return new Translation3d(fuelExitSpeedMetersPerSecond, new Rotation3d(0, -fuelExitAngle.getRadians(), turretFieldRelativeAngle.getRadians()));
+        final double fuelExitSpeedMetersPerSecond = SHOOTING_CALCULATIONS.getTargetShootingState().targetShootingVelocityMetersPerSecond(); // TODO: get from shooter subsystem
+        final Rotation2d fuelExitPitch = SHOOTING_CALCULATIONS.getTargetShootingState().targetPitch(); // TODO: get from hood subsystem
+        final Rotation2d turretFieldRelativeAngle = SHOOTING_CALCULATIONS.getTargetShootingState().targetFieldRelativeYaw().get(); // TODO: get from turret subsystem
+        return new Translation3d(fuelExitSpeedMetersPerSecond, new Rotation3d(0, -fuelExitPitch.getRadians(), turretFieldRelativeAngle.getRadians()));
     }
 
     private void initializeSpin(double fuelExitVelocityMetersPerSecond) {
@@ -67,10 +72,14 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private Translation3d calculateCurrentDragSpeedVector(Translation3d currentGamePieceVelocity) {
         final double velocityMagnitude = currentGamePieceVelocity.getNorm();
+        if (velocityMagnitude < 1e-6)
+            return new Translation3d();
         final double dragForceMagnitude = 0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * velocityMagnitude * velocityMagnitude * FuelShootingVisualizationConstants.DRAG_COEFFICIENT * FuelShootingVisualizationConstants.GAME_PIECE_AREA;
         final double dragAccelerationMagnitude = dragForceMagnitude / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
         final double dragVelocityMagnitude = dragAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
-        return new Translation3d(-dragVelocityMagnitude, getAngle(currentGamePieceVelocity));
+        final Translation3d velocityDirection = currentGamePieceVelocity.div(velocityMagnitude);
+
+        return velocityDirection.times(-dragVelocityMagnitude);
     }
 
     private Translation3d calculateCurrentMagnusSpeedVector(Translation3d currentGamePieceVelocity) {
@@ -78,15 +87,23 @@ public class VisualizeFuelShootingCommand extends Command {
         final double spinParameter = (currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS) / (gamePieceVelocityMagnitude);
         final double magnusLiftCoefficient = FuelShootingVisualizationConstants.MAGNUS_LIFT_FACTOR * spinParameter;
         final double magnusAccelerationMagnitude = (0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * gamePieceVelocityMagnitude * gamePieceVelocityMagnitude * magnusLiftCoefficient * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
-        return new Translation3d(magnusAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS, getAngle(currentGamePieceVelocity).plus(new Rotation3d(Rotation2d.kCCW_90deg)));
+        final double magnusVelocityMagnitude = magnusAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
+
+        final Vector<N3> magnusDirection = FuelShootingVisualizationConstants.MAGNUS_SPIN_AXIS.cross(currentGamePieceVelocity);
+        final double magnusDirectionNorm = magnusDirection.norm();
+        if (magnusDirectionNorm < 1e-6) return new Translation3d();
+
+        final Vector<N3> magnusUnit = magnusDirection.div(magnusDirectionNorm);
+        final Vector<N3> magnusVelocityVector = magnusUnit.times(magnusVelocityMagnitude);
+        return new Translation3d(
+                magnusVelocityVector.get(0),
+                magnusVelocityVector.get(1),
+                magnusVelocityVector.get(2)
+        );
     }
 
     private void updateSpin(Translation3d currentGamePieceVelocity) {
         final double coefficient = (0.5 * FuelShootingVisualizationConstants.SPIN_DECAY_COEFFICIENT * FuelShootingVisualizationConstants.AIR_DENSITY * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.MOMENT_OF_INERTIA;
         currentSpinRadiansPerSecond -= coefficient * currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.TIME_STEP_SECONDS * currentGamePieceVelocity.getNorm();
-    }
-
-    private Rotation3d getAngle(Translation3d translation) {
-        return new Rotation3d(0, -SHOOTING_CALCULATIONS.getYaw(translation).getRadians(), SHOOTING_CALCULATIONS.getPitch(translation).getRadians()); // TODO: check signs
     }
 }

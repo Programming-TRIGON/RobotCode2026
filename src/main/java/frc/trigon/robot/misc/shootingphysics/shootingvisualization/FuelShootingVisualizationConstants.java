@@ -1,5 +1,7 @@
 package frc.trigon.robot.misc.shootingphysics.shootingvisualization;
 
+import edu.wpi.first.math.geometry.Translation3d;
+
 public class FuelShootingVisualizationConstants {
     static final double G_FORCE = 9.81;
     static final double
@@ -15,5 +17,6 @@ public class FuelShootingVisualizationConstants {
             DRAG_COEFFICIENT = 0.5,
             MAGNUS_LIFT_FACTOR = 0.6,
             SPIN_DECAY_COEFFICIENT = 0.01;
+    static final Translation3d MAGNUS_SPIN_AXIS = new Translation3d(0, 1, 0);
     static final double TIME_STEP_SECONDS = 0.02;
 }
