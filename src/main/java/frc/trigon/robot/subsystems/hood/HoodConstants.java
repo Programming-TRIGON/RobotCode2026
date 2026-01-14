@@ -1,0 +1,143 @@
+package frc.trigon.robot.subsystems.hood;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.*;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.RobotHardwareStats;
+import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
+import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
+import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
+
+public class HoodConstants {
+    private static final int
+            MOTOR_ID = 15,
+            ANGLE_ENCODER_ID = 15;
+    private static final String
+            MOTOR_NAME = "HoodMotor",
+            ANGLE_ENCODER_NAME = "HoodEncoder";
+
+    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
+    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
+
+    private static final double GEAR_RATIO = 40;
+    private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
+    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
+
+    static final double
+            DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 0 : 0,
+            DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 0 : 0,
+            DEFAULT_MAXIMUM_JERK = DEFAULT_MAXIMUM_ACCELERATION * 10;
+
+    private static final double MOTOR_CURRENT_LIMIT = 50;
+
+    private static final int MOTOR_AMOUNT = 1;
+    private static final DCMotor GEAR_BOX = DCMotor.getKrakenX60(MOTOR_AMOUNT);
+    private static final double
+            MASS_KILOGRAMS = 2,
+            LENGTH_METERS = 0.35;
+    private static final Rotation2d
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(360);
+    private static final boolean SHOULD_SIMULATE_GRAVITY = true;
+
+    private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
+            GEAR_BOX,
+            GEAR_RATIO,
+            LENGTH_METERS,
+            MASS_KILOGRAMS,
+            MINIMUM_ANGLE,
+            MAXIMUM_ANGLE,
+            SHOULD_SIMULATE_GRAVITY
+    );
+
+    static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
+            "HoodMechanism",
+            LENGTH_METERS,
+            Color.kBlue
+    );
+
+    static final Pose3d HOOD_VISUALIZATION_ORIGIN_POINT = new Pose3d(
+            new Translation3d(0, 0, 0),
+            new Rotation3d(0, 0, 0)
+    );
+
+    static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
+            Units.Volts.of(1.5).per(Units.Seconds),
+            Units.Volts.of(3),
+            Units.Second.of(1000)
+    );
+
+    static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5);
+    static final boolean FOC_ENABLED = true;
+
+    static {
+        configureMotor();
+        configureAngleEncoder();
+    }
+
+    private static void configureMotor() {
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.Audio.BeepOnBoot = false;
+        config.Audio.BeepOnConfig = false;
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+        config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+
+
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.014822 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.7431 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.14264 : 0;
+
+        config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+
+        config.MotionMagic.MotionMagicCruiseVelocity = DEFAULT_MAXIMUM_VELOCITY;
+        config.MotionMagic.MotionMagicAcceleration = DEFAULT_MAXIMUM_ACCELERATION;
+        config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = MOTOR_CURRENT_LIMIT;
+
+        MOTOR.applyConfiguration(config);
+        MOTOR.setPhysicsSimulation(SIMULATION);
+
+        MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
+        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
+        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
+        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+    }
+
+    private static void configureAngleEncoder() {
+        final CANcoderConfiguration config = new CANcoderConfiguration();
+
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+
+        ANGLE_ENCODER.applyConfiguration(config);
+        ANGLE_ENCODER.setSimulationInputsFromTalonFX(MOTOR);
+
+        ANGLE_ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
+        ANGLE_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
+    }
+}
