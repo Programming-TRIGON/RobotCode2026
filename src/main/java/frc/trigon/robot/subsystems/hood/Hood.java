@@ -71,7 +71,7 @@ public class Hood extends MotorSubsystem {
         return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION));
     }
 
-    void setTargetAngleWithPHysics(){}//TODO implement
+    void aimAtHub(){}//TODO implement
 
     void setTargetAngle(Rotation2d targetAngle) {
         motor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
