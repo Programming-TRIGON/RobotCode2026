@@ -1,0 +1,48 @@
+package frc.trigon.robot.subsystems.turret;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.trigon.lib.commands.NetworkTablesCommand;
+import frc.trigon.robot.RobotContainer;
+
+import java.util.Set;
+
+public class TurretCommands {
+    public static Command getDebuggingCommand() {
+        return new NetworkTablesCommand(
+                (targetAngleDegrees) -> RobotContainer.TURRET.setTargetAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
+                false,
+                Set.of(RobotContainer.TURRET),
+                "Debugging/TurretTargetAngleDegrees"
+        );
+    }
+
+    public static Command getAlignToHubCommand() {
+        return new RunCommand(
+                RobotContainer.TURRET::alignToHub,
+                RobotContainer.TURRET
+        );
+    }
+
+    public static Command getAlignForDeliveryCommand() {
+        return new RunCommand(
+                RobotContainer.TURRET::alignForDelivery,
+                RobotContainer.TURRET
+        );
+    }
+
+    public static Command getStopCommand() {
+        return new RunCommand(
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
+
+    public static Command getSetTargetAngleCommand(Rotation2d targetAngle) {
+        return new RunCommand(
+                () -> RobotContainer.TURRET.setTargetAngle(targetAngle),
+                RobotContainer.TURRET
+        );
+    }
+}

@@ -21,6 +21,8 @@ import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.swerve.Swerve;
+import frc.trigon.robot.subsystems.turret.Turret;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -31,6 +33,7 @@ public class RobotContainer {
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
     public static final Swerve SWERVE = new Swerve();
+    public static final Turret TURRET = new Turret();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -53,6 +56,7 @@ public class RobotContainer {
 
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
+        TURRET.setDefaultCommand(TurretCommands.getStopCommand());
     }
 
     private void bindControllerCommands() {

@@ -1,0 +1,123 @@
+package frc.trigon.robot.subsystems.turret;
+
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
+import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.subsystems.MotorSubsystem;
+
+public class Turret extends MotorSubsystem {
+    private final TalonFXMotor motor = TurretConstants.MOTOR;
+    private final CANcoderEncoder encoder = TurretConstants.ENCODER;
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED);
+
+    public Turret() {
+        setName("Turret");
+    }
+
+    @Override
+    public void sysIDDrive(double targetDrivePower) {
+        motor.setControl(voltageRequest.withOutput(targetDrivePower));
+    }
+
+    @Override
+    public void updateLog(SysIdRoutineLog log) {
+        log.motor("TurretMotor")
+                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)))
+                .angularPosition(Units.Rotations.of(getCurrentEncoderAngle().getRotations()))
+                .angularVelocity(Units.RotationsPerSecond.of(encoder.getSignal(CANcoderSignal.VELOCITY)));
+    }
+
+    @Override
+    public SysIdRoutine.Config getSysIDConfig() {
+        return TurretConstants.SYSID_CONFIG;
+    }
+
+    @Override
+    public void setBrake(boolean brake) {
+        motor.setBrake(brake);
+    }
+
+    @Override
+    public void updatePeriodically() {
+        motor.update();
+        encoder.update();
+    }
+
+    @Override
+    public void updateMechanism() {
+        TurretConstants.MECHANISM.update(
+                getCurrentEncoderAngle(),
+                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+        );
+    }
+
+    @Override
+    public void stop() {
+        motor.stopMotor();
+    }
+
+    void alignToHub() {
+        Rotation2d targetAngle = calculateTargetAngleToHub();
+        Rotation2d targetAngleAfterLimitCheck = limitAngle(targetAngle);
+        setTargetAngle(targetAngleAfterLimitCheck);
+    }
+
+    void alignForDelivery() {
+        Rotation2d targetAngle = calculateTargetAngleForDelivery();
+        Rotation2d targetAngleAfterLimitCheck = limitAngle(targetAngle);
+        setTargetAngle(targetAngleAfterLimitCheck);
+    }
+
+    void setTargetAngle(Rotation2d targetAngle) {
+        motor.setControl(positionRequest.withPosition(targetAngle.getRotations() - TurretConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET));
+    }
+
+    private Rotation2d calculateTargetAngleToHub() {
+        return calculateTargetAngleToPose(FieldConstants.HUB_POSITION.get());
+    }
+
+    private Rotation2d calculateTargetAngleForDelivery() {
+        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        if (!isRobotInHubYRange())
+            return Rotation2d.kZero.minus(currentPosition.getRotation());
+        if (currentPosition.getY() < FieldConstants.HUB_Y)
+            return calculateTargetAngleToPose(new Translation2d(FieldConstants.ALLIANCE_ZONE_LINE_X / 2, FieldConstants.HUB_LEFTMOST_Y / 2));
+        return calculateTargetAngleToPose(new Translation2d(FieldConstants.ALLIANCE_ZONE_LINE_X / 2, FieldConstants.HUB_LEFTMOST_Y * 1.5));
+    }
+
+    private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation) {
+        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Translation2d difference = targetTranslation.minus(currentPosition.getTranslation());
+        final Rotation2d theta = Rotation2d.fromRadians(Math.atan2(difference.getY(), difference.getX()));
+        return theta.minus(currentPosition.getRotation());
+    }
+
+    private boolean isRobotInHubYRange() {
+        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return currentPosition.getY() < FieldConstants.HUB_LEFTMOST_Y || currentPosition.getY() > FieldConstants.HUB_RIGHTMOST_Y;
+    }
+
+    private Rotation2d limitAngle(Rotation2d targetAngle) {
+        if (targetAngle.getDegrees() > TurretConstants.ANGULAR_LIMIT.getDegrees() / 2)
+            return targetAngle.minus(TurretConstants.ANGULAR_LIMIT);
+        if (targetAngle.getDegrees() < -TurretConstants.ANGULAR_LIMIT.getDegrees() / 2)
+            return targetAngle.minus(TurretConstants.ANGULAR_LIMIT);
+        return targetAngle;
+    }
+
+    private Rotation2d getCurrentEncoderAngle() {
+        return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
+    }
+}
