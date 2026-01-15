@@ -36,7 +36,7 @@ public class ShooterConstants {
     static final SysIdRoutine.Config SYS_ID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(0.25).per(Units.Second),
             Units.Volts.of(7),
-            Units.Second.of(1000)
+            null
     );
 
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 100;
