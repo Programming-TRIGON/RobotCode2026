@@ -58,7 +58,7 @@ public class Turret extends MotorSubsystem {
     @Override
     public void updateMechanism() {
         TurretConstants.MECHANISM.update(
-                getCurrentEncoderAngle(),
+                getCurrentEncoderAngle().plus(TurretConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET),
                 Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
     }
