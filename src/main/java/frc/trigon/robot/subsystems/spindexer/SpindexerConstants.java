@@ -17,14 +17,11 @@ import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
 public class SpindexerConstants {
-    private static final int SPINDEXER_ID = 11;
-    private static final String SPINDEXER_NAME = "Spindexer";
-    static final TalonFXMotor SPINDEXER_MOTOR = new TalonFXMotor(SPINDEXER_ID, SPINDEXER_NAME);
+    private static final int MOTOR_ID = 11;
+    private static final String MOTOR_NAME = "SpindexerMotor";
+    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final double GEAR_RATIO = 5;
-    static final double
-            MAX_VELOCITY = RobotHardwareStats.isSimulation() ? 10 : 0,
-            MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 7 : 0;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
@@ -41,32 +38,25 @@ public class SpindexerConstants {
             Units.Second.of(1000)
     );
 
-    public static final Pose3d SPINDEXER_VISUALIZATION_POSE = new Pose3d(
+    static final Pose3d SPINDEXER_VISUALIZATION_POSE = new Pose3d(
             new Translation3d(0, 0, 0),
             new Rotation3d(0, 0, 0)
     );
 
-
-    static final double MAX_DISPLAYABLE_VELOCITY = 10;
-    static final String SPINDEXER_MECHANISM_NAME = "Spindexer";
-    static final double DEADBAND = 0.02;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 10;
+    private static final String SPINDEXER_MECHANISM_NAME = "SpindexerMechanism";
     static final SpeedMechanism2d SPINDEXER_MECHANISM = new SpeedMechanism2d(
             SPINDEXER_MECHANISM_NAME,
-            MAX_DISPLAYABLE_VELOCITY,
-            DEADBAND
+            MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
-    static final double VELOCITY_TOLERANCE = 2;
+    static final double VELOCITY_TOLERANCE_ROTATIONS = 2;
     static final boolean FOC_ENABLED = true;
 
     static {
-        configureMotor();
-    }
-
-    private static void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
@@ -79,27 +69,26 @@ public class SpindexerConstants {
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011144 : 0;
 
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.MotionMagic.MotionMagicCruiseVelocity = MAX_VELOCITY;
-        config.MotionMagic.MotionMagicAcceleration = MAX_ACCELERATION;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 7 : 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 50;
 
-        SPINDEXER_MOTOR.applyConfiguration(config);
-        SPINDEXER_MOTOR.setPhysicsSimulation(SPINDEXER_SIMULATION);
+        MOTOR.applyConfiguration(config);
+        MOTOR.setPhysicsSimulation(SPINDEXER_SIMULATION);
 
-        SPINDEXER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        SPINDEXER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        SPINDEXER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        SPINDEXER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
-        SPINDEXER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
+        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
+        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
+        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
     public enum SpindexerState {
         SPIN_CLOCKWISE(10),
         SPIN_COUNTERCLOCKWISE(-10),
         STOP(0);
-
 
         public final double targetVelocity;
 

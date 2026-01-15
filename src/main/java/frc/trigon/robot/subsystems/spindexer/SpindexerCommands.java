@@ -7,17 +7,14 @@ import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class SpindexerCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetVelocityDegrees) -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocityDegrees),
+                (targetVelocity) -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity),
                 false,
                 Set.of(RobotContainer.SPINDEXER),
                 "Debugging/TargetSpindexerVelocity"
-        ).finallyDo(
-                interrupted -> RobotContainer.SPINDEXER.setTargetVelocity(0)
         );
     }
 
@@ -29,9 +26,9 @@ public class SpindexerCommands {
         );
     }
 
-    public static Command getSetTargetVelocityCommand(Supplier<Double> targetVelocity) {
+    public static Command getSetTargetVelocityCommand(double targetVelocity) {
         return new ExecuteEndCommand(
-                () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity.get()),
+                () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity),
                 RobotContainer.SPINDEXER::stop,
                 RobotContainer.SPINDEXER
         );

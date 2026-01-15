@@ -2,7 +2,10 @@ package frc.trigon.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -12,17 +15,18 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Spindexer extends MotorSubsystem {
-    private final TalonFXMotor motor = SpindexerConstants.SPINDEXER_MOTOR;
+    private final TalonFXMotor motor = SpindexerConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
+    private double targetVelocity;
 
     public Spindexer() {
-        setName(SpindexerConstants.SPINDEXER_MECHANISM_NAME);
+        setName("Spindexer");
     }
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("Spindexer")
+        log.motor("Motor")
                 .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
                 .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
@@ -30,12 +34,12 @@ public class Spindexer extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
-        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
-
         SpindexerConstants.SPINDEXER_MECHANISM.update(
                 getCurrentVelocity(),
-                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
+                targetVelocity
         );
+
+        Logger.recordOutput("Poses/Components/SpindexerPose", getComponentPose());
     }
 
     @Override
@@ -56,7 +60,6 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
-        Logger.recordOutput("Spindexer/CurrentVelocity", getCurrentVelocity());
     }
 
     @Override
@@ -64,36 +67,37 @@ public class Spindexer extends MotorSubsystem {
         motor.stopMotor();
     }
 
-    private Pose3d calculateComponentPose() {
+    private Pose3d calculateComponentPose(Pose3d originPose) {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, 0, getCurrentPosition())
         );
-        return Pose3d.kZero.plus(yawTransform);
+        return originPose.transformBy(yawTransform);
     }
 
-    public Pose3d getComponentPose() {
-        return calculateComponentPose();
+    private Pose3d getComponentPose() {
+        return calculateComponentPose(SpindexerConstants.SPINDEXER_VISUALIZATION_POSE);
     }
 
-    public boolean atVelocity(double targetVelocity) {
+    boolean atVelocity() {
         return Math.abs(getCurrentVelocity() - targetVelocity)
-                < SpindexerConstants.VELOCITY_TOLERANCE;
+                < SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS;
     }
 
-    public void setTargetState(SpindexerConstants.SpindexerState targetState) {
+    void setTargetState(SpindexerConstants.SpindexerState targetState) {
         setTargetVelocity(targetState.targetVelocity);
     }
 
-    public void setTargetVelocity(double targetVelocity) {
+    void setTargetVelocity(double targetVelocity) {
+        this.targetVelocity = targetVelocity;
         motor.setControl(velocityRequest.withVelocity(targetVelocity));
     }
 
-    public double getCurrentVelocity() {
+    double getCurrentVelocity() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 
-    public double getCurrentPosition() {
+    double getCurrentPosition() {
         return motor.getSignal(TalonFXSignal.POSITION);
     }
 }
