@@ -110,11 +110,18 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
-        if (targetAngle.getDegrees() > TurretConstants.ANGULAR_LIMIT.getDegrees() / 2)
-            return targetAngle.minus(TurretConstants.ANGULAR_LIMIT);
-        if (targetAngle.getDegrees() < -TurretConstants.ANGULAR_LIMIT.getDegrees() / 2)
-            return targetAngle.minus(TurretConstants.ANGULAR_LIMIT);
+        if (isAngleOutOfRange(targetAngle))
+            return targetAngle.getDegrees() > 0 ? TurretConstants.ANGLE_RANGE_PER_SIDE : TurretConstants.ANGLE_RANGE_PER_SIDE.unaryMinus();
+        if (targetAngle.getDegrees() > TurretConstants.ANGLE_RANGE_PER_SIDE.getDegrees())
+            return targetAngle.minus(TurretConstants.ANGLE_RANGE);
+        if (targetAngle.getDegrees() < -TurretConstants.ANGLE_RANGE_PER_SIDE.getDegrees())
+            return targetAngle.minus(TurretConstants.ANGLE_RANGE);
         return targetAngle;
+    }
+
+    private boolean isAngleOutOfRange(Rotation2d angle) {
+        final double absoluteAngleDegrees = Math.abs(angle.getDegrees());
+        return absoluteAngleDegrees > TurretConstants.ANGLE_RANGE_PER_SIDE.getDegrees() && absoluteAngleDegrees < 360 - TurretConstants.ANGLE_RANGE.getDegrees();
     }
 
     private Rotation2d getCurrentEncoderAngle() {

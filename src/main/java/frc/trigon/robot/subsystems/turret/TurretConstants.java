@@ -57,8 +57,8 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            ANGULAR_LIMIT = Rotation2d.fromDegrees(355),
-            ANGLE_TOLERANCE = Rotation2d.fromDegrees(1);
+            ANGLE_RANGE = Rotation2d.fromDegrees(355),
+            ANGLE_RANGE_PER_SIDE = ANGLE_RANGE.div(2);
 
     static {
         configureMotor();
