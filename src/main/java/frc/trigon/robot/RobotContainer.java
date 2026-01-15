@@ -6,6 +6,7 @@
 package frc.trigon.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -20,6 +21,9 @@ import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import frc.trigon.robot.subsystems.spindexer.Spindexer;
+import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -31,6 +35,7 @@ public class RobotContainer {
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
     public static final Swerve SWERVE = new Swerve();
+    public static final Spindexer SPINDEXER = new Spindexer();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -49,16 +54,20 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
+        configureSysIDBindings(SPINDEXER);
     }
 
     private void bindDefaultCommands() {
-        SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
+       // SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
+        SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
     }
 
     private void bindControllerCommands() {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(SpindexerCommands.getDebuggingCommand());
+        OperatorConstants.TARGET_ANGLE_TRIGGER.whileTrue(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.SPIN_CLOCKWISE));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
