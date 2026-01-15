@@ -1,0 +1,74 @@
+package frc.trigon.robot.subsystems.shooter;
+
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
+import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.subsystems.MotorSubsystem;
+
+public class Shooter extends MotorSubsystem {
+    private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
+    private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
+    private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
+    private double targetVelocityRotationsPerSecond = 0;
+
+    public Shooter() {
+        setName("Shooter");
+    }
+
+    @Override
+    public void updateLog(SysIdRoutineLog log) {
+        log.motor("ShooterMaster")
+                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
+                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
+                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
+    }
+
+    @Override
+    public void stop() {
+        motor.stopMotor();
+        targetVelocityRotationsPerSecond = 0;
+        ShooterConstants.MECHANISM.setTargetVelocity(0);
+    }
+
+    @Override
+    public void updatePeriodically() {
+        motor.update();
+    }
+
+    @Override
+    public void sysIDDrive(double targetDrivePower) {
+        motor.setControl(voltageRequest.withOutput(targetDrivePower));
+    }
+
+    @Override
+    public SysIdRoutine.Config getSysIDConfig() {
+        return ShooterConstants.SYS_ID_CONFIG;
+    }
+
+    @Override
+    public void setBrake(boolean brake) {
+        motor.setBrake(brake);
+    }
+
+    @Override
+    public void updateMechanism() {
+        ShooterConstants.MECHANISM.update(getCurrentVelocityRotationsPerSecond(), targetVelocityRotationsPerSecond);
+    }
+
+    public boolean atTargetVelocity() {
+        return Math.abs(getCurrentVelocityRotationsPerSecond() - targetVelocityRotationsPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
+    }
+
+    void setTargetVelocity(double targetVelocityRotationsPerSecond) {
+        this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
+        motor.setControl(velocityRequest.withVelocity(targetVelocityRotationsPerSecond));
+    }
+
+    private double getCurrentVelocityRotationsPerSecond() {
+        return motor.getSignal(TalonFXSignal.VELOCITY);
+    }
+}
