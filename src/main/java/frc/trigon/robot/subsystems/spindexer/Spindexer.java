@@ -2,10 +2,7 @@ package frc.trigon.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -70,7 +67,7 @@ public class Spindexer extends MotorSubsystem {
     private Pose3d calculateComponentPose(Pose3d originPose) {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, getCurrentPosition())
+                new Rotation3d(0, 0, getCurrentPositionRotations().getRadians())
         );
         return originPose.transformBy(yawTransform);
     }
@@ -85,7 +82,7 @@ public class Spindexer extends MotorSubsystem {
     }
 
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
-        setTargetVelocity(targetState.targetVelocity);
+        setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
     }
 
     void setTargetVelocity(double targetVelocity) {
@@ -97,7 +94,13 @@ public class Spindexer extends MotorSubsystem {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 
+    Rotation2d getCurrentPositionRotations() {
+        return Rotation2d.fromRotations(getCurrentPosition());
+    }
+
     double getCurrentPosition() {
         return motor.getSignal(TalonFXSignal.POSITION);
     }
+
+
 }

@@ -11,7 +11,7 @@ import java.util.Set;
 public class SpindexerCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetVelocity) -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity),
+                RobotContainer.SPINDEXER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.SPINDEXER),
                 "Debugging/TargetSpindexerVelocity"

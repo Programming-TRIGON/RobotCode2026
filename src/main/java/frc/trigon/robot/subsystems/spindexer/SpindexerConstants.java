@@ -90,10 +90,10 @@ public class SpindexerConstants {
         SPIN_COUNTERCLOCKWISE(-10),
         STOP(0);
 
-        public final double targetVelocity;
+        public final double targetVelocityRotationsPerSecond;
 
         SpindexerState(double targetVelocity) {
-            this.targetVelocity = targetVelocity;
+            this.targetVelocityRotationsPerSecond = targetVelocity;
         }
     }
 }
