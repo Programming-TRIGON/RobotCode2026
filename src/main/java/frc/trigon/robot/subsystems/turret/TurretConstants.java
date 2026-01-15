@@ -28,8 +28,8 @@ public class TurretConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
-    private static final double ANGLE_ENCODER_GRAVITY_OFFSET = 0;
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : 0;
+    private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
+    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = Rotation2d.fromRotations(RobotHardwareStats.isSimulation() ? 0 : 0);
     static final double
             DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 5 : 5,
             DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 5;
@@ -100,7 +100,7 @@ public class TurretConstants {
         CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET;
+        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

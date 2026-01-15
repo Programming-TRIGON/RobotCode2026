@@ -81,7 +81,7 @@ public class Turret extends MotorSubsystem {
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
-        motor.setControl(positionRequest.withPosition(targetAngle.getRotations() - TurretConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET));
+        motor.setControl(positionRequest.withPosition(targetAngle.minus(TurretConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET).getRotations()));
     }
 
     private Rotation2d calculateTargetAngleToHub() {
