@@ -8,6 +8,7 @@ package frc.trigon.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
@@ -17,6 +18,8 @@ import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.LEDConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.objectDetection.ObjectPoseEstimator;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import frc.trigon.robot.misc.shootingphysics.shootingvisualization.VisualizeFuelShootingCommand;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
@@ -59,6 +62,8 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.DRIVER_CONTROLLER.rightBumper().onTrue(new VisualizeFuelShootingCommand());
+        OperatorConstants.DRIVER_CONTROLLER.leftBumper().whileTrue(new RunCommand(ShootingCalculations.getInstance()::updateCalculations));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

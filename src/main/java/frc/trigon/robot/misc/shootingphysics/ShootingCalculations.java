@@ -30,11 +30,16 @@ public class ShootingCalculations {
     }
 
     public Translation3d calculateCurrentFuelExitPose() {
-        return null; // TODO: Implement fuel exit pose calculation
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return new Translation3d(robotPose.getTranslation().getX(), robotPose.getTranslation().getY(), 0.5);
+
+//        return null; // TODO: Implement fuel exit pose calculation
     }
 
     public Translation2d calculateTargetFuelExitPosition() {
-        return null; // TODO: Implement fuel exit pose calculation
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return robotPose.getTranslation();
+//        return null; // TODO: Implement fuel exit pose calculation
     }
 
     public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d pitch, Rotation2d turretYaw) {
