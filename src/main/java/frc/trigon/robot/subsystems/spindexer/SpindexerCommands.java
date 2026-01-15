@@ -27,7 +27,7 @@ public class SpindexerCommands {
     }
 
     public static Command getSetTargetVelocityCommand(double targetVelocity) {
-        return new ExecuteEndCommand(
+        return new StartEndCommand(
                 () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity),
                 RobotContainer.SPINDEXER::stop,
                 RobotContainer.SPINDEXER
