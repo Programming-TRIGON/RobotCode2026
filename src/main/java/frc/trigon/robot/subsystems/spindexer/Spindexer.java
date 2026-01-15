@@ -24,8 +24,8 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("Motor")
-                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
-                .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
+                .angularPosition(Units.Rotations.of(getCurrentPosition().getRotations()))
+                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocity()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
@@ -64,21 +64,9 @@ public class Spindexer extends MotorSubsystem {
         motor.stopMotor();
     }
 
-    private Pose3d calculateComponentPose(Pose3d originPose) {
-        final Transform3d yawTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, getCurrentPositionRotations().getRadians())
-        );
-        return originPose.transformBy(yawTransform);
-    }
-
-    private Pose3d getComponentPose() {
-        return calculateComponentPose(SpindexerConstants.SPINDEXER_VISUALIZATION_POSE);
-    }
-
-    boolean atVelocity() {
+    public boolean atVelocity() {
         return Math.abs(getCurrentVelocity() - targetVelocity)
-                < SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS;
+                < SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND    ;
     }
 
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
@@ -90,17 +78,23 @@ public class Spindexer extends MotorSubsystem {
         motor.setControl(velocityRequest.withVelocity(targetVelocity));
     }
 
-    double getCurrentVelocity() {
+    private double getCurrentVelocity() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 
-    Rotation2d getCurrentPositionRotations() {
-        return Rotation2d.fromRotations(getCurrentPosition());
+    private Rotation2d getCurrentPosition() {
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
     }
 
-    double getCurrentPosition() {
-        return motor.getSignal(TalonFXSignal.POSITION);
+    private Pose3d calculateComponentPose(Pose3d originPose) {
+        final Transform3d yawTransform = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, 0, getCurrentPosition().getRadians())
+        );
+        return originPose.transformBy(yawTransform);
     }
 
-
+    private Pose3d getComponentPose() {
+        return calculateComponentPose(SpindexerConstants.SPINDEXER_VISUALIZATION_POSE);
+    }
 }

@@ -14,7 +14,7 @@ public class SpindexerCommands {
                 RobotContainer.SPINDEXER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.SPINDEXER),
-                "Debugging/TargetSpindexerVelocity"
+                "Debugging/SpindexerTargetVelocity"
         );
     }
 
@@ -26,7 +26,7 @@ public class SpindexerCommands {
         );
     }
 
-    public static Command getSetTargetVelocityCommand(double targetVelocity) {
+    public static Command getSetTargetVelocityRotationsPerSecondCommand(double targetVelocity) {
         return new StartEndCommand(
                 () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocity),
                 RobotContainer.SPINDEXER::stop,

@@ -20,8 +20,8 @@ public class SpindexerConstants {
     private static final int MOTOR_ID = 11;
     private static final String MOTOR_NAME = "SpindexerMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
-
-    static final double GEAR_RATIO = 5;
+    private static final double GEAR_RATIO = 5;
+    static final boolean FOC_ENABLED = true;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
@@ -43,15 +43,14 @@ public class SpindexerConstants {
             new Rotation3d(0, 0, 0)
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 10;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 12;
     private static final String SPINDEXER_MECHANISM_NAME = "SpindexerMechanism";
     static final SpeedMechanism2d SPINDEXER_MECHANISM = new SpeedMechanism2d(
             SPINDEXER_MECHANISM_NAME,
             MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
-    static final double VELOCITY_TOLERANCE_ROTATIONS = 2;
-    static final boolean FOC_ENABLED = true;
+    static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 2;
 
     static {
         TalonFXConfiguration config = new TalonFXConfiguration();
