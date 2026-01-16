@@ -29,7 +29,6 @@ public class SpindexerConstants {
             GEARBOX,
             GEAR_RATIO,
             MOMENT_OF_INERTIA
-
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
