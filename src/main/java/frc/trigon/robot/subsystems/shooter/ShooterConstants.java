@@ -25,6 +25,7 @@ public class ShooterConstants {
             MASTER_MOTOR = new TalonFXMotor(MASTER_MOTOR_ID, MASTER_MOTOR_NAME),
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
 
+    static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 1;
     private static final MotorAlignmentValue SHOULD_FOLLOWER_OPPOSE_MASTER = MotorAlignmentValue.Aligned;
 
@@ -42,7 +43,6 @@ public class ShooterConstants {
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 100;
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
 
-    static final boolean FOC_ENABLED = true;
     static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 3;
 
     static {
@@ -66,6 +66,9 @@ public class ShooterConstants {
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
 
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 0 : 0;
+
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         MASTER_MOTOR.applyConfiguration(config);
@@ -74,6 +77,7 @@ public class ShooterConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.TORQUE_CURRENT, 100);
     }
 

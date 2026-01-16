@@ -1,6 +1,6 @@
 package frc.trigon.robot.subsystems.shooter;
 
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -12,7 +12,7 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 public class Shooter extends MotorSubsystem {
     private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
-    private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
+    private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private double targetVelocityRotationsPerSecond = 0;
 
     public Shooter() {

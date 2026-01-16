@@ -11,7 +11,7 @@ public class ShooterCommands {
         return new NetworkTablesCommand(
                 ShooterCommands::getSetTargetVelocityCommand,
                 false,
-                "Debugging/TargetRightMotorDebuggingShootingVelocity"
+                "Debugging/TargetShooterVelocityRotationsPerSecond"
         );
     }
 
