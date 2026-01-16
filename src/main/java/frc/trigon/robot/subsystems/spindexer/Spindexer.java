@@ -71,6 +71,7 @@ public class Spindexer extends MotorSubsystem {
         return Math.abs(currentVelocity - targetVelocity)
                 <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
+    
     public boolean atTargetVelocity() {
         return Math.abs(getCurrentVelocity() - targetVelocity)
                 < SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
