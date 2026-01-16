@@ -24,8 +24,8 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("SpindexerMotor")
-                .angularPosition(Units.Rotations.of(getCurrentPosition().getRotations()))
-                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocity()))
+                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
+                .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
