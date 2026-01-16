@@ -23,7 +23,7 @@ public class Spindexer extends MotorSubsystem {
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("Motor")
+        log.motor("SpindexerMotor")
                 .angularPosition(Units.Rotations.of(getCurrentPosition().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocity()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
@@ -33,7 +33,7 @@ public class Spindexer extends MotorSubsystem {
     public void updateMechanism() {
         SpindexerConstants.SPINDEXER_MECHANISM.update(
                 getCurrentVelocity(),
-                targetVelocity
+                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
 
         Logger.recordOutput("Poses/Components/SpindexerPose", getComponentPose());
@@ -64,6 +64,13 @@ public class Spindexer extends MotorSubsystem {
         motor.stopMotor();
     }
 
+    public boolean atState(SpindexerConstants.SpindexerState targetState) {
+        double currentVelocity = getCurrentVelocity();
+        double targetVelocity = targetState.targetVelocityRotationsPerSecond;
+
+        return Math.abs(currentVelocity - targetVelocity)
+                <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
+    }
     public boolean atTargetVelocity() {
         return Math.abs(getCurrentVelocity() - targetVelocity)
                 < SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;

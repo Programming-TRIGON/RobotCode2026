@@ -22,7 +22,6 @@ public class SpindexerConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
     private static final double GEAR_RATIO = 5;
     static final boolean FOC_ENABLED = true;
-
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation SPINDEXER_SIMULATION = new SimpleMotorSimulation(
@@ -59,14 +58,13 @@ public class SpindexerConstants {
 
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.0015934 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.4 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0012991 : 0;
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.61844 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011144 : 0;
 
-        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 7 : 0;
 
