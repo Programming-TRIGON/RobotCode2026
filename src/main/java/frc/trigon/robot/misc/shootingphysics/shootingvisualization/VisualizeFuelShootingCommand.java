@@ -61,7 +61,7 @@ public class VisualizeFuelShootingCommand extends Command {
         final Translation3d shootingVelocityVector = calculateShootingVelocityVector();
         final Translation3d robotVelocityVector = new Translation3d(RobotContainer.SWERVE.getFieldRelativeVelocity());
 
-        return shootingVelocityVector.plus(robotVelocityVector); // TODO: check direction
+        return shootingVelocityVector.plus(robotVelocityVector);
     }
 
     private Translation3d calculateShootingVelocityVector() {

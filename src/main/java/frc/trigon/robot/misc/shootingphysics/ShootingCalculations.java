@@ -62,8 +62,9 @@ public class ShootingCalculations {
     private Translation3d calculateTotalShotVector() {
         final Translation2d targetFuelExitPosition = calculateTargetFuelExitPosition();
         final Translation2d robotVelocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
-        final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToFieldPoint(FieldConstants.HUB_POSITION.get(), targetFuelExitPosition, robotVelocity);
-        final Rotation2d fuelAngleToHub = calculateAngleToPoint(FieldConstants.HUB_POSITION.get(), targetFuelExitPosition);
+        final Translation2d allianceHubPosition = FieldConstants.HUB_POSITION.get();
+        final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToFieldPoint(allianceHubPosition, targetFuelExitPosition, robotVelocity);
+        final Rotation2d fuelAngleToHub = calculateAngleToPoint(allianceHubPosition, targetFuelExitPosition);
 
         final Translation3d radialShotVector = calculateRadialShotVector(hubRelativeRobotVelocity, fuelAngleToHub, targetFuelExitPosition);
         final Translation3d tangentialRobotVelocityVector = calculateTangentialRobotVelocityVector(hubRelativeRobotVelocity, fuelAngleToHub);
