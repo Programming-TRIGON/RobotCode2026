@@ -21,6 +21,14 @@ public class FieldConstants {
             //Tags to ignore
     );
 
+    public static final double
+            HUB_X = 4.03,
+            HUB_Y = FieldConstants.FIELD_WIDTH_METERS / 2,
+            HUB_RADIUS_METERS = 1.19 / 2,
+            HUB_LEFTMOST_Y = HUB_Y - HUB_RADIUS_METERS,
+            HUB_RIGHTMOST_Y = HUB_Y + HUB_RADIUS_METERS;
+    public static final double ALLIANCE_ZONE_LINE_X = HUB_X - HUB_RADIUS_METERS;
+
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = createAprilTagFieldLayout();
     private static final Transform3d TAG_OFFSET = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
