@@ -1,8 +1,9 @@
 package frc.trigon.robot.subsystems.intake;
 
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -14,35 +15,49 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends MotorSubsystem {
     private final TalonFXMotor AngleMotor = IntakeConstants.ANGLE_MOTOR;
+    private final TalonFXMotor WheelMotor = IntakeConstants.WHEEL_MOTOR;
     private final CANcoderEncoder AngleEncoder = IntakeConstants.ANGLE_ENCODER;
+    private final CANcoderEncoder WheelEncoder = IntakeConstants.WHEEL_ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
 
     private Rotation2d targetAngle = Rotation2d.fromDegrees(0);
 
     public Intake() {
-        setName(IntakeConstants.MECHANISM_NAME);
+        setName("Intake");
     }
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("Arm")
+        log.motor("IntakeAngleMotor")
                 .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(AngleMotor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(AngleMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
+        log.motor("IntakeWheelMotor")
+                .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
+                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
+                .voltage(Units.Volts.of(WheelMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
-        IntakeConstants.MECHANISM.update(
+        IntakeConstants.INTAKE_ANGLE_MOTOR_MECHANISM.update(
                 getCurrentAngle(),
                 Rotation2d.fromRotations(AngleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
+
+        IntakeConstants.INTAKE_WHEEL_MOTOR_MECHANISM.update(
+                getCurrentVelocityRotationsPerSecond(),
+                WheelMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
+        );
+
+        //Logger.recordOutput("Poses/Components/IntakePose", getComponentPose()); pose3d
     }
 
     @Override
     public void sysIDDrive(double targetVoltage) {
         AngleMotor.setControl(voltageRequest.withOutput(targetVoltage));
+        WheelMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     @Override
@@ -53,13 +68,16 @@ public class Intake extends MotorSubsystem {
     @Override
     public void setBrake(boolean brake) {
         AngleMotor.setBrake(brake);
+        WheelMotor.setBrake(brake);
     }
 
     @Override
     public void updatePeriodically() {
         AngleMotor.update();
         AngleEncoder.update();
+        WheelMotor.update();
         Logger.recordOutput("Arm/CurrentPositionDegrees", getCurrentAngle().getDegrees());
+        //Logger.recordOutput(); for the wheel ask Yishay
     }
 
     @Override
@@ -67,18 +85,24 @@ public class Intake extends MotorSubsystem {
         AngleMotor.stopMotor();
     }
 
+    /////////////////////////////
+
     public boolean atTargetAngle() {
-        return atAngle(targetAngle);
+        return atAngleWheel(targetAngle);
     }
 
-    public boolean atAngle(Rotation2d angle) {
+    public boolean atAngleWheel(Rotation2d angle) {
         return Math.abs(
                 angle.minus(getCurrentAngle()).getDegrees()
-        ) < IntakeConstants.TOLERANCE.getDegrees();
+        ) < IntakeConstants.INTAKE_WHEEL_MOTOR_TOLERANCE.getDegrees();
     }
 
-    public void setTargetState(IntakeConstants.AngleMotorState targetState) {
+    public void AngleMotorSetTargetState(IntakeConstants.AngleMotorState targetState) {
         setTargetAngle(targetState.targetAngle);
+    }
+
+    public void WheelMotorSetTargetState(IntakeConstants.WheelMotorState targetState) {
+        voltageRequest.withOutput(targetState.targetVoltage);
     }
 
     public void setTargetAngle(Rotation2d targetAngle) {
@@ -94,7 +118,28 @@ public class Intake extends MotorSubsystem {
         );
     }
 
-    public void isTheTriggerWork(){
-        System.out.println("working");
-    };
+    private double getCurrentVelocityRotationsPerSecond() {
+        return WheelMotor.getSignal(TalonFXSignal.VELOCITY);
+    }
+
+    private Rotation2d getCurrentPosition() {
+        return Rotation2d.fromRotations(WheelMotor.getSignal(TalonFXSignal.POSITION));
+    }
+
+/*    void setTargetVelocityRotationsPerSecond(double targetVelocity) {
+        this.targetVelocity = targetVelocity;
+        WheelMotor.setControl(velocityRequest.withVelocity(targetVelocity));
+    }*/
+
+    /*private Pose3d getComponentPose() {
+        return calculateComponentPose(IntakeConstants.SPINDEXER_VISUALIZATION_POSE);
+    }
+
+    private Pose3d calculateComponentPose(Pose3d originPose) {
+        final Transform3d yawTransform = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, 0, getCurrentPosition().getRadians())
+        );
+        return originPose.transformBy(yawTransform);
+    }*/
 }
