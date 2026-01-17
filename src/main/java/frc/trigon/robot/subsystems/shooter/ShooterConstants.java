@@ -27,9 +27,9 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 1;
-    private static final MotorAlignmentValue SHOULD_FOLLOWER_OPPOSE_MASTER = MotorAlignmentValue.Aligned;
+    private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
 
-    private static final int MOTOR_AMOUNT = 1;
+    private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, GEAR_RATIO, MOMENT_OF_INERTIA);
@@ -92,7 +92,7 @@ public class ShooterConstants {
 
         FOLLOWER_MOTOR.applyConfiguration(config);
 
-        final Follower followRequest = new Follower(MASTER_MOTOR.getID(), SHOULD_FOLLOWER_OPPOSE_MASTER);
+        final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_MOTOR.setControl(followRequest);
     }
 }
