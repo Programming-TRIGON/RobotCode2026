@@ -21,6 +21,7 @@ public class SpindexerConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
     private static final double GEAR_RATIO = 5;
     static final boolean FOC_ENABLED = true;
+
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation SPINDEXER_SIMULATION = new SimpleMotorSimulation(
@@ -40,17 +41,17 @@ public class SpindexerConstants {
             new Rotation3d(0, 0, 0)
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 12;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 2;
     private static final String SPINDEXER_MECHANISM_NAME = "SpindexerMechanism";
     static final SpeedMechanism2d SPINDEXER_MECHANISM = new SpeedMechanism2d(
             SPINDEXER_MECHANISM_NAME,
             MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
-    static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 2;
+    static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 0.2;
 
     static {
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -81,14 +82,14 @@ public class SpindexerConstants {
     }
 
     public enum SpindexerState {
-        SPIN_CLOCKWISE(10),
-        SPIN_COUNTERCLOCKWISE(-10),
-        STOP(0);
+        FEED(1.0),
+        INDEX(0.6),
+        REST(0.0);
 
         public final double targetVelocityRotationsPerSecond;
 
-        SpindexerState(double targetVelocity) {
-            this.targetVelocityRotationsPerSecond = targetVelocity;
+        SpindexerState(double targetVelocityRotationsPerSecond) {
+            this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
         }
     }
 }
