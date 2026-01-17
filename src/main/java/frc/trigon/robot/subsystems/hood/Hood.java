@@ -49,8 +49,8 @@ public class Hood extends MotorSubsystem {
     @Override
     public void updateMechanism() {
         HoodConstants.MECHANISM.update(
-                Rotation2d.fromRotations(getCurrentAngle().getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET),
-                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET)
+                Rotation2d.fromRotations(getCurrentAngle().getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations()),
+                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations())
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
     }
@@ -71,7 +71,8 @@ public class Hood extends MotorSubsystem {
         return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION));
     }
 
-    void aimAtHub(){}//TODO implement
+    void aimAtHub() {
+    }//TODO implement
 
     void setTargetAngle(Rotation2d targetAngle) {
         motor.setControl(positionRequest.withPosition(targetAngle.getRotations()));

@@ -21,8 +21,8 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 
 public class HoodConstants {
     private static final int
-            MOTOR_ID = 15,
-            ANGLE_ENCODER_ID = 15;
+            MOTOR_ID = 16,
+            ANGLE_ENCODER_ID = 16;
     private static final String
             MOTOR_NAME = "HoodMotor",
             ANGLE_ENCODER_NAME = "HoodEncoder";
@@ -30,29 +30,26 @@ public class HoodConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
 
+    static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 40;
+    static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0);
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
-    static final double
-            DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 0 : 0,
-            DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 0 : 0,
-            DEFAULT_MAXIMUM_JERK = DEFAULT_MAXIMUM_ACCELERATION * 10;
+    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? Rotation2d.fromDegrees(0) : ANGLE_ENCODER_GRAVITY_OFFSET;
     private static final double MOTOR_CURRENT_LIMIT = 50;
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEAR_BOX = DCMotor.getKrakenX60(MOTOR_AMOUNT);
     private static final double
-            MASS_KILOGRAMS = 2,
-            LENGTH_METERS = 0.35;
+            HOOD_MASS_KILOGRAMS = 2,
+            HOOD_LENGTH_METERS = 0.35;
     private static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(360);
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(50);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
-
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
             GEAR_BOX,
             GEAR_RATIO,
-            LENGTH_METERS,
-            MASS_KILOGRAMS,
+            HOOD_LENGTH_METERS,
+            HOOD_MASS_KILOGRAMS,
             MINIMUM_ANGLE,
             MAXIMUM_ANGLE,
             SHOULD_SIMULATE_GRAVITY
@@ -60,7 +57,7 @@ public class HoodConstants {
 
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
             "HoodMechanism",
-            LENGTH_METERS,
+            HOOD_LENGTH_METERS,
             Color.kBlue
     );
 
@@ -74,9 +71,6 @@ public class HoodConstants {
             Units.Volts.of(3),
             Units.Second.of(1000)
     );
-
-    static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(5);
-    static final boolean FOC_ENABLED = true;
 
     static {
         configureMotor();
@@ -94,21 +88,20 @@ public class HoodConstants {
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-
-
+        
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.014822 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.7431 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.14264 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = DEFAULT_MAXIMUM_VELOCITY;
-        config.MotionMagic.MotionMagicAcceleration = DEFAULT_MAXIMUM_ACCELERATION;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -129,7 +122,7 @@ public class HoodConstants {
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);
         ANGLE_ENCODER.setSimulationInputsFromTalonFX(MOTOR);
