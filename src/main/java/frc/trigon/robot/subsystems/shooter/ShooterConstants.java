@@ -26,7 +26,7 @@ public class ShooterConstants {
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 1;
+    private static final double GEAR_RATIO = 6.22853402;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
 
     private static final int MOTOR_AMOUNT = 2;
@@ -43,7 +43,7 @@ public class ShooterConstants {
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 100;
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
 
-    static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 3;
+    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 3;
 
     static {
         configureMasterMotor();

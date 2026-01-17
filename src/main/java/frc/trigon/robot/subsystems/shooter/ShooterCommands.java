@@ -6,18 +6,29 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
+import java.util.Set;
+
 public class ShooterCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
                 ShooterCommands::getSetTargetVelocityCommand,
                 false,
-                "Debugging/TargetShooterVelocityRotationsPerSecond"
+                Set.of(RobotContainer.SHOOTER),
+                "Debugging/TargetShooterVelocityMeterssPerSecond"
         );
     }
 
-    public static Command getSetTargetVelocityCommand(double targetVelocityRotationsPerSecond) {
+    public static Command getAimAtHubCommand() {
         return new StartEndCommand(
-                () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityRotationsPerSecond),
+                RobotContainer.SHOOTER::aimAtHub,
+                RobotContainer.SHOOTER::stop,
+                RobotContainer.SHOOTER
+        );
+    }
+
+    public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
+        return new StartEndCommand(
+                () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityMetersPerSecond),
                 RobotContainer.SHOOTER::stop,
                 RobotContainer.SHOOTER
         );

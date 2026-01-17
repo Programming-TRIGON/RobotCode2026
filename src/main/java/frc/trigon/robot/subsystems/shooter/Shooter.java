@@ -13,7 +13,7 @@ public class Shooter extends MotorSubsystem {
     private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
-    private double targetVelocityRotationsPerSecond = 0;
+    private double targetVelocityMetersPerSecond = 0;
 
     public Shooter() {
         setName("Shooter");
@@ -23,15 +23,14 @@ public class Shooter extends MotorSubsystem {
     public void updateLog(SysIdRoutineLog log) {
         log.motor("ShooterMaster")
                 .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
-                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
+                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityMetersPerSecond()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void stop() {
         motor.stopMotor();
-        targetVelocityRotationsPerSecond = 0;
-        ShooterConstants.MECHANISM.setTargetVelocity(0);
+        targetVelocityMetersPerSecond = 0;
     }
 
     @Override
@@ -56,19 +55,25 @@ public class Shooter extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
-        ShooterConstants.MECHANISM.update(getCurrentVelocityRotationsPerSecond(), targetVelocityRotationsPerSecond);
+        ShooterConstants.MECHANISM.update(getCurrentVelocityMetersPerSecond(), targetVelocityMetersPerSecond);
     }
 
     public boolean atTargetVelocity() {
-        return Math.abs(getCurrentVelocityRotationsPerSecond() - targetVelocityRotationsPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
+        return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
-    void setTargetVelocity(double targetVelocityRotationsPerSecond) {
-        this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
-        motor.setControl(velocityRequest.withVelocity(targetVelocityRotationsPerSecond));
+    void aimAtHub() {
+        this.targetVelocityMetersPerSecond = 0;//TODO: Implement
+
+        setTargetVelocity(targetVelocityMetersPerSecond);
     }
 
-    private double getCurrentVelocityRotationsPerSecond() {
+    void setTargetVelocity(double targetVelocityMetersPerSecond) {
+        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
+        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
+    }
+
+    private double getCurrentVelocityMetersPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 }
