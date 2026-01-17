@@ -7,9 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.trigon.lib.utilities.FilesHandler;
-import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +27,6 @@ public class FieldConstants {
             HUB_RADIUS_METERS = 1.19 / 2,
             HUB_LEFTMOST_Y = HUB_Y - HUB_RADIUS_METERS,
             HUB_RIGHTMOST_Y = HUB_Y + HUB_RADIUS_METERS;
-    public static final FlippableTranslation2d HUB_POSITION = new FlippableTranslation2d(new Translation2d(HUB_X, HUB_Y), true);
     public static final double ALLIANCE_ZONE_LINE_X = HUB_X - HUB_RADIUS_METERS;
 
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;

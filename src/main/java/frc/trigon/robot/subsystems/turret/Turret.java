@@ -100,7 +100,7 @@ public class Turret extends MotorSubsystem {
 
     private boolean isRobotInHubYRange() {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return currentPosition.getY() < FieldConstants.HUB_LEFTMOST_Y || currentPosition.getY() > FieldConstants.HUB_RIGHTMOST_Y;
+        return currentPosition.getY() > FieldConstants.HUB_LEFTMOST_Y || currentPosition.getY() < FieldConstants.HUB_RIGHTMOST_Y;
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
@@ -109,13 +109,13 @@ public class Turret extends MotorSubsystem {
         if (targetAngle.getDegrees() > TurretConstants.ANGULAR_RANGE_PER_SIDE.getDegrees())
             return targetAngle.minus(TurretConstants.ANGULAR_RANGE);
         if (targetAngle.getDegrees() < -TurretConstants.ANGULAR_RANGE_PER_SIDE.getDegrees())
-            return targetAngle.minus(TurretConstants.ANGULAR_RANGE);
+            return targetAngle.plus(TurretConstants.ANGULAR_RANGE);
         return targetAngle;
     }
 
     private boolean isAngleOutOfRange(Rotation2d angle) {
         final double absoluteAngleDegrees = Math.abs(angle.getDegrees());
-        return absoluteAngleDegrees > TurretConstants.ANGULAR_RANGE_PER_SIDE.getDegrees() && absoluteAngleDegrees < 360 - TurretConstants.ANGULAR_RANGE.getDegrees();
+        return absoluteAngleDegrees > TurretConstants.ANGULAR_RANGE_PER_SIDE.getDegrees() && absoluteAngleDegrees < 360 - TurretConstants.ANGULAR_RANGE_PER_SIDE.getDegrees();
     }
 
     private Rotation2d getCurrentEncoderAngle() {

@@ -30,9 +30,6 @@ public class TurretConstants {
 
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
     static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = Rotation2d.fromRotations(RobotHardwareStats.isSimulation() ? 0 : 0);
-    static final double
-            DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 5 : 5,
-            DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 5;
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 10; //TODO: get number
     private static final int MOTOR_AMOUNT = 1;
@@ -82,8 +79,8 @@ public class TurretConstants {
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = DEFAULT_MAXIMUM_VELOCITY;
-        config.MotionMagic.MotionMagicAcceleration = DEFAULT_MAXIMUM_ACCELERATION;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 5;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 5;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         MOTOR.applyConfiguration(config);
