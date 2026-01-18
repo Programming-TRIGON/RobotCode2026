@@ -93,7 +93,7 @@ public class ShootingCalculations {
     }
 
     /**
-     * Extracts the yaw off of a 3d vector.
+     * Extracts the yaw of a 3d vector.
      *
      * @param vector the vector to extract the yaw from
      * @return the yaw of the vector
@@ -103,7 +103,7 @@ public class ShootingCalculations {
     }
 
     /**
-     * Extracts the pitch off of a 3d vector.
+     * Extracts the pitch of a 3d vector.
      *
      * @param vector the vector to extract the pitch from
      * @return the pitch of the vector
