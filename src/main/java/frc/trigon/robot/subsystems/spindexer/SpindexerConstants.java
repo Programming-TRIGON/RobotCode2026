@@ -1,6 +1,7 @@
 package frc.trigon.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -10,18 +11,19 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
-import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSMotor;
+import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
 public class SpindexerConstants {
     private static final int MOTOR_ID = 11;
     private static final String MOTOR_NAME = "SpindexerMotor";
-    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
+    static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 5;
+    private static final double GEAR_RATIO = 25;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
@@ -52,12 +54,12 @@ public class SpindexerConstants {
     static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 0.2;
 
     static {
-        final TalonFXConfiguration config = new TalonFXConfiguration();
+        final TalonFXSConfiguration config = new TalonFXSConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.ExternalFeedback.withSensorToMechanismRatio(GEAR_RATIO);
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.4 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -75,11 +77,11 @@ public class SpindexerConstants {
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SPINDEXER_SIMULATION);
 
-        MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
-        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        MOTOR.registerSignal(TalonFXSSignal.POSITION, 100);
+        MOTOR.registerSignal(TalonFXSSignal.VELOCITY, 100);
+        MOTOR.registerSignal(TalonFXSSignal.MOTOR_VOLTAGE, 100);
+        MOTOR.registerSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE, 100);
+        MOTOR.registerSignal(TalonFXSSignal.STATOR_CURRENT, 100);
     }
 
     public enum SpindexerState {

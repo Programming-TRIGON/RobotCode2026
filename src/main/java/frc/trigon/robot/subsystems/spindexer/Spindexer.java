@@ -8,11 +8,13 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSMotor;
+import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Spindexer extends MotorSubsystem {
-    private final TalonFXMotor motor = SpindexerConstants.MOTOR;
+    private final TalonFXSMotor motor = SpindexerConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private double targetVelocityRotationsPerSecond;
@@ -26,14 +28,14 @@ public class Spindexer extends MotorSubsystem {
         log.motor("SpindexerMotor")
                 .angularPosition(Units.Rotations.of(getCurrentPosition().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
-                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
+                .voltage(Units.Volts.of(motor.getSignal(TalonFXSSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
         SpindexerConstants.SPINDEXER_MECHANISM.update(
                 getCurrentVelocityRotationsPerSecond(),
-                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
+                motor.getSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE)
         );
 
         Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
@@ -84,7 +86,7 @@ public class Spindexer extends MotorSubsystem {
     }
 
     private double getCurrentVelocityRotationsPerSecond() {
-        return motor.getSignal(TalonFXSignal.VELOCITY);
+        return motor.getSignal(TalonFXSSignal.VELOCITY);
     }
 
     private Pose3d calculateComponentPose() {
@@ -96,6 +98,6 @@ public class Spindexer extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentPosition() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION));
     }
 }
