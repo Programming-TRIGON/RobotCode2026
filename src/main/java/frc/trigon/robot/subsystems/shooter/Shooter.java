@@ -77,7 +77,7 @@ public class Shooter extends MotorSubsystem {
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond + ShooterConstants.WHEEL_SLIP_COMPENSATION_VELOCITY_METERS_PER_SECOND;
-        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
+        motor.setControl(velocityRequest.withVelocity(this.targetVelocityMetersPerSecond));
     }
 
     private double getCurrentVelocityMetersPerSecond() {
