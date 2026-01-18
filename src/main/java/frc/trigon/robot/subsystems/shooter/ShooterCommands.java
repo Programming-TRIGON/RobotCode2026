@@ -14,7 +14,7 @@ public class ShooterCommands {
                 ShooterCommands::getSetTargetVelocityCommand,
                 false,
                 Set.of(RobotContainer.SHOOTER),
-                "Debugging/TargetShooterVelocityMeterssPerSecond"
+                "Debugging/TargetShooterVelocityMetersPerSecond"
         );
     }
 

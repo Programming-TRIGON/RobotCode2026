@@ -55,7 +55,10 @@ public class Shooter extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
-        ShooterConstants.MECHANISM.update(getCurrentVelocityMetersPerSecond(), targetVelocityMetersPerSecond);
+        ShooterConstants.MECHANISM.update(
+                getCurrentVelocityMetersPerSecond(),
+                targetVelocityMetersPerSecond
+        );
     }
 
     public boolean atTargetVelocity() {
