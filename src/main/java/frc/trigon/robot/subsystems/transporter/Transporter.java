@@ -61,9 +61,7 @@ public class Transporter extends MotorSubsystem {
     }
 
     public boolean atState(TransporterConstants.TransporterState targetState) {
-        final double targetVelocity = targetState.targetVelocityMetersPerSecond;
-
-        return atVelocity(targetVelocity);
+        return atVelocity(targetState.targetVelocityMetersPerSecond);
     }
 
     public boolean atTargetVelocity() {
