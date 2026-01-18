@@ -9,10 +9,8 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends MotorSubsystem {
-    private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
@@ -39,7 +37,6 @@ public class Shooter extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
-        ShooterConstants.FOLLOWER_MOTOR.update();
     }
 
     @Override
@@ -53,41 +50,33 @@ public class Shooter extends MotorSubsystem {
     }
 
     @Override
-    public void updateMechanism() {
-        final double currentVelocityMetersPerSecond = getCurrentVelocityMetersPerSecond();
-        final double targetProfiledVelocityMetersPerSecond = motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE);
-        ShooterConstants.MECHANISM.update(
-                currentVelocityMetersPerSecond,
-                targetProfiledVelocityMetersPerSecond
-        );
+    public void setBrake(boolean brake) {
+        motor.setBrake(brake);
+    }
 
-        Logger.recordOutput("Shooter/CurrentVelocityMetersPerSecond", currentVelocityMetersPerSecond);
-        Logger.recordOutput("Shooter/TargetVelocityMetersPerSecond", this.targetVelocityMetersPerSecond);
-        Logger.recordOutput("Shooter/TargetProfiledVelocityMetersPerSecond", targetProfiledVelocityMetersPerSecond);
+    @Override
+    public void updateMechanism() {
+        ShooterConstants.MECHANISM.update(
+                getCurrentVelocityMetersPerSecond(),
+                targetVelocityMetersPerSecond
+        );
     }
 
     public boolean atTargetVelocity() {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
-    public double getCurrentVelocityMetersPerSecond() {
-        return motor.getSignal(TalonFXSignal.VELOCITY);
-    }
-
     void aimAtHub() {
-        final double targetVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
-        final double targetVelocityWithSlippageCompensation = targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
-
-        setTargetVelocity(targetVelocityWithSlippageCompensation);
-    }
-
-    void aimForDelivery() {
-        final double targetDeliveryVelocity = ShooterConstants.TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND;
-        setTargetVelocity(targetDeliveryVelocity);
+        final double targetVelocityFromShootingCalculations = ShootingCalculations.getInstance().getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        setTargetVelocity(targetVelocityFromShootingCalculations);
     }
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
+    }
+
+    private double getCurrentVelocityMetersPerSecond() {
+        return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 }
