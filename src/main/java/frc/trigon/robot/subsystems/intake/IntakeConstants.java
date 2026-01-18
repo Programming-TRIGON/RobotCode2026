@@ -31,19 +31,22 @@ public class IntakeConstants {
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
     static final TalonFXMotor WHEEL_MOTOR = new TalonFXMotor(WHEEL_MOTOR_ID, WHEEL_MOTOR_NAME);
 
-    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
-    static final double WHEEL_MOTOR_GEAR_RATIO = 2.6;
     static final double ANGLE_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 0;
+
+    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(2);
+    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
+    private static final double
+            ANGLE_MOTOR_LENGTH_METERS = 0.23,
+            ANGLE_MOTOR_MASS_KILOGRAMS = 3;
 
     static final Rotation2d
             ANGLE_MOTOR_MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
             ANGLE_MOTOR_MAXIMUM_ANGLE = Rotation2d.fromDegrees(120);
-    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(2);
-    private static final double
-            ANGLE_MOTOR_LENGTH_METERS = 0.23,
-            ANGLE_MOTOR_MASS_KILOGRAMS = 3;
     private static final boolean SHOULD_ARM_SIMULATE_GRAVITY = true;
+
+    static final double WHEEL_MOTOR_GEAR_RATIO = 2.6;
     private static final double WHEEL_MOTOR_MOMENT_OF_INERTIA = 0.003;
+
     static final SingleJointedArmSimulation INTAKE_ANGLE_SIMULATION = new SingleJointedArmSimulation(
             GEARBOX,
             ANGLE_MOTOR_GEAR_RATIO,
@@ -66,10 +69,11 @@ public class IntakeConstants {
             Units.Second.of(1000)
     );
 
-    private static final double WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY = 3;
-
     static final String
-            ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotor";
+            ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotorMechanism",
+            WHEEL_MOTOR_MECHANISM_NAME = "IntakeWheelMotorMechanism";
+
+    private static final double WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY = 2;
 
     static final SingleJointedArmMechanism2d ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
             ANGLE_MOTOR_MECHANISM_NAME,
@@ -78,12 +82,9 @@ public class IntakeConstants {
     );
 
     static final SpeedMechanism2d WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
-            WHEEL_MOTOR_NAME,
+            WHEEL_MOTOR_MECHANISM_NAME,
             WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY
     );
-
-    static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
-    static final boolean FOC_ENABLED = true;
 
     static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT =
             new Pose3d(
@@ -91,11 +92,8 @@ public class IntakeConstants {
                     new Rotation3d(0, 0, 0)
             );
 
-    static final Transform3d INTAKE_ORIGIN_TO_COLLECTION_TRANSFORM =
-            new Transform3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d()
-            );
+    static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
+    static final boolean FOC_ENABLED = true;
 
     static {
         configureIntakeAngleEncoder();
@@ -113,13 +111,13 @@ public class IntakeConstants {
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 3 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.5 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.080163 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 5.4 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.10494 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.33154 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
@@ -161,16 +159,6 @@ public class IntakeConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.RotorToSensorRatio = WHEEL_MOTOR_GEAR_RATIO;
-
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 7 : 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 60;

@@ -41,6 +41,7 @@ public class RobotContainer {
         initializeGeneralSystems();
         buildAutoChooser();
         configureBindings();
+        configureSysIDBindings(INTAKE);
     }
 
     /**
@@ -53,7 +54,6 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        configureSysIDBindings(INTAKE);
     }
 
     private void bindDefaultCommands() {
@@ -64,6 +64,8 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.WHEEL_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState.COLLECT));
+        OperatorConstants.ARM_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState.INTAKE));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

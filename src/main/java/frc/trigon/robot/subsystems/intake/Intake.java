@@ -53,18 +53,10 @@ public class Intake extends MotorSubsystem {
         Logger.recordOutput("Poses/Components/IntakePose", calculateVisualizationPose());
     }
 
-    private Pose3d calculateVisualizationPose() {
-        final Transform3d intakeTransform = new Transform3d(
-                new Translation3d(0, 0,0 ),
-                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)
-        );
-        return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(intakeTransform);
-    }
-
     @Override
     public void sysIDDrive(double targetVoltage) {
         angleMotor.setControl(voltageRequest.withOutput(targetVoltage));
-        wheelMotor.setControl(voltageRequest.withOutput(targetVoltage));
+        //wheelMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     @Override
@@ -75,7 +67,6 @@ public class Intake extends MotorSubsystem {
     @Override
     public void setBrake(boolean brake) {
         angleMotor.setBrake(brake);
-        wheelMotor.setBrake(brake);
     }
 
     @Override
@@ -96,10 +87,8 @@ public class Intake extends MotorSubsystem {
         return atAngle(targetAngle);
     }
 
-    public boolean atAngle(Rotation2d angle) {
-        return Math.abs(
-                angle.minus(getCurrentAngle()).getDegrees()
-        ) < IntakeConstants.ANGLE_MOTOR_TOLERANCE.getDegrees();
+    public void setTargetVoltage(double targetVoltage) {
+        voltageRequest.withOutput(targetVoltage);
     }
 
     public void AngleMotorSetTargetState(IntakeConstants.AngleMotorState targetState) {
@@ -110,7 +99,7 @@ public class Intake extends MotorSubsystem {
         wheelMotor.setControl(voltageRequest.withOutput(targetState.targetVoltage));
     }
 
-    public void setTargetAngle(Rotation2d targetAngle) {
+    void setTargetAngle(Rotation2d targetAngle) {
         Rotation2d clampedAngle = Rotation2d.fromDegrees(
                 MathUtil.clamp(
                         targetAngle.getDegrees(),
@@ -125,11 +114,13 @@ public class Intake extends MotorSubsystem {
         );
     }
 
-    public void setTargetVoltage(double targetVoltage) {
-        voltageRequest.withOutput(targetVoltage);
+    boolean atAngle(Rotation2d angle) {
+        return Math.abs(
+                angle.minus(getCurrentAngle()).getDegrees()
+        ) < IntakeConstants.ANGLE_MOTOR_TOLERANCE.getDegrees();
     }
 
-    public Rotation2d getCurrentAngle() {
+    Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(
                 angleMotor.getSignal(TalonFXSignal.POSITION)
         );
@@ -141,5 +132,13 @@ public class Intake extends MotorSubsystem {
 
     private Rotation2d getWheelPosition() {
         return Rotation2d.fromRotations(wheelMotor.getSignal(TalonFXSignal.POSITION));
+    }
+
+    private Pose3d calculateVisualizationPose() {
+        final Transform3d intakeTransform = new Transform3d(
+                new Translation3d(0, 0,0 ),
+                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)
+        );
+        return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(intakeTransform);
     }
 }
