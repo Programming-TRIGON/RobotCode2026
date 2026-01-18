@@ -23,8 +23,7 @@ public class IntakeConstants {
     private static final int
             INTAKE_ANGLE_MOTOR_ID = 10,
             INTAKE_ANGLE_ENCODER_ID = 10,
-            INTAKE_WHEEL_MOTOR_ID = 9,
-            INTAKE_WHEEL_ENCODER_ID = 9;
+            INTAKE_WHEEL_MOTOR_ID = 9;
     private static final String
             INTAKE_ANGLE_MOTOR_NAME = "IntakeAngleMotor",
             INTAKE_ANGLE_ENCODER_NAME = "IntakeAngleEncoder",
@@ -33,17 +32,13 @@ public class IntakeConstants {
     static final TalonFXMotor ANGLE_MOTOR = new TalonFXMotor(INTAKE_ANGLE_MOTOR_ID, INTAKE_ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(INTAKE_ANGLE_ENCODER_ID, INTAKE_ANGLE_ENCODER_NAME);
     static final TalonFXMotor WHEEL_MOTOR = new TalonFXMotor(INTAKE_WHEEL_MOTOR_ID, INTAKE_WHEEL_MOTOR_NAME);
-    static final CANcoderEncoder WHEEL_ENCODER = new CANcoderEncoder(INTAKE_WHEEL_ENCODER_ID, INTAKE_WHEEL_ENCODER_NAME);
 
     static final double ANGLE_MOTOR_GEAR_RATIO = 42;
     static final double WHEEL_MOTOR_GEAR_RATIO = 5;
     static final double
             ANGLE_MOTOR_MAX_VELOCITY = RobotHardwareStats.isSimulation() ? 5 : 0,
             ANGLE_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 0,
-            ANGLE_MOTOR_MAX_JERK = ANGLE_MOTOR_MAX_ACCELERATION * 10,
-            WHEEL_MOTOR_MAX_VELOCITY = RobotHardwareStats.isSimulation() ? 5 : 0,
-            WHEEL_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5: 0,
-            WHEEL_MOTOR_MAX_JERK = WHEEL_MOTOR_MAX_ACCELERATION * 10;
+            ANGLE_MOTOR_MAX_JERK = ANGLE_MOTOR_MAX_ACCELERATION * 10;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(2);
     private static final double
@@ -77,9 +72,12 @@ public class IntakeConstants {
             Units.Second.of(1000)
     );
 
+    private static final double INTAKE_WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY = 3;
+
     static final String
             INTAKE_ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotor",
             INTAKE_WHEEL_MOTOR_MECHANISM_NAME = "IntakeWheelMotor";
+
     static final SingleJointedArmMechanism2d INTAKE_ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
             INTAKE_ANGLE_MOTOR_MECHANISM_NAME,
             ANGLE_MOTOR_LENGTH_METERS,
@@ -88,7 +86,7 @@ public class IntakeConstants {
 
     static final SpeedMechanism2d INTAKE_WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
             INTAKE_WHEEL_MOTOR_NAME,
-            WHEEL_MOTOR_MAX_VELOCITY
+            INTAKE_WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
     static final Rotation2d INTAKE_ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(0);
@@ -183,22 +181,6 @@ public class IntakeConstants {
         WHEEL_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         WHEEL_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
-
-/*
-    private static void configureIntakeWheelEncoder() {
-        final CANcoderConfiguration config = new CANcoderConfiguration();
-
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-
-        WHEEL_ENCODER.applyConfiguration(config);
-        WHEEL_ENCODER.setSimulationInputsFromTalonFX(WHEEL_MOTOR);
-
-        WHEEL_ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
-        WHEEL_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
-    }
-*/
 
     public enum AngleMotorState {
         HIGH(Rotation2d.fromDegrees(90)),

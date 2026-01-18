@@ -1,6 +1,5 @@
 package frc.trigon.robot.subsystems.intake;
 
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.math.geometry.*;
@@ -17,7 +16,6 @@ public class Intake extends MotorSubsystem {
     private final TalonFXMotor AngleMotor = IntakeConstants.ANGLE_MOTOR;
     private final TalonFXMotor WheelMotor = IntakeConstants.WHEEL_MOTOR;
     private final CANcoderEncoder AngleEncoder = IntakeConstants.ANGLE_ENCODER;
-    private final CANcoderEncoder WheelEncoder = IntakeConstants.WHEEL_ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
 
@@ -85,13 +83,11 @@ public class Intake extends MotorSubsystem {
         AngleMotor.stopMotor();
     }
 
-    /////////////////////////////
-
     public boolean atTargetAngle() {
-        return atAngleWheel(targetAngle);
+        return atAngle(targetAngle);
     }
 
-    public boolean atAngleWheel(Rotation2d angle) {
+    public boolean atAngle(Rotation2d angle) {
         return Math.abs(
                 angle.minus(getCurrentAngle()).getDegrees()
         ) < IntakeConstants.INTAKE_WHEEL_MOTOR_TOLERANCE.getDegrees();
@@ -112,6 +108,10 @@ public class Intake extends MotorSubsystem {
         );
     }
 
+    public void setTargetVoltage(double targetVoltage) {
+        voltageRequest.withOutput(targetVoltage);
+    }
+
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(
                 AngleMotor.getSignal(TalonFXSignal.POSITION)
@@ -125,21 +125,4 @@ public class Intake extends MotorSubsystem {
     private Rotation2d getCurrentPosition() {
         return Rotation2d.fromRotations(WheelMotor.getSignal(TalonFXSignal.POSITION));
     }
-
-/*    void setTargetVelocityRotationsPerSecond(double targetVelocity) {
-        this.targetVelocity = targetVelocity;
-        WheelMotor.setControl(velocityRequest.withVelocity(targetVelocity));
-    }*/
-
-    /*private Pose3d getComponentPose() {
-        return calculateComponentPose(IntakeConstants.SPINDEXER_VISUALIZATION_POSE);
-    }
-
-    private Pose3d calculateComponentPose(Pose3d originPose) {
-        final Transform3d yawTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, getCurrentPosition().getRadians())
-        );
-        return originPose.transformBy(yawTransform);
-    }*/
 }

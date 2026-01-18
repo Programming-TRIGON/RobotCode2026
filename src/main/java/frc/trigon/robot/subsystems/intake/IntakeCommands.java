@@ -20,9 +20,17 @@ public class IntakeCommands {
         );
     }
 
-    public static Command getSetTargetStateCommand(IntakeConstants.AngleMotorState targetState) {
+    public static Command getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.INTAKE.setTargetState(targetState),
+                () -> RobotContainer.INTAKE.AngleMotorSetTargetState(targetState),
+                RobotContainer.INTAKE::stop,
+                RobotContainer.INTAKE
+        );
+    }
+
+    public static Command getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState targetState) {
+        return new StartEndCommand(
+                () -> RobotContainer.INTAKE.WheelMotorSetTargetState(targetState),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
@@ -31,6 +39,14 @@ public class IntakeCommands {
     public static Command getSetTargetAngleCommand(Supplier<Rotation2d> targetAngle) {
         return new ExecuteEndCommand(
                 () -> RobotContainer.INTAKE.setTargetAngle(targetAngle.get()),
+                RobotContainer.INTAKE::stop,
+                RobotContainer.INTAKE
+        );
+    }
+
+    public static Command getSetTargetVoltageCommand(double targetVoltage){
+        return new ExecuteEndCommand(
+                () -> RobotContainer.INTAKE.setTargetVoltage(targetVoltage),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
