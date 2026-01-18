@@ -16,7 +16,7 @@ public class Transporter extends MotorSubsystem {
     private double targetVelocityMetersPerSecond;
 
     public Transporter() {
-        setName("TransporterMotor");
+        setName("Transporter");
     }
 
     @Override
@@ -36,8 +36,8 @@ public class Transporter extends MotorSubsystem {
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("Transporter")
-                .linearPosition(Units.Meters.of(getCurrentPositionMeters()))
+        log.motor("TransporterMotor")
+                .linearPosition(Units.Meters.of(motor.getSignal(TalonFXSignal.POSITION)))
                 .linearVelocity(Units.MetersPerSecond.of(getCurrentVelocityMetersPerSecond()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
@@ -60,6 +60,20 @@ public class Transporter extends MotorSubsystem {
         motor.update();
     }
 
+    public boolean atState(TransporterConstants.TransporterState targetState) {
+        final double targetVelocity = targetState.targetVelocityMetersPerSecond;
+
+        return atVelocity(targetVelocity);
+    }
+
+    public boolean atTargetVelocity() {
+        return atVelocity(targetVelocityMetersPerSecond);
+    }
+
+    public boolean atVelocity(double targetVelocityMetersPerSecond) {
+        return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
+    }
+
     void setTargetState(TransporterConstants.TransporterState targetState) {
         setTargetVelocity(targetState.targetVelocityMetersPerSecond);
     }
@@ -69,22 +83,7 @@ public class Transporter extends MotorSubsystem {
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
-    public boolean atState(TransporterConstants.TransporterState targetState) {
-        final double targetVelocity = targetState.targetVelocityMetersPerSecond;
-
-        return atTargetVelocity(targetVelocity);
-    }
-
-    public boolean atTargetVelocity(double targetVelocityMetersPerSecond) {
-        return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
-    }
-
     private double getCurrentVelocityMetersPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
-
-    private double getCurrentPositionMeters() {
-        return motor.getSignal(TalonFXSignal.POSITION);
-    }
-
 }

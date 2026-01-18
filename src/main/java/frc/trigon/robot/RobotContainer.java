@@ -38,7 +38,6 @@ public class RobotContainer {
     public static final Swerve SWERVE = new Swerve();
     public static final Shooter SHOOTER = new Shooter();
     public static final Transporter TRANSPORTER = new Transporter();
-
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -62,7 +61,7 @@ public class RobotContainer {
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
-        TRANSPORTER.setDefaultCommand(TransporterCommands.getSetTargetStateCommand(TransporterConstants.TransporterState.REST));
+        TRANSPORTER.setDefaultCommand(TransporterCommands.getSetTargetStateCommand(TransporterConstants.TransporterState.STOP));
     }
 
     private void bindControllerCommands() {

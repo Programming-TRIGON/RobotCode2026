@@ -23,7 +23,7 @@ public class TransporterConstants {
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
-    static final SimpleMotorSimulation TRANSPORTER_SIMULATION = new SimpleMotorSimulation(
+    static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
             GEAR_RATIO,
             MOMENT_OF_INERTIA
@@ -63,7 +63,7 @@ public class TransporterConstants {
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
 
         MOTOR.applyConfiguration(config);
-        MOTOR.setPhysicsSimulation(TRANSPORTER_SIMULATION);
+        MOTOR.setPhysicsSimulation(SIMULATION);
 
         MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
@@ -75,7 +75,7 @@ public class TransporterConstants {
     public enum TransporterState {
         TRANSPORT(2),
         EJECT(-2),
-        REST(0);
+        STOP(0);
 
         public final double targetVelocityMetersPerSecond;
 
