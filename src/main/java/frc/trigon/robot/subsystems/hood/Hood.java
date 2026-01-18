@@ -18,6 +18,7 @@ public class Hood extends MotorSubsystem {
     private final CANcoderEncoder angleEncoder = HoodConstants.ANGLE_ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED);
+    private Rotation2d targetAngle;
 
     public Hood() {
         setName("Hood");
@@ -67,6 +68,10 @@ public class Hood extends MotorSubsystem {
         motor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
+    public boolean atTargetAngle() {
+        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
+    }
+
     public Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION)).plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
@@ -76,10 +81,12 @@ public class Hood extends MotorSubsystem {
 
     void setAngleToRest() {
         setTargetAngle(HoodConstants.REST_ANGLE);
+        targetAngle = HoodConstants.REST_ANGLE;
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
         motor.setControl(positionRequest.withPosition(targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations()));
+        this.targetAngle = targetAngle;
     }
 
     private Pose3d calculateVisualizationPose() {
