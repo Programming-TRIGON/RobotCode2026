@@ -19,8 +19,8 @@ public class SpindexerConstants {
     private static final int MOTOR_ID = 11;
     private static final String MOTOR_NAME = "SpindexerMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
-    static final boolean FOC_ENABLED = true;
 
+    static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 5;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
@@ -83,8 +83,8 @@ public class SpindexerConstants {
     }
 
     public enum SpindexerState {
-        FEED_TURRET(1.0),
-        INDEX_BALL(0.6),
+        FEED_TO_TURRET(1.0),
+        AGITATE(0.6),
         STOP(0.0);
 
         public final double targetVelocityRotationsPerSecond;

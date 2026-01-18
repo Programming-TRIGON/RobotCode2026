@@ -15,7 +15,7 @@ public class Spindexer extends MotorSubsystem {
     private final TalonFXMotor motor = SpindexerConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
-    private double targetVelocity;
+    private double targetVelocityRotationPerSecond;
 
     public Spindexer() {
         setName("Spindexer");
@@ -62,19 +62,15 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void stop() {
         motor.stopMotor();
-        targetVelocity = 0;
+        targetVelocityRotationPerSecond = 0;
     }
 
-    public boolean atState(SpindexerConstants.SpindexerState targetState) {
-        double currentVelocity = getCurrentVelocityRotationsPerSecond();
-        final double targetVelocityRotationsPerSecond = targetState.targetVelocityRotationsPerSecond;
-
-        return Math.abs(currentVelocity - targetVelocityRotationsPerSecond)
-                <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
+    public boolean atTargetState(SpindexerConstants.SpindexerState targetState) {
+        return atTargetVelocity(getCurrentVelocityRotationsPerSecond(), targetState.targetVelocityRotationsPerSecond);
     }
 
-    public boolean atTargetVelocity() {
-        return Math.abs(getCurrentVelocityRotationsPerSecond() - targetVelocity)
+    private boolean atTargetVelocity(double currentVelocity, double targetVelocity) {
+        return Math.abs(currentVelocity - targetVelocity)
                 <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
 
@@ -83,7 +79,7 @@ public class Spindexer extends MotorSubsystem {
     }
 
     void setTargetVelocityRotationsPerSecond(double targetVelocity) {
-        this.targetVelocity = targetVelocity;
+        this.targetVelocityRotationPerSecond = targetVelocity;
         motor.setControl(velocityRequest.withVelocity(targetVelocity));
     }
 
