@@ -34,12 +34,12 @@ public class TransporterConstants {
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(2).per(Units.Seconds),
-            Units.Volts.of(6),
+            Units.Volts.of(1).per(Units.Seconds),
+            Units.Volts.of(4),
             Units.Second.of(1000)
     );
 
-    static final Pose3d TRANSPORTER_VISUALIZTION_POSE = new Pose3d(
+    static final Pose3d TRANSPORTER_VISUALIZATION_POSE = new Pose3d(
             new Translation3d(0, 0, 0),
             new Rotation3d(0, 0, 0)
     );
@@ -82,8 +82,8 @@ public class TransporterConstants {
     }
 
     public enum TransporterState {
-        TRANSPORT(6),
-        EJECT(-6),
+        TRANSPORT(2),
+        EJECT(-2),
         REST(0);
 
         public final double targetVelocityMetersPerSecond;
