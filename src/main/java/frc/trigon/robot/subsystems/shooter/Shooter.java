@@ -66,9 +66,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimAtHub() {
-        this.targetVelocityMetersPerSecond = 0;//TODO: Implement
-
-        setTargetVelocity(targetVelocityMetersPerSecond);
+        setTargetVelocity(0);//TODO: Implement
     }
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
