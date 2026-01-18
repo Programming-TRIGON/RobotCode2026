@@ -57,7 +57,7 @@ public class HoodConstants {
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
             "HoodMechanism",
             HOOD_LENGTH_METERS,
-            Color.kBlue
+            Color.kYellow
     );
 
     static final Pose3d HOOD_VISUALIZATION_ORIGIN_POINT = new Pose3d(
