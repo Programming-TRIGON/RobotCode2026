@@ -68,6 +68,8 @@ public class Hood extends MotorSubsystem {
     }
 
     public boolean atTargetAngle() {
+        if (targetAngle == null)
+            return false;
         return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
