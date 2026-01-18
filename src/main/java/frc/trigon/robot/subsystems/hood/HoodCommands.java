@@ -20,22 +20,33 @@ public class HoodCommands {
 
     public static Command getAimAtHubCommand() {
         return new StartEndCommand(
-                () -> RobotContainer.HOOD.aimAtHub(),
-                RobotContainer.HOOD::stop
+                RobotContainer.HOOD::aimAtHub,
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
+        );
+    }
+
+    public static Command getSetAngleToRestCommand() {
+        return new StartEndCommand(
+                RobotContainer.HOOD::setAngleToRest,
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
         );
     }
 
     public static Command getSetTargetAngleCommand(Rotation2d targetAngle) {
         return new StartEndCommand(
                 () -> RobotContainer.HOOD.setTargetAngle(targetAngle),
-                RobotContainer.HOOD::stop
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
         );
     }
 
     public static Command getStopMotorCommand() {
         return new StartEndCommand(
                 RobotContainer.HOOD::stop,
-                RobotContainer.HOOD::stop
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
         );
     }
 }

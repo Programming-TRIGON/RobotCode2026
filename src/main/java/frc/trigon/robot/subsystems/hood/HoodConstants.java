@@ -32,9 +32,9 @@ public class HoodConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 40;
-    static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0);
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
     static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? Rotation2d.fromDegrees(0) : ANGLE_ENCODER_GRAVITY_OFFSET;
+
     private static final double MOTOR_CURRENT_LIMIT = 50;
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEAR_BOX = DCMotor.getKrakenX60(MOTOR_AMOUNT);
@@ -71,6 +71,9 @@ public class HoodConstants {
             Units.Volts.of(3),
             Units.Second.of(1000)
     );
+    static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
+    static final Rotation2d REST_ANGLE = Rotation2d.fromDegrees(10);
+
 
     static {
         configureMotor();
@@ -78,7 +81,7 @@ public class HoodConstants {
     }
 
     private static void configureMotor() {
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        final TalonFXConfiguration config = new TalonFXConfiguration();
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
 
@@ -88,7 +91,7 @@ public class HoodConstants {
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        
+
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
