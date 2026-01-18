@@ -30,12 +30,12 @@ public class TransporterConstants {
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(0.5).per(Units.Seconds),
-            Units.Volts.of(6),
+            Units.Volts.of(1).per(Units.Seconds),
+            Units.Volts.of(4),
             null
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 3;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 8;
     private static final String TRANSPORTER_MECHANISM_NAME = "TransporterMechanism";
     static final SpeedMechanism2d TRANSPORTER_MECHANISM = new SpeedMechanism2d(
             TRANSPORTER_MECHANISM_NAME,
@@ -52,12 +52,12 @@ public class TransporterConstants {
 
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.08612 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0057719 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.35355 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014576 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
