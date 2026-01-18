@@ -85,21 +85,17 @@ public class IntakeConstants {
     static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
     static final boolean FOC_ENABLED = true;
 
-    // Where the intake visualization origin is relative to the robot (meters)
-// This should match your CAD / where the arm pivot actually is.
     static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT =
             new Pose3d(
-                    new Translation3d(0.35, 0.0, 0.25),  // TODO tune these
-                    new Rotation3d(0.0, 0.0, 0.0)        // if your origin has rotation, put it here
+                    new Translation3d(0, 0, 0),
+                    new Rotation3d(0, 0, 0)
             );
 
-    // Optional: if you want “real” collection pose like CoralIntake did:
     static final Transform3d INTAKE_ORIGIN_TO_COLLECTION_TRANSFORM =
             new Transform3d(
-                    new Translation3d(0.35, 0.0, 0.0),   // TODO: offset from pivot to where game piece enters
+                    new Translation3d(0, 0, 0),
                     new Rotation3d()
             );
-
 
     static {
         configureIntakeAngleEncoder();
@@ -132,7 +128,7 @@ public class IntakeConstants {
         config.MotionMagic.MotionMagicJerk = ANGLE_MOTOR_MAX_ACCELERATION * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 50;
+        config.CurrentLimits.StatorCurrentLimit = 60;
 
         ANGLE_MOTOR.applyConfiguration(config);
         ANGLE_MOTOR.setPhysicsSimulation(INTAKE_ANGLE_SIMULATION);
@@ -177,7 +173,7 @@ public class IntakeConstants {
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 7 : 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 50;
+        config.CurrentLimits.StatorCurrentLimit = 60;
 
         WHEEL_MOTOR.applyConfiguration(config);
         WHEEL_MOTOR.setPhysicsSimulation(WHEEL_SIMULATION);

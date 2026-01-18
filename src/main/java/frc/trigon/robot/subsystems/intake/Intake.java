@@ -84,7 +84,6 @@ public class Intake extends MotorSubsystem {
         angleEncoder.update();
         wheelMotor.update();
         Logger.recordOutput("Arm/CurrentPositionDegrees", getCurrentAngle().getDegrees());
-        //Logger.recordOutput(); for the wheel ask Yishay
     }
 
     @Override
