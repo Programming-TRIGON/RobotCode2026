@@ -25,7 +25,7 @@ public class SpindexerConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 25;
 
-    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
+    private static final DCMotor GEARBOX = DCMotor.getMinion(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation SPINDEXER_SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
