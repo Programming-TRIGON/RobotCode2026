@@ -40,7 +40,7 @@ public class ShooterConstants {
             null
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 30;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 15;
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
 
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 3;
@@ -66,8 +66,8 @@ public class ShooterConstants {
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.76102 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.012523 : 0;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 80 : 0;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
