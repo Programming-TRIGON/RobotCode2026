@@ -13,7 +13,7 @@ public class ClimberCommands {
                 RobotContainer.CLIMBER::setTargetPositionRotations,
                 false,
                 Set.of(RobotContainer.CLIMBER),
-                "Debugging/ElevatorTargetPositionRotations"
+                "Debugging/ClimberTargetPositionRotations"
         );
     }
 

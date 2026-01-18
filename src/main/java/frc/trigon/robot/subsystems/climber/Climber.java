@@ -13,7 +13,6 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.Conversions;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends MotorSubsystem {
@@ -47,7 +46,7 @@ public class Climber extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("Climber")
-                .linearPosition(Units.Meters.of(getPositionRotations()))
+                .linearPosition(Units.Meters.of(getPositionMeters()))
                 .linearVelocity(Units.MetersPerSecond.of(masterMotor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(masterMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
@@ -65,25 +64,12 @@ public class Climber extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         masterMotor.update();
-        Logger.recordOutput("Elevator/CurrentPositionMeters", getPositionMeters());
+        Logger.recordOutput("Climber/CurrentPositionMeters", getPositionMeters());
     }
 
     @Override
     public void sysIDDrive(double targetVoltage) {
         masterMotor.setControl(voltageRequest.withOutput(targetVoltage));
-    }
-
-    public boolean atExtendedState(ClimberConstants.ClimberState targetState) {
-        return targetState == this.targetState && atTargetExtendedState();
-    }
-
-    @AutoLogOutput(key = "Elevator/AtTargetState")
-    public boolean atTargetExtendedState() {
-        return calculateTargetExtendedStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
-    }
-
-    private double calculateTargetExtendedStateDistance() {
-        return Math.abs(targetState.targetExtendedPositionMeters - getPositionMeters());
     }
 
     public double metersToRotations(double positionMeters) {
@@ -97,8 +83,12 @@ public class Climber extends MotorSubsystem {
     }
 
     void setTargetRetractedState(ClimberConstants.ClimberState targetState) {
-        if (atExtendedState(targetState))
+        if (atTargetExtendedState())
             setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters));
+    }
+
+    void setTargetPositionRotations(double targetPositionRotations) {
+        masterMotor.setControl(positionRequest.withPosition(targetPositionRotations));
     }
 
     private void scalePositionRequestSpeed(double speedScalar) {
@@ -107,8 +97,12 @@ public class Climber extends MotorSubsystem {
         positionRequest.Jerk = positionRequest.Acceleration * 10;
     }
 
-    void setTargetPositionRotations(double targetPositionRotations) {
-        masterMotor.setControl(positionRequest.withPosition(targetPositionRotations));
+    private boolean atTargetExtendedState() {
+        return calculateTargetExtendedStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
+    }
+
+    private double calculateTargetExtendedStateDistance() {
+        return Math.abs(targetState.targetExtendedPositionMeters - getPositionMeters());
     }
 
     private Pose3d calculateComponentPose() {
