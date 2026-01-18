@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 
 public class Shooter extends MotorSubsystem {
@@ -66,7 +67,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimAtHub() {
-        final double targetVelocityFromShootingCalculations = 0/*ShootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond()*/;
+        final double targetVelocityFromShootingCalculations = ShootingCalculations.getInstance().getTargetShootingState().targetShootingVelocityMetersPerSecond();
         setTargetVelocity(targetVelocityFromShootingCalculations);
     }
 
