@@ -85,9 +85,8 @@ public class Hood extends MotorSubsystem {
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
-        final Rotation2d targetAngleWithPositionOffset = targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
-        motor.setControl(positionRequest.withPosition(targetAngleWithPositionOffset.getRotations()));
-        this.targetAngle = targetAngleWithPositionOffset;
+        motor.setControl(positionRequest.withPosition((targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET)).getRotations()));
+        this.targetAngle = targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
 
     private Pose3d calculateVisualizationPose() {
