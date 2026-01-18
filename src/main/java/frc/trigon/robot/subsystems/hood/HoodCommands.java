@@ -19,7 +19,7 @@ public class HoodCommands {
         );
     }
 
-    public static Command getGearRatioCalulationCommand() {
+    public static Command getGearRatioCalculationCommand() {
         return new GearRatioCalculationCommand(
                 HoodConstants.MOTOR,
                 HoodConstants.ENCODER,

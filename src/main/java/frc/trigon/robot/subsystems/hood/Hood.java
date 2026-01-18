@@ -58,7 +58,8 @@ public class Hood extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Logger.recordOutput("Hood/CurrentPositionDegrees", getCurrentAngle().getDegrees());
+        motor.update();
+        angleEncoder.update();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class Hood extends MotorSubsystem {
         return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
-    Rotation2d getCurrentAngle() {
+    private Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION)).plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
 
@@ -83,7 +84,7 @@ public class Hood extends MotorSubsystem {
 
     void setTargetAngle(Rotation2d targetAngle) {
         motor.setControl(positionRequest.withPosition(targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations()));
-        this.targetAngle = targetAngle;
+        this.targetAngle = targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
 
     private Pose3d calculateVisualizationPose() {

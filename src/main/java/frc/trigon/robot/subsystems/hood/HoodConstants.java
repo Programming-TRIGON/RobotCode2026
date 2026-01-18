@@ -26,7 +26,6 @@ public class HoodConstants {
     private static final String
             MOTOR_NAME = "HoodMotor",
             ENCODER_NAME = "HoodEncoder";
-
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
