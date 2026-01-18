@@ -2,21 +2,18 @@ package frc.trigon.robot.subsystems.transporter;
 
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Transporter extends MotorSubsystem {
     private final TalonFXMotor motor = TransporterConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TransporterConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(TransporterConstants.FOC_ENABLED);
-    private double targetVelocity;
+    private double targetVelocityMetersPerSecond;
 
     public Transporter() {
         setName("Transporter");
@@ -51,8 +48,6 @@ public class Transporter extends MotorSubsystem {
                 getCurrentVelocityMetersPerSecond(),
                 motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
-
-        Logger.recordOutput("Poses/Components/TransporterPose", getComponentPose());
     }
 
     @Override
@@ -65,36 +60,24 @@ public class Transporter extends MotorSubsystem {
         motor.update();
     }
 
-    private Pose3d getComponentPose(){
-        return calculateComponentPose(TransporterConstants.TRANSPORTER_VISUALIZTION_POSE);
+    void setTargetState(TransporterConstants.TransporterState targetState) {
+        setTargetVelocity(targetState.targetVelocityMetersPerSecond);
     }
 
-    private Pose3d calculateComponentPose(Pose3d originPose) {
-        final Transform3d transporterTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, Rotation2d.fromRotations(getCurrentPositionMeters()).getRadians(), 0)
-        );
-        return originPose.transformBy(transporterTransform);
+    void setTargetVelocity(double targetVelocityMetersPerSecond) {
+        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
+        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
     public boolean atTargetState(TransporterConstants.TransporterState targetState) {
-        double currentVelocity = getCurrentVelocityMetersPerSecond();
+        final double currentVelocity = getCurrentVelocityMetersPerSecond();
         final double targetVelocity = targetState.targetVelocityMetersPerSecond;
 
         return Math.abs(currentVelocity - targetVelocity) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
     public boolean atTargetVelocity() {
-        return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocity) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
-    }
-
-    void setTargetState(TransporterConstants.TransporterState targetState) {
-        setTargetVelocityMetersPerSecond(targetState.targetVelocityMetersPerSecond);
-    }
-
-    void setTargetVelocityMetersPerSecond(double targetVelocity) {
-        this.targetVelocity = targetVelocity;
-        motor.setControl(velocityRequest.withVelocity(targetVelocity));
+        return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
     private double getCurrentVelocityMetersPerSecond() {

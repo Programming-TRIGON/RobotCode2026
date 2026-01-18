@@ -22,9 +22,9 @@ public class TransporterConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
+    private static final double GEAR_RATIO = 3;
 
     private static final int MOTOR_AMOUNT = 1;
-    private static final double GEAR_RATIO = 3;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation TRANSPORTER_SIMULATION = new SimpleMotorSimulation(
@@ -54,7 +54,7 @@ public class TransporterConstants {
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 
     static {
-        TalonFXConfiguration config = new TalonFXConfiguration();
+        final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

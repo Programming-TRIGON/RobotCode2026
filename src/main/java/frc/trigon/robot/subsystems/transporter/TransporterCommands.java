@@ -10,7 +10,7 @@ import java.util.Set;
 public class TransporterCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                RobotContainer.TRANSPORTER::setTargetVelocityMetersPerSecond,
+                RobotContainer.TRANSPORTER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.TRANSPORTER),
                 "Debugging/TransporterTargetVelocity"
@@ -25,9 +25,9 @@ public class TransporterCommands {
         );
     }
 
-    public static Command getSetTargetVelocity(double targetVelocityMetersPerSecond) {
+    public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
         return new StartEndCommand(
-                () -> RobotContainer.TRANSPORTER.setTargetVelocityMetersPerSecond(targetVelocityMetersPerSecond),
+                () -> RobotContainer.TRANSPORTER.setTargetVelocity(targetVelocityMetersPerSecond),
                 RobotContainer.TRANSPORTER::stop,
                 RobotContainer.TRANSPORTER
         );
