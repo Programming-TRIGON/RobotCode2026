@@ -59,7 +59,7 @@ public class RobotContainer {
 
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
-        HOOD.setDefaultCommand(HoodCommands.getSetAngleToRestCommand());
+        HOOD.setDefaultCommand(HoodCommands.getRestCommand());
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
     }
 

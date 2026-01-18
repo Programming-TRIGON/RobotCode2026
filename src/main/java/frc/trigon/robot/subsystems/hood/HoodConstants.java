@@ -22,22 +22,22 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 public class HoodConstants {
     private static final int
             MOTOR_ID = 16,
-            ANGLE_ENCODER_ID = 16;
+            ENCODER_ID = 16;
     private static final String
             MOTOR_NAME = "HoodMotor",
-            ANGLE_ENCODER_NAME = "HoodEncoder";
+            ENCODER_NAME = "HoodEncoder";
 
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
-    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
+    static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 40;
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
-    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? Rotation2d.fromDegrees(0) : ANGLE_ENCODER_GRAVITY_OFFSET;
-
+    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(0);
     private static final double MOTOR_CURRENT_LIMIT = 50;
+
     private static final int MOTOR_AMOUNT = 1;
-    private static final DCMotor GEAR_BOX = DCMotor.getKrakenX60(MOTOR_AMOUNT);
+    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
     private static final double
             HOOD_MASS_KILOGRAMS = 2,
             HOOD_LENGTH_METERS = 0.35;
@@ -46,7 +46,7 @@ public class HoodConstants {
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(50);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
-            GEAR_BOX,
+            GEARBOX,
             GEAR_RATIO,
             HOOD_LENGTH_METERS,
             HOOD_MASS_KILOGRAMS,
@@ -69,19 +69,19 @@ public class HoodConstants {
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(1.5).per(Units.Seconds),
             Units.Volts.of(3),
-            Units.Second.of(1000)
+            null
     );
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
     static final Rotation2d REST_ANGLE = Rotation2d.fromDegrees(10);
 
-
     static {
         configureMotor();
-        configureAngleEncoder();
+        configureEncoder();
     }
 
     private static void configureMotor() {
         final TalonFXConfiguration config = new TalonFXConfiguration();
+
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
 
@@ -89,7 +89,7 @@ public class HoodConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
-        config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
+        config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -120,17 +120,17 @@ public class HoodConstants {
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
-    private static void configureAngleEncoder() {
+    private static void configureEncoder() {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
-        ANGLE_ENCODER.applyConfiguration(config);
-        ANGLE_ENCODER.setSimulationInputsFromTalonFX(MOTOR);
+        ENCODER.applyConfiguration(config);
+        ENCODER.setSimulationInputsFromTalonFX(MOTOR);
 
-        ANGLE_ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
-        ANGLE_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
+        ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
+        ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
     }
 }

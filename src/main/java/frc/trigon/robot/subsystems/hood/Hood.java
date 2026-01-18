@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
     private final TalonFXMotor motor = HoodConstants.MOTOR;
-    private final CANcoderEncoder angleEncoder = HoodConstants.ANGLE_ENCODER;
+    private final CANcoderEncoder angleEncoder = HoodConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private Rotation2d targetAngle;
@@ -41,7 +41,7 @@ public class Hood extends MotorSubsystem {
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("Hood")
+        log.motor("HoodMotor")
                 .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
@@ -50,7 +50,7 @@ public class Hood extends MotorSubsystem {
     @Override
     public void updateMechanism() {
         HoodConstants.MECHANISM.update(
-                Rotation2d.fromRotations(getCurrentAngle().getRotations()),
+                getCurrentAngle(),
                 Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations())
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
@@ -58,8 +58,6 @@ public class Hood extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        motor.update();
-        angleEncoder.update();
         Logger.recordOutput("Hood/CurrentPositionDegrees", getCurrentAngle().getDegrees());
     }
 
@@ -72,16 +70,15 @@ public class Hood extends MotorSubsystem {
         return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
-    public Rotation2d getCurrentAngle() {
+    Rotation2d getCurrentAngle() {
         return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION)).plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
 
     void aimAtHub() {
     }//TODO implement
 
-    void setAngleToRest() {
+    void rest() {
         setTargetAngle(HoodConstants.REST_ANGLE);
-        targetAngle = HoodConstants.REST_ANGLE;
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
@@ -90,10 +87,10 @@ public class Hood extends MotorSubsystem {
     }
 
     private Pose3d calculateVisualizationPose() {
-        final Transform3d hoodTransform = new Transform3d(
+        final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
         );
-        return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(hoodTransform);
+        return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
     }
 }
