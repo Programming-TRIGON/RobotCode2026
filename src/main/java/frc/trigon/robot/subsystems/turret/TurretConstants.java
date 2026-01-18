@@ -103,7 +103,7 @@ public class TurretConstants {
     }
 
     private static void configureEncoder() {
-        CANcoderConfiguration config = new CANcoderConfiguration();
+        final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
