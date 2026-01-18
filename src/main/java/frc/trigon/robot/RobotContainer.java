@@ -27,7 +27,7 @@ public class RobotContainer {
     public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator();
     public static final ObjectPoseEstimator OBJECT_POSE_ESTIMATOR = new ObjectPoseEstimator(
             CameraConstants.OBJECT_POSE_ESTIMATOR_DELETION_THRESHOLD_SECONDS,
-            SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE,
+            SimulatedGamePieceConstants.GamePieceType.FUEL,
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
     public static final Swerve SWERVE = new Swerve();

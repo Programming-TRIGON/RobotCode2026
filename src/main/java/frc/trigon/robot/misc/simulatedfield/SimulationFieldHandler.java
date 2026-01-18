@@ -4,24 +4,30 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.trigon.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles the simulation of game pieces.
  */
 public class SimulationFieldHandler {
-    private static final ArrayList<SimulatedGamePiece> GAME_PIECES_ON_FIELD = SimulatedGamePieceConstants.STARTING_GAME_PIECES;
-    private static Integer HELD_GAME_PIECE_INDEX = null;
+    private static final ArrayList<SimulatedGamePiece>
+            FUEL_ON_FIELD = SimulatedGamePieceConstants.STARTING_FUEL,
+            HELD_FUEL = new ArrayList<>(List.of());
+    private static double LAST_FUEL_EJECTION_TIMESTAMP = 0;
 
-    public static ArrayList<SimulatedGamePiece> getSimulatedGamePieces() {
-        return GAME_PIECES_ON_FIELD;
+    public static ArrayList<SimulatedGamePiece> getSimulatedFuel() {
+        return FUEL_ON_FIELD;
     }
 
-    public static boolean isHoldingGamePiece() {
-        return HELD_GAME_PIECE_INDEX != null;
+    public static boolean hasFuel() {
+        return !HELD_FUEL.isEmpty();
     }
 
     public static void update() {
@@ -33,72 +39,85 @@ public class SimulationFieldHandler {
      * Updates the state of all game pieces.
      */
     private static void updateGamePieces() {
-        updateGamePiecesPeriodically();
+        updateFuelPeriodically();
         updateCollection();
         updateEjection();
-        updateHeldGamePiecePoses();
+        updateHeldFuelPoses();
     }
 
     /**
      * Logs the position of all the game pieces.
      */
     private static void logGamePieces() {
-        Logger.recordOutput("Poses/GamePieces/GamePieces", mapSimulatedGamePieceListToPoseArray(GAME_PIECES_ON_FIELD));
+        final Pose3d[]
+                fuelOnFieldArray = mapSimulatedGamePieceListToPoseArray(FUEL_ON_FIELD),
+                heldFuelArray = mapSimulatedGamePieceListToPoseArray(HELD_FUEL),
+                totalFuel = new Pose3d[fuelOnFieldArray.length + heldFuelArray.length];
+
+        System.arraycopy(fuelOnFieldArray, 0, totalFuel, 0, fuelOnFieldArray.length);
+        System.arraycopy(heldFuelArray, 0, totalFuel, fuelOnFieldArray.length, heldFuelArray.length);
+
+        Logger.recordOutput("Poses/GamePieces/Fuel", totalFuel);
     }
 
-    private static void updateGamePiecesPeriodically() {
-        for (SimulatedGamePiece gamePiece : GAME_PIECES_ON_FIELD)
-            gamePiece.updatePeriodically(HELD_GAME_PIECE_INDEX != null && HELD_GAME_PIECE_INDEX == GAME_PIECES_ON_FIELD.indexOf(gamePiece));
+    private static void updateFuelPeriodically() {
+        for (SimulatedGamePiece fuel : FUEL_ON_FIELD)
+            fuel.updatePeriodically();
     }
 
     private static void updateCollection() {
         final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
-        final Pose3d robotRelativeCollectionPose = new Pose3d();
+        final Pose3d robotRelativeCollectionPose = new Pose3d();//TODO: Add in intake subsystem
         final Pose3d collectionPose = robotPose.plus(toTransform(robotRelativeCollectionPose));
 
-        updateFeederCollection(robotPose);
+        updateOutpostCollection(robotPose);
 
-        if (isCollectingGamePiece() && HELD_GAME_PIECE_INDEX == null)
-            HELD_GAME_PIECE_INDEX = getIndexOfCollectedGamePiece(collectionPose, GAME_PIECES_ON_FIELD, SimulatedGamePieceConstants.INTAKE_TOLERANCE_METERS);
+        if (isCollectingFuel() && HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL) {
+            final ArrayList<SimulatedGamePiece> collectedFuel = getCollectedFuel(collectionPose);
+            for (SimulatedGamePiece fuel : collectedFuel) {
+                if (HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL)
+                    return;
+                HELD_FUEL.add(fuel);
+                FUEL_ON_FIELD.remove(fuel);
+            }
+        }
     }
 
-    private static void updateFeederCollection(Pose3d robotPose) {
-        final double distanceFromFeeder = robotPose.toPose2d().getTranslation().getDistance(SimulatedGamePieceConstants.FEEDER_POSITION.get());
+    private static void updateOutpostCollection(Pose3d robotPose) {
+        final double distanceFromFeeder = robotPose.toPose2d().getTranslation().getDistance(SimulatedGamePieceConstants.OUTPOST_POSITION.get());
 
-        if (isCollectingGamePieceFromFeeder() && HELD_GAME_PIECE_INDEX == null &&
-                distanceFromFeeder < SimulatedGamePieceConstants.FEEDER_INTAKE_TOLERANCE_METERS) {
-            GAME_PIECES_ON_FIELD.add(new SimulatedGamePiece(new Pose3d(), SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE));
-            HELD_GAME_PIECE_INDEX = GAME_PIECES_ON_FIELD.size() - 1;
+        if (isCollectingFuelFromOutpost() && HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL &&
+                distanceFromFeeder < SimulatedGamePieceConstants.OUTPOST_INTAKE_TOLERANCE_METERS) {
+            HELD_FUEL.add(new SimulatedGamePiece(0, 0));
         }
     }
 
     /**
-     * Gets the index of the game piece that is being collected.
+     * Gets the fuel object that is being collected.
      *
      * @param collectionPose the pose of the collection mechanism
-     * @param gamePieceList  the list of game pieces
-     * @return the index of the game piece that is being collected
+     * @return the fuel object that is being collected
      */
-    private static Integer getIndexOfCollectedGamePiece(Pose3d collectionPose, ArrayList<SimulatedGamePiece> gamePieceList, double intakeTolerance) {
-        for (SimulatedGamePiece gamePiece : gamePieceList)
-            if (gamePiece.getDistanceFromPoseMeters(collectionPose) <= intakeTolerance)
-                return gamePieceList.indexOf(gamePiece);
-        return null;
+    private static ArrayList<SimulatedGamePiece> getCollectedFuel(Pose3d collectionPose) {
+        final ArrayList<SimulatedGamePiece> collectedFuel = new ArrayList<>(List.of());
+        for (SimulatedGamePiece gamePiece : FUEL_ON_FIELD)
+            if (gamePiece.getDistanceFromPoseMeters(collectionPose) <= SimulatedGamePieceConstants.INTAKE_TOLERANCE_METERS)
+                collectedFuel.add(gamePiece);
+        return collectedFuel;
     }
 
-    private static boolean isCollectingGamePiece() {
+    private static boolean isCollectingFuel() {
         return false;//TODO: Implement
     }
 
-    private static boolean isCollectingGamePieceFromFeeder() {
+    private static boolean isCollectingFuelFromOutpost() {
         return false;//TODO: Implement
     }
 
     private static void updateEjection() {
-        if (HELD_GAME_PIECE_INDEX != null && isEjectingGamePiece()) {
-            final SimulatedGamePiece heldGamePiece = GAME_PIECES_ON_FIELD.get(HELD_GAME_PIECE_INDEX);
-            ejectGamePiece(heldGamePiece);
-            HELD_GAME_PIECE_INDEX = null;
+        if (hasFuel() && isEjectingFuel() && LAST_FUEL_EJECTION_TIMESTAMP + SimulatedGamePieceConstants.FUEL_EJECTION_DELAY_SECONDS < Timer.getFPGATimestamp()) {
+            final SimulatedGamePiece heldFuel = HELD_FUEL.get(0);
+            ejectGamePiece(heldFuel);
         }
     }
 
@@ -107,37 +126,37 @@ public class SimulationFieldHandler {
         final Translation3d robotRelativeReleaseVelocity = new Translation3d();//TODO:This should be extracted to a method in a different branch...
 
         ejectedGamePiece.release(robotSelfRelativeVelocity.plus(robotRelativeReleaseVelocity).rotateBy(new Rotation3d(RobotContainer.SWERVE.getHeading())));
+        LAST_FUEL_EJECTION_TIMESTAMP = Timer.getFPGATimestamp();
+
+        HELD_FUEL.remove(ejectedGamePiece);
+        CommandScheduler.getInstance().schedule(new WaitUntilCommand(() -> ejectedGamePiece.getPose().getZ() <= 0).andThen(() -> FUEL_ON_FIELD.remove(ejectedGamePiece)));
     }
 
-    private static boolean isEjectingGamePiece() {
+    private static boolean isEjectingFuel() {
         return false;//TODO: Implement
     }
 
-    /**
-     * Updates the position of the held game pieces so that they stay inside the robot.
-     */
-    private static void updateHeldGamePiecePoses() {
-        final Pose3d robotRelativeHeldGamePiecePosition = new Pose3d();
-        updateHeldGamePiecePose(robotRelativeHeldGamePiecePosition, GAME_PIECES_ON_FIELD, HELD_GAME_PIECE_INDEX);
+    private static void updateHeldFuelPoses() {
+        for (int i = 0; i < HELD_FUEL.size(); i++) {
+            updateHeldFuelPose(i);
+        }
     }
 
-    private static void updateHeldGamePiecePose(Pose3d robotRelativeHeldGamePiecePose, ArrayList<SimulatedGamePiece> gamePieceList, Integer heldGamePieceIndex) {
-        if (heldGamePieceIndex == null)
-            return;
-
-        final SimulatedGamePiece heldGamePiece = gamePieceList.get(heldGamePieceIndex);
-        heldGamePiece.updatePose(calculateHeldGamePieceFieldRelativePose(robotRelativeHeldGamePiecePose));
+    private static void updateHeldFuelPose(int heldFuelIndex) {
+        final SimulatedGamePiece heldFuel = HELD_FUEL.get(heldFuelIndex);
+        heldFuel.updatePose(calculateHeldFuelFieldRelativePose(heldFuelIndex));
     }
 
     /**
-     * Calculate the position of the held game piece relative to the field.
+     * Calculate the position of the held fuel relative to the field.
      *
-     * @param robotRelativeHeldGamePiecePosition the position of the held game piece relative to the robot
-     * @return the position of the held game piece relative to the field
+     * @param heldFuelIndex the index of the fuel to calculate the position for. Used to find the spot in the magazine to use
+     * @return the position of the held fuel relative to the field
      */
-    private static Pose3d calculateHeldGamePieceFieldRelativePose(Pose3d robotRelativeHeldGamePiecePosition) {
+    private static Pose3d calculateHeldFuelFieldRelativePose(int heldFuelIndex) {
         final Pose3d robotPose3d = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
-        return robotPose3d.plus(toTransform(robotRelativeHeldGamePiecePosition));
+        final Pose3d robotRelativeStoragePose = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_POSITIONS[heldFuelIndex];
+        return robotPose3d.plus(toTransform(robotRelativeStoragePose));
     }
 
     /**

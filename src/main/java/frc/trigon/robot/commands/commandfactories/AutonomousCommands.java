@@ -8,7 +8,6 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandclasses.GamePieceAutoDriveCommand;
 import frc.trigon.robot.constants.AutonomousConstants;
-import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.json.simple.parser.ParseException;
 
@@ -50,7 +49,7 @@ public class AutonomousCommands {
 
     private static Command getDriveToGamePieceCommand(FlippablePose2d[] intakeLocations) {
         return new ConditionalCommand(
-                new GamePieceAutoDriveCommand(SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE).onlyWhile(() -> RobotContainer.OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot() != null),
+                new GamePieceAutoDriveCommand().onlyWhile(() -> RobotContainer.OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot() != null),
                 getFindGamePieceCommand(intakeLocations),
                 AutonomousCommands::shouldCollectGamePiece
         );

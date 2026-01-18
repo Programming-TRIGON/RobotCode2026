@@ -15,15 +15,13 @@ public class SimulatedGamePiece {
     private double timestampAtRelease = 0;
     private boolean isTouchingGround = true;
 
-    public SimulatedGamePiece(Pose3d startingPose, SimulatedGamePieceConstants.GamePieceType gamePieceType) {
-        fieldRelativePose = startingPose;
-        this.gamePieceType = gamePieceType;
+    public SimulatedGamePiece(double startingPoseXMeters, double startingPoseYMeters) {
+        this.gamePieceType = SimulatedGamePieceConstants.GamePieceType.FUEL;
+        fieldRelativePose = new Pose3d(startingPoseXMeters, startingPoseYMeters, this.gamePieceType.originPointHeightOffGroundMeters, new Rotation3d());
     }
 
-    public void updatePeriodically(boolean isHeld) {
-        if (!isHeld)
-            checkScored();
-        if (!isScored && !isTouchingGround)
+    public void updatePeriodically() {
+        if (!isTouchingGround)
             applyGravity();
     }
 
@@ -72,11 +70,6 @@ public class SimulatedGamePiece {
                 velocityAtRelease.getZ() * elapsedTime - ((SimulatedGamePieceConstants.G_FORCE / 2) * elapsedTime * elapsedTime),
                 poseAtRelease.getRotation()
         );
-    }
-
-    private void checkScored() {
-        if (!isScored)
-            SimulationScoringHandler.checkGamePieceScored(this);
     }
 
     private void updateIsTouchingGround() {

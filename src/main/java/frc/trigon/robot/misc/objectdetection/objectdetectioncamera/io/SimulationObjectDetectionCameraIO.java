@@ -51,7 +51,7 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
     private ArrayList<Pair<SimulatedGamePiece, Rotation3d>>[] calculateAllVisibleGamePieces(Pose3d cameraPose) {
         final ArrayList<Pair<SimulatedGamePiece, Rotation3d>>[] visibleGamePieces = new ArrayList[ObjectDetectionConstants.NUMBER_OF_GAME_PIECE_TYPES];
         for (int i = 0; i < visibleGamePieces.length; i++)
-            visibleGamePieces[i] = calculateVisibleGamePiecesRotations(cameraPose, i);
+            visibleGamePieces[i] = calculateVisibleGamePiecesRotations(cameraPose);
         return visibleGamePieces;
     }
 
@@ -76,11 +76,10 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
      * Calculates the placements of all visible objects by checking if they are within range and within the horizontal FOV.
      *
      * @param cameraPose the position of the robot on the field
-     * @param objectID   the ID of the object to check for visibility
      * @return the placements of the visible objects, as a pair of the object and the rotation of the object relative to the camera
      */
-    private ArrayList<Pair<SimulatedGamePiece, Rotation3d>> calculateVisibleGamePiecesRotations(Pose3d cameraPose, int objectID) {
-        final ArrayList<SimulatedGamePiece> gamePiecesOnField = SimulationFieldHandler.getSimulatedGamePieces();
+    private ArrayList<Pair<SimulatedGamePiece, Rotation3d>> calculateVisibleGamePiecesRotations(Pose3d cameraPose) {
+        final ArrayList<SimulatedGamePiece> gamePiecesOnField = SimulationFieldHandler.getSimulatedFuel();
         final ArrayList<Pair<SimulatedGamePiece, Rotation3d>> visibleObjects = new ArrayList<>();
         for (SimulatedGamePiece currentObject : gamePiecesOnField) {
             if (currentObject.isScored())
