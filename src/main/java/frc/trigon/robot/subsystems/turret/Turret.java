@@ -97,18 +97,19 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
+        final Rotation2d currentRobotRotationalSpeed = new Rotation2d(RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
+        final Rotation2d rotationalSpeedToAngle = currentRobotRotationalSpeed.times(TurretConstants.ROBOT_SPEED_CONSTANT);
         if (isAngleOutOfRange(targetAngle))
-            return targetAngle.getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
-        if (targetAngle.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
+            return targetAngle.plus(rotationalSpeedToAngle).getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
+        if (targetAngle.plus(rotationalSpeedToAngle).getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
             return targetAngle.minus(TurretConstants.TOTAL_ANGULAR_RANGE);
-        if (targetAngle.getDegrees() < -TurretConstants.MINIMUM_ANGLE.getDegrees())
+        if (targetAngle.plus(rotationalSpeedToAngle).getDegrees() < -TurretConstants.MINIMUM_ANGLE.getDegrees())
             return targetAngle.plus(TurretConstants.TOTAL_ANGULAR_RANGE);
         return targetAngle;
     }
 
     private boolean isAngleOutOfRange(Rotation2d angle) {
-        final double absoluteAngleDegrees = Math.abs(angle.getDegrees());
-        return absoluteAngleDegrees > TurretConstants.MAXIMUM_ANGLE.getDegrees() && absoluteAngleDegrees < 360 - TurretConstants.MINIMUM_ANGLE.getDegrees();
+        return angle.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees() && angle.getDegrees() < TurretConstants.MINIMUM_ANGLE.getDegrees();
     }
 
     private Pose3d calculateVisualizationPose() {
