@@ -35,12 +35,12 @@ public class ShooterConstants {
     static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, GEAR_RATIO, MOMENT_OF_INERTIA);
 
     static final SysIdRoutine.Config SYS_ID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(0.25).per(Units.Second),
+            Units.Volts.of(1).per(Units.Second),
             Units.Volts.of(7),
             null
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 100;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 30;
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
 
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 3;
@@ -59,12 +59,12 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.019553 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.019114 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.76102 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.012523 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 0 : 0;

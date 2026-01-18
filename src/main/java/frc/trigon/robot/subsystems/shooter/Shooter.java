@@ -21,7 +21,7 @@ public class Shooter extends MotorSubsystem {
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
-        log.motor("ShooterMaster")
+        log.motor("ShooterMasterMotor")
                 .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
                 .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityMetersPerSecond()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
