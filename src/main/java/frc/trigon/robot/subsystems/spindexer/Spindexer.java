@@ -15,7 +15,7 @@ public class Spindexer extends MotorSubsystem {
     private final TalonFXMotor motor = SpindexerConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
-    private double targetVelocityRotationPerSecond;
+    private double targetVelocityRotationsPerSecond;
 
     public Spindexer() {
         setName("Spindexer");
@@ -62,7 +62,7 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void stop() {
         motor.stopMotor();
-        targetVelocityRotationPerSecond = 0;
+        targetVelocityRotationsPerSecond = 0;
     }
 
     public boolean atTargetState(SpindexerConstants.SpindexerState targetState) {
@@ -79,7 +79,7 @@ public class Spindexer extends MotorSubsystem {
     }
 
     void setTargetVelocityRotationsPerSecond(double targetVelocity) {
-        this.targetVelocityRotationPerSecond = targetVelocity;
+        this.targetVelocityRotationsPerSecond = targetVelocity;
         motor.setControl(velocityRequest.withVelocity(targetVelocity));
     }
 
