@@ -16,7 +16,7 @@ public class Transporter extends MotorSubsystem {
     private double targetVelocityMetersPerSecond;
 
     public Transporter() {
-        setName("Transporter");
+        setName("TransporterMotor");
     }
 
     @Override
@@ -69,14 +69,13 @@ public class Transporter extends MotorSubsystem {
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
-    public boolean atTargetState(TransporterConstants.TransporterState targetState) {
-        final double currentVelocity = getCurrentVelocityMetersPerSecond();
+    public boolean atState(TransporterConstants.TransporterState targetState) {
         final double targetVelocity = targetState.targetVelocityMetersPerSecond;
 
-        return Math.abs(currentVelocity - targetVelocity) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
+        return atTargetVelocity(targetVelocity);
     }
 
-    public boolean atTargetVelocity() {
+    public boolean atTargetVelocity(double targetVelocityMetersPerSecond) {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) <= TransporterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 

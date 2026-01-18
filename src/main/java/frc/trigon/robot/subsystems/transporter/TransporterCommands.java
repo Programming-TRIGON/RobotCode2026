@@ -13,7 +13,7 @@ public class TransporterCommands {
                 RobotContainer.TRANSPORTER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.TRANSPORTER),
-                "Debugging/TransporterTargetVelocity"
+                "Debugging/TransporterTargetVelocityMetersPerSecond"
         );
     }
 

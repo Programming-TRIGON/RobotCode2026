@@ -3,12 +3,8 @@ package frc.trigon.robot.subsystems.transporter;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
@@ -25,7 +21,7 @@ public class TransporterConstants {
     private static final double GEAR_RATIO = 3;
 
     private static final int MOTOR_AMOUNT = 1;
-    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
+    private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation TRANSPORTER_SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
@@ -34,14 +30,9 @@ public class TransporterConstants {
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(1).per(Units.Seconds),
-            Units.Volts.of(4),
-            Units.Second.of(1000)
-    );
-
-    static final Pose3d TRANSPORTER_VISUALIZATION_POSE = new Pose3d(
-            new Translation3d(0, 0, 0),
-            new Rotation3d(0, 0, 0)
+            Units.Volts.of(0.5).per(Units.Seconds),
+            Units.Volts.of(6),
+            null
     );
 
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 3;

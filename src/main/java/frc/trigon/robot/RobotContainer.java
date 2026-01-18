@@ -63,7 +63,6 @@ public class RobotContainer {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         TRANSPORTER.setDefaultCommand(TransporterCommands.getSetTargetStateCommand(TransporterConstants.TransporterState.REST));
-
     }
 
     private void bindControllerCommands() {
