@@ -26,6 +26,14 @@ public class ShooterCommands {
         );
     }
 
+    public static Command getDeliveryCommand() {
+        return new ExecuteEndCommand(
+                RobotContainer.SHOOTER::delivery,
+                RobotContainer.SHOOTER::stop,
+                RobotContainer.SHOOTER
+        );
+    }
+
     public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
         return new StartEndCommand(
                 () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityMetersPerSecond),
