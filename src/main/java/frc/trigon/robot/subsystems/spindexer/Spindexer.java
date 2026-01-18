@@ -36,7 +36,7 @@ public class Spindexer extends MotorSubsystem {
                 motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
 
-        Logger.recordOutput("Poses/Components/SpindexerPose", getComponentPose());
+        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
     }
 
     @Override
@@ -62,6 +62,7 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void stop() {
         motor.stopMotor();
+        targetVelocity = 0;
     }
 
     public boolean atState(SpindexerConstants.SpindexerState targetState) {
@@ -90,16 +91,12 @@ public class Spindexer extends MotorSubsystem {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 
-    private Pose3d getComponentPose() {
-        return calculateComponentPose(SpindexerConstants.SPINDEXER_VISUALIZATION_POSE);
-    }
-
-    private Pose3d calculateComponentPose(Pose3d originPose) {
+    private Pose3d calculateComponentPose() {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, 0, getCurrentPosition().getRadians())
         );
-        return originPose.transformBy(yawTransform);
+        return SpindexerConstants.SPINDEXER_VISUALIZATION_POSE.transformBy(yawTransform);
     }
 
     private Rotation2d getCurrentPosition() {

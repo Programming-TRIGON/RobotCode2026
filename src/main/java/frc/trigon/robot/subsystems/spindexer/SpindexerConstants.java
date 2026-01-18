@@ -19,8 +19,9 @@ public class SpindexerConstants {
     private static final int MOTOR_ID = 11;
     private static final String MOTOR_NAME = "SpindexerMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
-    private static final double GEAR_RATIO = 5;
     static final boolean FOC_ENABLED = true;
+
+    private static final double GEAR_RATIO = 5;
 
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(1);
     private static final double MOMENT_OF_INERTIA = 0.003;
@@ -33,7 +34,7 @@ public class SpindexerConstants {
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(2).per(Units.Seconds),
             Units.Volts.of(8),
-            Units.Second.of(1000)
+            null
     );
 
     static final Pose3d SPINDEXER_VISUALIZATION_POSE = new Pose3d(
@@ -56,7 +57,7 @@ public class SpindexerConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.4 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -82,9 +83,9 @@ public class SpindexerConstants {
     }
 
     public enum SpindexerState {
-        FEED(1.0),
-        INDEX(0.6),
-        REST(0.0);
+        FEED_TURRET(1.0),
+        INDEX_BALL(0.6),
+        STOP(0.0);
 
         public final double targetVelocityRotationsPerSecond;
 

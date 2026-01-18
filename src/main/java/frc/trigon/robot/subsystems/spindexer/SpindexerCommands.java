@@ -13,7 +13,7 @@ public class SpindexerCommands {
                 RobotContainer.SPINDEXER::setTargetVelocityRotationsPerSecond,
                 false,
                 Set.of(RobotContainer.SPINDEXER),
-                "Debugging/SpindexerTargetVelocity"
+                "Debugging/SpindexerTargetVelocityRotationsPerSecond"
         );
     }
 
