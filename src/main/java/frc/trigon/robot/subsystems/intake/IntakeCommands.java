@@ -11,15 +11,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class IntakeCommands {
-    public static Command getDebuggingCommand() {
-        return new NetworkTablesCommand(
-                (targetAngleDegrees) -> RobotContainer.INTAKE.setTargetAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
-                false,
-                Set.of(RobotContainer.INTAKE),
-                "Debugging/TargetArmAngleDegrees"
-        );
-    }
-
     public static Command getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState targetState) {
         return new StartEndCommand(
                 () -> RobotContainer.INTAKE.AngleMotorSetTargetState(targetState),

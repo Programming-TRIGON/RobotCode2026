@@ -36,9 +36,6 @@ public class OperatorConstants {
             );
 
     public static final Trigger
-            TARGET_INTAKE_ANGLE_TRIGGER = OPERATOR_CONTROLLER.n(),
-            TARGET_INTAKE_WHEEL_TRIGGER = OPERATOR_CONTROLLER.b(),
-            DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.m(),
             RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),

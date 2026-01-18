@@ -3,7 +3,7 @@ package frc.trigon.robot.subsystems.intake;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.*;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -18,36 +18,30 @@ import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
 import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
-
 public class IntakeConstants {
     private static final int
-            INTAKE_ANGLE_MOTOR_ID = 10,
-            INTAKE_ANGLE_ENCODER_ID = 10,
-            INTAKE_WHEEL_MOTOR_ID = 9;
+            ANGLE_MOTOR_ID = 10,
+            ANGLE_ENCODER_ID = 10,
+            WHEEL_MOTOR_ID = 9;
     private static final String
-            INTAKE_ANGLE_MOTOR_NAME = "IntakeAngleMotor",
-            INTAKE_ANGLE_ENCODER_NAME = "IntakeAngleEncoder",
-            INTAKE_WHEEL_MOTOR_NAME = "IntakeWheelMotor",
-            INTAKE_WHEEL_ENCODER_NAME = "IntakeWheelEncoder";
-    static final TalonFXMotor ANGLE_MOTOR = new TalonFXMotor(INTAKE_ANGLE_MOTOR_ID, INTAKE_ANGLE_MOTOR_NAME);
-    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(INTAKE_ANGLE_ENCODER_ID, INTAKE_ANGLE_ENCODER_NAME);
-    static final TalonFXMotor WHEEL_MOTOR = new TalonFXMotor(INTAKE_WHEEL_MOTOR_ID, INTAKE_WHEEL_MOTOR_NAME);
+            ANGLE_MOTOR_NAME = "IntakeAngleMotor",
+            ANGLE_ENCODER_NAME = "IntakeAngleEncoder",
+            WHEEL_MOTOR_NAME = "IntakeWheelMotor";
+    static final TalonFXMotor ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
+    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
+    static final TalonFXMotor WHEEL_MOTOR = new TalonFXMotor(WHEEL_MOTOR_ID, WHEEL_MOTOR_NAME);
 
-    static final double ANGLE_MOTOR_GEAR_RATIO = 42;
-    static final double WHEEL_MOTOR_GEAR_RATIO = 5;
-    static final double
-            ANGLE_MOTOR_MAX_VELOCITY = RobotHardwareStats.isSimulation() ? 5 : 0,
-            ANGLE_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 0,
-            ANGLE_MOTOR_MAX_JERK = ANGLE_MOTOR_MAX_ACCELERATION * 10;
+    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
+    static final double WHEEL_MOTOR_GEAR_RATIO = 2.6;
+    static final double ANGLE_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 0;
 
+    static final Rotation2d
+            ANGLE_MOTOR_MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
+            ANGLE_MOTOR_MAXIMUM_ANGLE = Rotation2d.fromDegrees(120);
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(2);
     private static final double
-            ANGLE_MOTOR_LENGTH_METERS = 0.5,
-            ANGLE_MOTOR_MASS_KILOGRAMS = 5;
-
-    private static final Rotation2d
-            ANGLE_MOTOR_MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
-            ANGLE_MOTOR_MAXIMUM_ANGLE = Rotation2d.fromDegrees(90);
+            ANGLE_MOTOR_LENGTH_METERS = 0.23,
+            ANGLE_MOTOR_MASS_KILOGRAMS = 3;
     private static final boolean SHOULD_ARM_SIMULATE_GRAVITY = true;
     private static final double WHEEL_MOTOR_MOMENT_OF_INERTIA = 0.003;
     static final SingleJointedArmSimulation INTAKE_ANGLE_SIMULATION = new SingleJointedArmSimulation(
@@ -60,7 +54,7 @@ public class IntakeConstants {
             SHOULD_ARM_SIMULATE_GRAVITY
     );
 
-    static final SimpleMotorSimulation INTAKE_WHEEL_SIMULATION = new SimpleMotorSimulation(
+    static final SimpleMotorSimulation WHEEL_SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
             WHEEL_MOTOR_GEAR_RATIO,
             WHEEL_MOTOR_MOMENT_OF_INERTIA
@@ -72,32 +66,45 @@ public class IntakeConstants {
             Units.Second.of(1000)
     );
 
-    private static final double INTAKE_WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY = 3;
+    private static final double WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY = 3;
 
     static final String
-            INTAKE_ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotor",
-            INTAKE_WHEEL_MOTOR_MECHANISM_NAME = "IntakeWheelMotor";
+            ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotor";
 
-    static final SingleJointedArmMechanism2d INTAKE_ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
-            INTAKE_ANGLE_MOTOR_MECHANISM_NAME,
+    static final SingleJointedArmMechanism2d ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
+            ANGLE_MOTOR_MECHANISM_NAME,
             ANGLE_MOTOR_LENGTH_METERS,
             Color.kLightSeaGreen
     );
 
-    static final SpeedMechanism2d INTAKE_WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
-            INTAKE_WHEEL_MOTOR_NAME,
-            INTAKE_WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY
+    static final SpeedMechanism2d WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
+            WHEEL_MOTOR_NAME,
+            WHEEL_MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
-    static final Rotation2d INTAKE_ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(0);
-    static final Rotation2d INTAKE_WHEEL_MOTOR_TOLERANCE = Rotation2d.fromDegrees(0);
+    static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
     static final boolean FOC_ENABLED = true;
+
+    // Where the intake visualization origin is relative to the robot (meters)
+// This should match your CAD / where the arm pivot actually is.
+    static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT =
+            new Pose3d(
+                    new Translation3d(0.35, 0.0, 0.25),  // TODO tune these
+                    new Rotation3d(0.0, 0.0, 0.0)        // if your origin has rotation, put it here
+            );
+
+    // Optional: if you want “real” collection pose like CoralIntake did:
+    static final Transform3d INTAKE_ORIGIN_TO_COLLECTION_TRANSFORM =
+            new Transform3d(
+                    new Translation3d(0.35, 0.0, 0.0),   // TODO: offset from pivot to where game piece enters
+                    new Rotation3d()
+            );
+
 
     static {
         configureIntakeAngleEncoder();
         configureIntakeAngleMotor();
         configureIntakeWheel();
-        //configureIntakeWheelEncoder();
     }
 
     private static void configureIntakeAngleMotor() {
@@ -120,9 +127,9 @@ public class IntakeConstants {
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
-        config.MotionMagic.MotionMagicCruiseVelocity = ANGLE_MOTOR_MAX_VELOCITY;
-        config.MotionMagic.MotionMagicAcceleration = ANGLE_MOTOR_MAX_ACCELERATION;
-        config.MotionMagic.MotionMagicJerk = ANGLE_MOTOR_MAX_JERK;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.MotionMagic.MotionMagicJerk = ANGLE_MOTOR_MAX_ACCELERATION * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 50;
@@ -173,7 +180,7 @@ public class IntakeConstants {
         config.CurrentLimits.StatorCurrentLimit = 50;
 
         WHEEL_MOTOR.applyConfiguration(config);
-        WHEEL_MOTOR.setPhysicsSimulation(INTAKE_WHEEL_SIMULATION);
+        WHEEL_MOTOR.setPhysicsSimulation(WHEEL_SIMULATION);
 
         WHEEL_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         WHEEL_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
@@ -183,9 +190,8 @@ public class IntakeConstants {
     }
 
     public enum AngleMotorState {
-        HIGH(Rotation2d.fromDegrees(90)),
-        LOW(Rotation2d.fromDegrees(45)),
-        REST(Rotation2d.fromDegrees(0));
+        REST(Rotation2d.fromDegrees(0)),
+        INTAKE(Rotation2d.fromDegrees(90));
 
         public final Rotation2d targetAngle;
 
