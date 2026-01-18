@@ -5,7 +5,10 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -29,9 +32,9 @@ public class TurretConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
-    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = Rotation2d.fromRotations(RobotHardwareStats.isSimulation() ? 0 : 0);
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 10; //TODO: get number
+    private static final double GEAR_RATIO = 10;//TODO: get number
+
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
@@ -46,6 +49,10 @@ public class TurretConstants {
             "TurretMechanism",
             Color.kRed
     );
+    static final Pose3d TURRET_VISUALIZATION_ORIGIN_POINT = new Pose3d(
+            new Translation3d(),
+            new Rotation3d()
+    ); //TODO: set correct pose
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(0.5).per(Units.Seconds),
