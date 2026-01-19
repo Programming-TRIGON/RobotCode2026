@@ -25,6 +25,9 @@ import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
 import frc.trigon.robot.subsystems.shooter.Shooter;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
+import frc.trigon.robot.subsystems.spindexer.Spindexer;
+import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.turret.Turret;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
@@ -40,6 +43,7 @@ public class RobotContainer {
     public static final Swerve SWERVE = new Swerve();
     public static final Loader LOADER = new Loader();
     public static final Shooter SHOOTER = new Shooter();
+    public static final Spindexer SPINDEXER = new Spindexer();
     public static final Turret TURRET = new Turret();
     private LoggedDashboardChooser<Command> autoChooser;
 
@@ -65,6 +69,7 @@ public class RobotContainer {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
+        SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
         TURRET.setDefaultCommand(TurretCommands.getStopCommand());
     }
 
