@@ -23,6 +23,16 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.intake.Intake;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import frc.trigon.robot.subsystems.hood.Hood;
+import frc.trigon.robot.subsystems.hood.HoodCommands;
+import frc.trigon.robot.subsystems.loader.Loader;
+import frc.trigon.robot.subsystems.loader.LoaderCommands;
+import frc.trigon.robot.subsystems.loader.LoaderConstants;
+import frc.trigon.robot.subsystems.shooter.Shooter;
+import frc.trigon.robot.subsystems.shooter.ShooterCommands;
+import frc.trigon.robot.subsystems.spindexer.Spindexer;
+import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -34,14 +44,17 @@ public class RobotContainer {
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
     public static final Swerve SWERVE = new Swerve();
+    public static final Hood HOOD = new Hood();
     public static final Intake INTAKE = new Intake();
+    public static final Loader LOADER = new Loader();
+    public static final Shooter SHOOTER = new Shooter();
+    public static final Spindexer SPINDEXER = new Spindexer();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
         initializeGeneralSystems();
         buildAutoChooser();
         configureBindings();
-        configureSysIDBindings(INTAKE);
     }
 
     /**
@@ -54,20 +67,21 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
+        //configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
+        HOOD.setDefaultCommand(HoodCommands.getRestCommand());
+        LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
+        SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
+        SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
     }
 
     private void bindControllerCommands() {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
-        /*OperatorConstants.WHEEL_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState.COLLECT));
-        OperatorConstants.ARM_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState.INTAKE));*/
-        OperatorConstants.TEST_TYPE_SHIT.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
-        OperatorConstants.WHEEL_TEST_TYPE_SHIT.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
