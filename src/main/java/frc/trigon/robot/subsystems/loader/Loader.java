@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 
 public class Loader extends MotorSubsystem {
+    private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = LoaderConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(LoaderConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(LoaderConstants.FOC_ENABLED);
@@ -68,7 +70,10 @@ public class Loader extends MotorSubsystem {
     }
 
     void feedToShooter() {
-    } // TODO: Implement
+        final double targetShooterVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        final double targetFeedingVelocity = targetShooterVelocityFromShootingCalculations * LoaderConstants.LOADING_TO_SHOOTER_COEFFICIENT;
+        setTargetVelocity(targetFeedingVelocity);
+    }
 
     void setTargetState(LoaderConstants.LoaderState targetState) {
         setTargetVelocity(targetState.targetVelocityMetersPerSecond);
