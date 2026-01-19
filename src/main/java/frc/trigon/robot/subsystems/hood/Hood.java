@@ -70,6 +70,10 @@ public class Hood extends MotorSubsystem {
         return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
+    boolean atState(Rotation2d targetAngle) {
+        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
+    }
+
     void aimAtHub() {
     }//TODO implement
 
