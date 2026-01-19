@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
-import frc.trigon.lib.utilities.Conversions;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -42,7 +41,7 @@ public class Hood extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("HoodMotor")
-                .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
+                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
                 .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
@@ -72,8 +71,7 @@ public class Hood extends MotorSubsystem {
     }
 
     boolean atState(Rotation2d targetAngle) {
-        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees() - Conversions.rotationsToDegrees(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION))
-                < HoodConstants.ANGLE_TOLERANCE.getDegrees();
+        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
     void aimAtHub() {
@@ -89,7 +87,8 @@ public class Hood extends MotorSubsystem {
 
     void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle;
-        motor.setControl(positionRequest.withPosition(this.targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION));
+        final double targetAngleRotationsWithVisualizationOffset = targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        motor.setControl(positionRequest.withPosition(targetAngleRotationsWithVisualizationOffset));
     }
 
     private Pose3d calculateVisualizationPose() {
@@ -101,6 +100,7 @@ public class Hood extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION);
+        final double currentAngleRotationWithoutVisualizationOffset = motor.getSignal(TalonFXSignal.POSITION) - HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        return Rotation2d.fromRotations(currentAngleRotationWithoutVisualizationOffset);
     }
 }

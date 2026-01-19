@@ -32,7 +32,7 @@ public class HoodConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 50;
     private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
+    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
