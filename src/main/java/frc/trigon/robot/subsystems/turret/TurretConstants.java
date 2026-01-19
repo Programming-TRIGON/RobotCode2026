@@ -37,7 +37,6 @@ public class TurretConstants {
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
-    private static final Rotation2d ENCODER_OFFSET = Rotation2d.fromRotations(0);
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 10;//TODO: get number
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
@@ -131,7 +130,7 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ENCODER_OFFSET.getRotations();
+        config.MagnetSensor.MagnetOffset = 0;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);
