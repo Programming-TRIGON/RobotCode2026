@@ -75,7 +75,7 @@ public class TurretConstants {
 
     static {
         configureMasterMotor();
-        configurateFollowerMotor();
+        configureFollowerMotor();
         configureEncoder();
     }
 
@@ -89,12 +89,12 @@ public class TurretConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 115 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.023445 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 1.155 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.02399 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 5;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 5;
@@ -113,7 +113,7 @@ public class TurretConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
     }
 
-    private static void configurateFollowerMotor() {
+    private static void configureFollowerMotor() {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.Audio.BeepOnBoot = false;
