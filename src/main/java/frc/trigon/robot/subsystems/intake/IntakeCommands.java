@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class IntakeCommands {
     public static Command getSetAngleMotorTargetStateCommand(IntakeConstants.IntakeState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.INTAKE.setTargetAngle(targetState),
+                () -> RobotContainer.INTAKE.setTargetState(targetState),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
@@ -19,7 +19,7 @@ public class IntakeCommands {
 
     public static Command getSetWheelMotorTargetStateCommand(IntakeConstants.IntakeState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.INTAKE.setTargetIntakeVoltage(targetState),
+                () -> RobotContainer.INTAKE.setTargetState(targetState),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
@@ -35,7 +35,7 @@ public class IntakeCommands {
 
     public static Command getSetTargetVoltageCommand(double targetVoltage){
         return new ExecuteEndCommand(
-                () -> RobotContainer.INTAKE.setTargetVoltage(targetVoltage),
+                () -> RobotContainer.INTAKE.setTargetIntakeVoltage(targetVoltage),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );

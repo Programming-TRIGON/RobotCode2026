@@ -27,21 +27,21 @@ public class Intake extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("IntakeAngleMotor")
-                .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
+                .angularPosition(Units.Rotations.of(getCurrentArmAngle().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(angleMotor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(angleMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
-        IntakeConstants.ANGLE_MOTOR_MECHANISM.update(
-                getCurrentAngle(),
+        IntakeConstants.ANGLE_MECHANISM.update(
+                getCurrentArmAngle(),
                 Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
-
-        IntakeConstants.WHEEL_MOTOR_MECHANISM.update(
-                getCurrentVoltage()
+        IntakeConstants.WHEEL_MECHANISM.update(
+                getCurrentIntakeVoltage()
         );
+
         Logger.recordOutput("Poses/Components/IntakePose", calculateVisualizationPose());
     }
 
@@ -64,7 +64,7 @@ public class Intake extends MotorSubsystem {
     public void updatePeriodically() {
         angleMotor.update();
         angleEncoder.update();
-        Logger.recordOutput("Arm/CurrentPositionDegrees", getCurrentAngle().getDegrees());
+        Logger.recordOutput("Arm/CurrentPositionDegrees", getCurrentArmAngle().getDegrees());
     }
 
     @Override
@@ -74,24 +74,23 @@ public class Intake extends MotorSubsystem {
     }
 
     public boolean atTargetState(IntakeConstants.IntakeState targetState) {
-        return atAngle(targetState.targetAngle);
+        return atAngle(targetState.targetAngle) && targetState == this.targetState;
     }
 
-    public void setTargetState(IntakeConstants.IntakeState targetState) {
-        setTargetAngle(targetState);
-        setTargetIntakeVoltage(targetState);
+    public boolean atAngle(Rotation2d targetAngle) {
+        return Math.abs(
+                targetAngle.minus(getCurrentArmAngle()).getDegrees()
+        ) < IntakeConstants.ANGLE_MOTOR_TOLERANCE.getDegrees();
     }
 
-    public void setTargetIntakeVoltage(IntakeConstants.IntakeState targetState) {
-        intakeMotor.setControl(voltageRequest.withOutput(targetState.targetVoltage));
+    void setTargetState(IntakeConstants.IntakeState targetState) {
+        this.targetState = targetState;
+        setTargetState(targetState.targetAngle, targetState.targetVoltage);
     }
 
-    public void setTargetAngle(IntakeConstants.IntakeState targetState) {
-        setTargetAngle(targetState.targetAngle);
-    }
-
-    void setTargetVoltage(double targetVoltage) {
-        intakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
+    void setTargetState(Rotation2d targetAngle, double targetVoltage) {
+        setTargetAngle(targetAngle);
+        setTargetIntakeVoltage(targetVoltage);
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
@@ -100,27 +99,26 @@ public class Intake extends MotorSubsystem {
         );
     }
 
-    private Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(
-                angleMotor.getSignal(TalonFXSignal.POSITION)
-        );
+    void setTargetIntakeVoltage(double targetVoltage) {
+        IntakeConstants.WHEEL_MECHANISM.setTargetVelocity(targetVoltage);
+        intakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
-    private boolean atAngle(Rotation2d targetAngle) {
-        return Math.abs(
-                targetAngle.minus(getCurrentAngle()).getDegrees()
-        ) < IntakeConstants.ANGLE_MOTOR_TOLERANCE.getDegrees();
-    }
-
-    private double getCurrentVoltage() {
+    private double getCurrentIntakeVoltage() {
         return intakeMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE);
     }
 
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0,0 ),
-                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)
+                new Rotation3d(0, -getCurrentArmAngle().getRadians(), 0)
         );
         return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
+    }
+
+    private Rotation2d getCurrentArmAngle() {
+        return Rotation2d.fromRotations(
+                angleMotor.getSignal(TalonFXSignal.POSITION)
+        );
     }
 }

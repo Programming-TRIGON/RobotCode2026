@@ -35,6 +35,10 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
 
+    static final boolean FOC_ENABLED = true;
+    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
+    static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
+
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
             INTAKE_MOTOR_AMOUNT = 1;
@@ -44,10 +48,6 @@ public class IntakeConstants {
     private static final double
             INTAKE_LENGTH_METERS = 0.23,
             INTAKE_MASS_KILOGRAMS = 3;
-    static final boolean FOC_ENABLED = true;
-    static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
-    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
-    static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(120);
@@ -74,25 +74,27 @@ public class IntakeConstants {
             Units.Second.of(1000)
     );
 
-    static final String
+    private static final String
             ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotorMechanism",
             WHEEL_MOTOR_MECHANISM_NAME = "IntakeWheelMotorMechanism";
+    private static final Color ANGLE_MECHANISM_COLOR = Color.kOrange;
     private static final double WHEEL_MAXIMUM_DISPLAYABLE_VOLTAGE = 12;
-    static final SingleJointedArmMechanism2d ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
+    static final SingleJointedArmMechanism2d ANGLE_MECHANISM = new SingleJointedArmMechanism2d(
             ANGLE_MOTOR_MECHANISM_NAME,
             INTAKE_LENGTH_METERS,
-            Color.kOrange
+            ANGLE_MECHANISM_COLOR
     );
-
-    static final SpeedMechanism2d WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
+    static final SpeedMechanism2d WHEEL_MECHANISM = new SpeedMechanism2d(
             WHEEL_MOTOR_MECHANISM_NAME,
             WHEEL_MAXIMUM_DISPLAYABLE_VOLTAGE
     );
 
     static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT = new Pose3d(
-                    new Translation3d(0, 0, 0),
-                    new Rotation3d(0, 0, 0)
-            );
+            new Translation3d(0, 0, 0),
+            new Rotation3d(0, 0, 0)
+    );
+
+    static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
 
     static {
         configureAngleMotor();
@@ -120,6 +122,7 @@ public class IntakeConstants {
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
@@ -162,7 +165,7 @@ public class IntakeConstants {
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         config.MagnetSensor.MagnetOffset = 0;
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);
         ANGLE_ENCODER.setSimulationInputsFromTalonFX(ANGLE_MOTOR);
@@ -172,9 +175,9 @@ public class IntakeConstants {
     }
 
     public enum IntakeState {
-        REST(Rotation2d.fromDegrees(0), 0),
-        INTAKE(Rotation2d.fromDegrees(120), 6),
-        EJECT(Rotation2d.fromDegrees(120), -6);
+        REST(Rotation2d.fromDegrees(120), 0),
+        INTAKE(Rotation2d.fromDegrees(0), 6),
+        EJECT(Rotation2d.fromDegrees(0), -6);
 
         public final Rotation2d targetAngle;
         public final double targetVoltage;
@@ -184,5 +187,4 @@ public class IntakeConstants {
             this.targetVoltage = targetVoltage;
         }
     }
-
 }
