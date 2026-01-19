@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.utilities.Conversions;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -71,7 +72,8 @@ public class Hood extends MotorSubsystem {
     }
 
     boolean atState(Rotation2d targetAngle) {
-        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
+        return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees() - Conversions.rotationsToDegrees(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION))
+                < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
     void aimAtHub() {
@@ -93,12 +95,12 @@ public class Hood extends MotorSubsystem {
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, getCurrentAngle().getRadians() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION, 0)//TODO implement turret rotation and conversion of rotations to radians
+                new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
         );
         return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
     }
 
     private Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION);
     }
 }
