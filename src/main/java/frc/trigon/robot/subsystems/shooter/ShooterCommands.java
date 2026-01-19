@@ -11,7 +11,7 @@ import java.util.Set;
 public class ShooterCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                ShooterCommands::getSetTargetVelocityCommand,
+                RobotContainer.SHOOTER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.SHOOTER),
                 "Debugging/TargetShooterVelocityMetersPerSecond"
