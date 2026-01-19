@@ -44,12 +44,11 @@ public class TurretConstants {
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
-    private static final SimpleMotorSimulation SIMULATION =
-            new SimpleMotorSimulation(
-                    GEARBOX,
-                    GEAR_RATIO,
-                    MOMENT_OF_INERTIA
-            );
+    private static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
+            GEARBOX,
+            GEAR_RATIO,
+            MOMENT_OF_INERTIA
+    );
 
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
             "TurretMechanism",
