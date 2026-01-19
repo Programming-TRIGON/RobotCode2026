@@ -35,9 +35,9 @@ public class RobotContainer {
             SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE,
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
-    public static final Swerve SWERVE = new Swerve();
     public static final Spindexer SPINDEXER = new Spindexer();
     public static final Shooter SHOOTER = new Shooter();
+    public static final Swerve SWERVE = new Swerve();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
