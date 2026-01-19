@@ -59,7 +59,6 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {

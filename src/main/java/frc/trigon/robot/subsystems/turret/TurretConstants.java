@@ -43,7 +43,7 @@ public class TurretConstants {
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
-    private static final double MOMENT_OF_INERTIA = 0.003;
+    private static final double MOMENT_OF_INERTIA = 0.5;
     private static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
             GEAR_RATIO,
@@ -89,10 +89,10 @@ public class TurretConstants {
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.39582 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0086176 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.6096 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.12169 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00083758 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.6478 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.14659 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 7 : 5;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 3 : 5;

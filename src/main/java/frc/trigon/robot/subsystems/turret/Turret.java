@@ -15,6 +15,8 @@ import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.ArrayList;
+
 public class Turret extends MotorSubsystem {
     private final TalonFXMotor motor = TurretConstants.MASTER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
@@ -96,20 +98,69 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
-        final double currentRobotRotationalSpeedRadiansPerSecond = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond;
-        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE);
-        final Rotation2d targetAngleAdjustedToRobotSpeed = targetAngle.plus(velocityAngleChange);
-        if (isAngleOutOfRange(targetAngleAdjustedToRobotSpeed))
-            return targetAngleAdjustedToRobotSpeed.getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
-        if (targetAngleAdjustedToRobotSpeed.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
-            return targetAngle.minus(TurretConstants.TOTAL_ANGULAR_RANGE);
-        if (targetAngleAdjustedToRobotSpeed.getDegrees() < -TurretConstants.MINIMUM_ANGLE.getDegrees())
-            return targetAngle.plus(TurretConstants.TOTAL_ANGULAR_RANGE);
-        return targetAngle;
+        final Rotation2d targetAngleAdjustedToRobotSpeed = getAngleAdjustedForRobotSpeed(targetAngle);
+
+        final Rotation2d[] targetAnglePossibilities = {
+                targetAngle,
+                Rotation2d.fromDegrees(targetAngle.getDegrees() + 360),
+                Rotation2d.fromDegrees(targetAngle.getDegrees() - 360)
+        };
+        final Rotation2d[] targetAngleAdjustedToRobotSpeedPossibilities = {
+                targetAngleAdjustedToRobotSpeed,
+                Rotation2d.fromDegrees(targetAngleAdjustedToRobotSpeed.getDegrees() + 360),
+                Rotation2d.fromDegrees(targetAngleAdjustedToRobotSpeed.getDegrees() - 360)
+        };
+
+        return getBestAngleInRange(targetAnglePossibilities, targetAngleAdjustedToRobotSpeedPossibilities);
     }
 
-    private boolean isAngleOutOfRange(Rotation2d angle) {
-        return angle.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees() && angle.getDegrees() < TurretConstants.MINIMUM_ANGLE.getDegrees();
+    private Rotation2d getBestAngleInRange(Rotation2d[] angleOptions, Rotation2d[] adjustedAngleOptions) {
+        final ArrayList<Integer> bothInRangeIndices = new ArrayList<>();
+        final ArrayList<Integer> targetAngleInRangeIndices = new ArrayList<>();
+        for (int i = 0; i < angleOptions.length; i++) {
+            final boolean angleInRange = isAngleInRange(angleOptions[i]);
+            final boolean adjustedAngleInRange = isAngleInRange(adjustedAngleOptions[i]);
+            if (angleInRange && adjustedAngleInRange)
+                bothInRangeIndices.add(i);
+            if (angleInRange)
+                targetAngleInRangeIndices.add(i);
+        }
+
+        if (targetAngleInRangeIndices.isEmpty())
+            return adjustedAngleOptions[0].getDegrees() > TurretConstants.TOTAL_ANGULAR_RANGE.getDegrees() / 2 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
+        if (targetAngleInRangeIndices.size() == 1)
+            return angleOptions[targetAngleInRangeIndices.get(0)];
+        if (bothInRangeIndices.size() == 1)
+            return angleOptions[bothInRangeIndices.get(0)];
+        return getAngleFurthestFromLimits(angleOptions, bothInRangeIndices);
+    }
+
+    private Rotation2d getAngleFurthestFromLimits(Rotation2d[] angles, ArrayList<Integer> indices) {
+        Rotation2d bestAngle = angles[indices.get(0)];
+        double bestDistanceFromLimit = Math.min(
+                Math.abs(bestAngle.getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees()),
+                Math.abs(bestAngle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees())
+        );
+        for (int i : indices) {
+            final double distanceFromMinimumLimit = Math.abs(angles[i].getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees());
+            final double distanceFromMaximumLimit = Math.abs(angles[i].getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees());
+            final double distanceFromLimit = Math.min(distanceFromMinimumLimit, distanceFromMaximumLimit);
+            if (distanceFromLimit > bestDistanceFromLimit) {
+                bestAngle = angles[i];
+                bestDistanceFromLimit = distanceFromLimit;
+            }
+        }
+        return bestAngle;
+    }
+
+    private Rotation2d getAngleAdjustedForRobotSpeed(Rotation2d targetAngle) {
+        final double currentRobotRotationalSpeedRadiansPerSecond = RobotContainer.SWERVE.getSelfRelativeChassisSpeeds().omegaRadiansPerSecond;
+        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE);
+        return Rotation2d.fromDegrees(velocityAngleChange.getDegrees() + targetAngle.getDegrees());
+    }
+
+    private boolean isAngleInRange(Rotation2d angle) {
+        return angle.getDegrees() > TurretConstants.MINIMUM_ANGLE.getDegrees() && angle.getDegrees() < TurretConstants.MAXIMUM_ANGLE.getDegrees();
     }
 
     private Pose3d calculateVisualizationPose() {
