@@ -1,4 +1,4 @@
-package frc.trigon.robot.subsystems.transporter;
+package frc.trigon.robot.subsystems.loader;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -12,9 +12,9 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
-public class TransporterConstants {
+public class LoaderConstants {
     private static final int MOTOR_ID = 12;
-    private static final String MOTOR_NAME = "TransporterMotor";
+    private static final String MOTOR_NAME = "LoaderMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
@@ -36,9 +36,9 @@ public class TransporterConstants {
     );
 
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 8;
-    private static final String TRANSPORTER_MECHANISM_NAME = "TransporterMechanism";
-    static final SpeedMechanism2d TRANSPORTER_MECHANISM = new SpeedMechanism2d(
-            TRANSPORTER_MECHANISM_NAME,
+    private static final String LOADER_MECHANISM_NAME = "LoaderMechanism";
+    static final SpeedMechanism2d LOADER_MECHANISM = new SpeedMechanism2d(
+            LOADER_MECHANISM_NAME,
             MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
@@ -72,14 +72,14 @@ public class TransporterConstants {
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
-    public enum TransporterState {
-        TRANSPORT(2),
+    public enum LoaderState {
+        LOAD(2),
         EJECT(-2),
         STOP(0);
 
         public final double targetVelocityMetersPerSecond;
 
-        TransporterState(double targetVelocityMetersPerSecond) {
+        LoaderState(double targetVelocityMetersPerSecond) {
             this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         }
     }

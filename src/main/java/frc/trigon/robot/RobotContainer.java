@@ -23,9 +23,9 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.shooter.Shooter;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.swerve.Swerve;
-import frc.trigon.robot.subsystems.transporter.Transporter;
-import frc.trigon.robot.subsystems.transporter.TransporterCommands;
-import frc.trigon.robot.subsystems.transporter.TransporterConstants;
+import frc.trigon.robot.subsystems.loader.Loader;
+import frc.trigon.robot.subsystems.loader.LoaderCommands;
+import frc.trigon.robot.subsystems.loader.LoaderConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -37,7 +37,7 @@ public class RobotContainer {
     );
     public static final Swerve SWERVE = new Swerve();
     public static final Shooter SHOOTER = new Shooter();
-    public static final Transporter TRANSPORTER = new Transporter();
+    public static final Loader LOADER = new Loader();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -61,7 +61,7 @@ public class RobotContainer {
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
-        TRANSPORTER.setDefaultCommand(TransporterCommands.getSetTargetStateCommand(TransporterConstants.TransporterState.STOP));
+        LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
     }
 
     private void bindControllerCommands() {
