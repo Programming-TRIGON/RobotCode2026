@@ -7,7 +7,6 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
-import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
@@ -15,10 +14,10 @@ import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
     private final TalonFXMotor motor = HoodConstants.MOTOR;
-    private final CANcoderEncoder angleEncoder = HoodConstants.ENCODER;
+    private final CANcoderEncoder encoder = HoodConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED);
-    private Rotation2d targetAngle;
+    private Rotation2d targetAngle = Rotation2d.fromDegrees(0);
 
     public Hood() {
         setName("Hood");
@@ -51,7 +50,7 @@ public class Hood extends MotorSubsystem {
     public void updateMechanism() {
         HoodConstants.MECHANISM.update(
                 getCurrentAngle(),
-                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET.getRotations())
+                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET)
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
     }
@@ -59,7 +58,7 @@ public class Hood extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
-        angleEncoder.update();
+        encoder.update();
     }
 
     @Override
@@ -68,25 +67,27 @@ public class Hood extends MotorSubsystem {
     }
 
     public boolean atTargetAngle() {
-        if (targetAngle == null)
-            return false;
         return Math.abs(targetAngle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
-    }
-
-    private Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(angleEncoder.getSignal(CANcoderSignal.POSITION)).plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
     }
 
     void aimAtHub() {
     }//TODO implement
+
+    void aimForDelivery() {
+        setTargetAngle(HoodConstants.DELIVERY_ANGLE);
+    }
 
     void rest() {
         setTargetAngle(HoodConstants.REST_ANGLE);
     }
 
     void setTargetAngle(Rotation2d targetAngle) {
-        motor.setControl(positionRequest.withPosition((targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET)).getRotations()));
-        this.targetAngle = targetAngle.plus(HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET);
+        this.targetAngle = targetAngle;
+        motor.setControl(positionRequest.withPosition(this.targetAngle.getRotations()));
+    }
+
+    private Rotation2d getCurrentAngle() {
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
     }
 
     private Pose3d calculateVisualizationPose() {

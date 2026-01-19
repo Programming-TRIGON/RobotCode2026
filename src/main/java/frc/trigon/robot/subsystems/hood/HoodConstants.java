@@ -32,8 +32,7 @@ public class HoodConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 40;
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
-    static final Rotation2d POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? Rotation2d.fromDegrees(0) : Rotation2d.fromDegrees(0);
-    private static final double MOTOR_CURRENT_LIMIT = 50;
+    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
@@ -41,8 +40,8 @@ public class HoodConstants {
             HOOD_MASS_KILOGRAMS = 2,
             HOOD_LENGTH_METERS = 0.35;
     private static final Rotation2d
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(50);
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(50),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(90);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
             GEARBOX,
@@ -70,8 +69,11 @@ public class HoodConstants {
             Units.Volts.of(3),
             null
     );
+
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
-    static final Rotation2d REST_ANGLE = Rotation2d.fromDegrees(10);
+    static final Rotation2d
+            REST_ANGLE = Rotation2d.fromDegrees(50),
+            DELIVERY_ANGLE = new Rotation2d(90);
 
     static {
         configureMotor();
@@ -107,7 +109,7 @@ public class HoodConstants {
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = MOTOR_CURRENT_LIMIT;
+        config.CurrentLimits.StatorCurrentLimit = 50;
 
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);

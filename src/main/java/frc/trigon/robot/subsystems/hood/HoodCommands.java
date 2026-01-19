@@ -36,6 +36,14 @@ public class HoodCommands {
         );
     }
 
+    public static Command getDeliveryCommand() {
+        return new StartEndCommand(
+                RobotContainer.HOOD::aimForDelivery,
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
+        );
+    }
+
     public static Command getRestCommand() {
         return new StartEndCommand(
                 RobotContainer.HOOD::rest,
@@ -47,7 +55,8 @@ public class HoodCommands {
     public static Command getSetTargetAngleCommand(Rotation2d targetAngle) {
         return new StartEndCommand(
                 () -> RobotContainer.HOOD.setTargetAngle(targetAngle),
-                () -> {},
+                () -> {
+                },
                 RobotContainer.HOOD
         );
     }
