@@ -106,6 +106,9 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private Translation3d calculateCurrentMagnusSpeedVector(Translation3d currentGamePieceVelocity) {
         final double gamePieceVelocityMagnitude = currentGamePieceVelocity.getNorm();
+        if (gamePieceVelocityMagnitude < 1e-6)
+            return new Translation3d();
+        
         final double spinParameter = (currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS) / (gamePieceVelocityMagnitude);
         final double magnusLiftCoefficient = FuelShootingVisualizationConstants.MAGNUS_LIFT_FACTOR * spinParameter;
         final double magnusAccelerationMagnitude = (0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * gamePieceVelocityMagnitude * gamePieceVelocityMagnitude * magnusLiftCoefficient * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
