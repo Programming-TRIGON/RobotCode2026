@@ -35,7 +35,7 @@ public class ClimberCommands {
 
     public static Command getSetTargetRetractedStateCommand(ClimberConstants.ClimberState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.CLIMBER.setTargetRetractedState(targetState),
+                RobotContainer.CLIMBER::setTargetRetractedState,
                 RobotContainer.CLIMBER::stop,
                 RobotContainer.CLIMBER
         );

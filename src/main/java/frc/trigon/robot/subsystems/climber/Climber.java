@@ -47,7 +47,7 @@ public class Climber extends MotorSubsystem {
     public void updateLog(SysIdRoutineLog log) {
         log.motor("Climber")
                 .linearPosition(Units.Meters.of(getPositionMeters()))
-                .linearVelocity(Units.MetersPerSecond.of(masterMotor.getSignal(TalonFXSignal.VELOCITY)))
+                .linearVelocity(Units.MetersPerSecond.of(rotationsToMeters(masterMotor.getSignal(TalonFXSignal.VELOCITY))))
                 .voltage(Units.Volts.of(masterMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
@@ -82,9 +82,8 @@ public class Climber extends MotorSubsystem {
         setTargetPositionRotations(metersToRotations(targetState.targetExtendedPositionMeters));
     }
 
-    void setTargetRetractedState(ClimberConstants.ClimberState targetState) {
-        if (atTargetExtendedState())
-            setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters));
+    void setTargetRetractedState() {
+        setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters));
     }
 
     void setTargetPositionRotations(double targetPositionRotations) {
