@@ -70,13 +70,13 @@ public class Shooter extends MotorSubsystem {
         setTargetVelocity(targetVelocityFromShootingCalculations);
     }
 
-    void delivery() {
+    void aimForDelivery() {
         final double targetDeliveryVelocity = 0;//TODO: Implement
         setTargetVelocity(targetDeliveryVelocity);
     }
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
-        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond + ShooterConstants.WHEEL_SLIP_COMPENSATION_VELOCITY_METERS_PER_SECOND;
+        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond * ShooterConstants.WHEEL_SLIP_COMPENSATION_VELOCITY_MULTIPLIER;
         motor.setControl(velocityRequest.withVelocity(this.targetVelocityMetersPerSecond));
     }
 
