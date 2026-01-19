@@ -22,6 +22,9 @@ import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.shooter.Shooter;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
+import frc.trigon.robot.subsystems.spindexer.Spindexer;
+import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,6 +35,7 @@ public class RobotContainer {
             SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE,
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
+    public static final Spindexer SPINDEXER = new Spindexer();
     public static final Swerve SWERVE = new Swerve();
     public static final Shooter SHOOTER = new Shooter();
     private LoggedDashboardChooser<Command> autoChooser;
@@ -57,6 +61,7 @@ public class RobotContainer {
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
+        SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
     }
 
     private void bindControllerCommands() {
