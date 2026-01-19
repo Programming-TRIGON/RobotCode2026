@@ -66,7 +66,12 @@ public class Spindexer extends MotorSubsystem {
     }
 
     public boolean atTargetState(SpindexerConstants.SpindexerState targetState) {
-        return atTargetVelocity(getCurrentVelocityRotationsPerSecond(), targetState.targetVelocityRotationsPerSecond);
+        return atVelocity(targetState.targetVelocityRotationsPerSecond);
+    }
+
+    public boolean atVelocity(double targetVelocity) {
+        return Math.abs(getCurrentVelocityRotationsPerSecond() - targetVelocity)
+                <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
 
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
@@ -76,11 +81,6 @@ public class Spindexer extends MotorSubsystem {
     void setTargetVelocity(double targetVelocityRotationsPerSecond) {
         this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
         motor.setControl(velocityRequest.withVelocity(targetVelocityRotationsPerSecond));
-    }
-
-    private boolean atTargetVelocity(double currentVelocity, double targetVelocity) {
-        return Math.abs(currentVelocity - targetVelocity)
-                <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
 
     private double getCurrentVelocityRotationsPerSecond() {

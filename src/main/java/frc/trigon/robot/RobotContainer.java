@@ -48,6 +48,7 @@ public class RobotContainer {
         initializeGeneralSystems();
         buildAutoChooser();
         configureBindings();
+        //configureSysIDBindings(LOADER);
     }
 
     /**
