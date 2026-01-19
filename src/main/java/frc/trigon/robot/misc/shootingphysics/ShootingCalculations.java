@@ -43,7 +43,7 @@ public class ShootingCalculations {
 //        return null; // TODO: Implement fuel exit pose calculation
     }
 
-    public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d pitch, Rotation2d turretYaw) {
+    public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d pitch, Rotation2d turretFieldRelativeYaw) {
         return null; // TODO: Implement fuel exit pose calculation
     }
 
