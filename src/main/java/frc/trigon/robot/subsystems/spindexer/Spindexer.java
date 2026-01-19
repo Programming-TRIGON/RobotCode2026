@@ -69,6 +69,18 @@ public class Spindexer extends MotorSubsystem {
                 <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
 
+    public Pose3d calculateComponentPose() {
+        final Transform3d yawTransform = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION)).getRadians())
+        );
+        return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
+    }
+
+    public Rotation2d getCurrentRotation() {
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
+    }
+
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
         setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
     }
@@ -80,13 +92,5 @@ public class Spindexer extends MotorSubsystem {
 
     private double getCurrentVelocityRotationsPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
-    }
-
-    private Pose3d calculateComponentPose() {
-        final Transform3d yawTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION)).getRadians())
-        );
-        return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }
 }
