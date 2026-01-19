@@ -23,16 +23,9 @@ public class FieldConstants {
             //Tags to ignore
     );
 
-    public static final double
-            HUB_X = 4.03,
-            HUB_Y = FieldConstants.FIELD_WIDTH_METERS / 2,
-            HUB_RADIUS_METERS = 1.19 / 2,
-            HUB_LEFTMOST_Y = HUB_Y - HUB_RADIUS_METERS,
-            HUB_RIGHTMOST_Y = HUB_Y + HUB_RADIUS_METERS;
-    public static final double ALLIANCE_ZONE_LINE_X = HUB_X - HUB_RADIUS_METERS;
     public static final FlippableTranslation2d
-            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(ALLIANCE_ZONE_LINE_X / 2, HUB_LEFTMOST_Y / 2), true),
-            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(ALLIANCE_ZONE_LINE_X / 2, HUB_RIGHTMOST_Y * 1.5), true);
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 1.76), true),
+            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 7.065), true);
 
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = createAprilTagFieldLayout();
