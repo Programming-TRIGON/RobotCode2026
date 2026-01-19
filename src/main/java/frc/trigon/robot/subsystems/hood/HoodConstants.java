@@ -21,8 +21,8 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 
 public class HoodConstants {
     private static final int
-            MOTOR_ID = 17,
-            ENCODER_ID = 17;
+            MOTOR_ID = 18,
+            ENCODER_ID = 18;
     private static final String
             MOTOR_NAME = "HoodMotor",
             ENCODER_NAME = "HoodEncoder";
@@ -65,8 +65,8 @@ public class HoodConstants {
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(1.5).per(Units.Seconds),
-            Units.Volts.of(3),
+            Units.Volts.of(0.5).per(Units.Seconds),
+            Units.Volts.of(1),
             null
     );
 
@@ -93,19 +93,19 @@ public class HoodConstants {
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 1 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.039753 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.45 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 0;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;

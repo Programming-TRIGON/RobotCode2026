@@ -22,12 +22,12 @@ import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.hood.Hood;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
-import frc.trigon.robot.subsystems.shooter.Shooter;
-import frc.trigon.robot.subsystems.shooter.ShooterCommands;
-import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.loader.Loader;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
+import frc.trigon.robot.subsystems.shooter.Shooter;
+import frc.trigon.robot.subsystems.shooter.ShooterCommands;
+import frc.trigon.robot.subsystems.swerve.Swerve;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -59,7 +59,6 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {
@@ -73,6 +72,7 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.OPERATOR_CONTROLLER.a().whileTrue(HoodCommands.getDeliveryCommand());
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
