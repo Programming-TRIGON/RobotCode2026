@@ -38,7 +38,7 @@ public class SpindexerConstants {
             null
     );
 
-    static final Pose3d SPINDEXER_VISUALIZATION_POSE = new Pose3d(
+    static final Pose3d VISUALIZATION_ORIGIN_POSE = new Pose3d(
             new Translation3d(0, 0, 0),
             new Rotation3d(0, 0, 0)
     );

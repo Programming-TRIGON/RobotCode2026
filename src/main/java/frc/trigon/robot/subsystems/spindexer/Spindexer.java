@@ -50,11 +50,6 @@ public class Spindexer extends MotorSubsystem {
     }
 
     @Override
-    public void setBrake(boolean brake) {
-        motor.setBrake(brake);
-    }
-
-    @Override
     public void updatePeriodically() {
         motor.update();
     }
@@ -92,6 +87,6 @@ public class Spindexer extends MotorSubsystem {
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION)).getRadians())
         );
-        return SpindexerConstants.SPINDEXER_VISUALIZATION_POSE.transformBy(yawTransform);
+        return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }
 }
