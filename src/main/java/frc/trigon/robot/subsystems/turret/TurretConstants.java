@@ -39,6 +39,7 @@ public class TurretConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 65;
+    private static final double CURRENT_LIMIT_AMPS = 40;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
 
     private static final int MOTOR_AMOUNT = 2;
@@ -101,7 +102,7 @@ public class TurretConstants {
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT_AMPS;
 
         MASTER_MOTOR.applyConfiguration(config);
         MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
@@ -123,7 +124,7 @@ public class TurretConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT_AMPS;
 
         FOLLOWER_MOTOR.applyConfiguration(config);
 
