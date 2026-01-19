@@ -31,14 +31,14 @@ public class HoodConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 50;
-    private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
+    private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
+    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int MOTOR_AMOUNT = 1;
-    private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
+    private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
     private static final double
-            HOOD_MASS_KILOGRAMS = 2,
-            HOOD_LENGTH_METERS = 0.35;
+            HOOD_MASS_KILOGRAMS = 0.7,
+            HOOD_LENGTH_METERS = 0.17;
     private static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(50),
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(90);
@@ -73,7 +73,7 @@ public class HoodConstants {
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(50),
-            DELIVERY_ANGLE = new Rotation2d(90);
+            DELIVERY_ANGLE = Rotation2d.fromDegrees(90);
 
     static {
         configureMotor();
@@ -125,7 +125,7 @@ public class HoodConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
+        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

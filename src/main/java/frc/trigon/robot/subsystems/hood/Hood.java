@@ -50,7 +50,7 @@ public class Hood extends MotorSubsystem {
     public void updateMechanism() {
         HoodConstants.MECHANISM.update(
                 getCurrentAngle(),
-                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET)
+                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION)
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
     }
@@ -86,15 +86,15 @@ public class Hood extends MotorSubsystem {
         motor.setControl(positionRequest.withPosition(this.targetAngle.getRotations()));
     }
 
-    private Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
-    }
-
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
                 new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
         );
         return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
+    }
+
+    private Rotation2d getCurrentAngle() {
+        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
     }
 }
