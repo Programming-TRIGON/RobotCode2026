@@ -65,7 +65,7 @@ public class LoaderConstants {
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
 
-        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = 50;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
 
         MOTOR.applyConfiguration(config);
