@@ -64,8 +64,10 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
-        OperatorConstants.WHEEL_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState.COLLECT));
-        OperatorConstants.ARM_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState.INTAKE));
+        /*OperatorConstants.WHEEL_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState.COLLECT));
+        OperatorConstants.ARM_TO_STATE_TRIGGER.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState.INTAKE));*/
+        OperatorConstants.TEST_TYPE_SHIT.whileTrue(IntakeCommands.getSetAngleMotorTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
+        OperatorConstants.WHEEL_TEST_TYPE_SHIT.whileTrue(IntakeCommands.getSetWheelMotorTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

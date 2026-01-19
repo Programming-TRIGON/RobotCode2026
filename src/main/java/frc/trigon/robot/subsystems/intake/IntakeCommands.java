@@ -4,31 +4,29 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.ExecuteEndCommand;
-import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class IntakeCommands {
-    public static Command getSetAngleMotorTargetStateCommand(IntakeConstants.AngleMotorState targetState) {
+    public static Command getSetAngleMotorTargetStateCommand(IntakeConstants.IntakeState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.INTAKE.AngleMotorSetTargetState(targetState),
+                () -> RobotContainer.INTAKE.setTargetAngle(targetState),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
     }
 
-    public static Command getSetWheelMotorTargetStateCommand(IntakeConstants.WheelMotorState targetState) {
+    public static Command getSetWheelMotorTargetStateCommand(IntakeConstants.IntakeState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.INTAKE.WheelMotorSetTargetState(targetState),
+                () -> RobotContainer.INTAKE.setTargetIntakeVoltage(targetState),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
         );
     }
 
     public static Command getSetTargetAngleCommand(Supplier<Rotation2d> targetAngle) {
-        return new ExecuteEndCommand(
+        return new StartEndCommand(
                 () -> RobotContainer.INTAKE.setTargetAngle(targetAngle.get()),
                 RobotContainer.INTAKE::stop,
                 RobotContainer.INTAKE
