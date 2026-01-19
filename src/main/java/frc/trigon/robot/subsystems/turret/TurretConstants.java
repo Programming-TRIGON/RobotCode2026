@@ -53,7 +53,7 @@ public class TurretConstants {
 
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
             "TurretMechanism",
-            Color.kYellow
+            Color.kMediumPurple
     );
     static final Pose3d TURRET_VISUALIZATION_ORIGIN_POINT = new Pose3d(
             new Translation3d(),
