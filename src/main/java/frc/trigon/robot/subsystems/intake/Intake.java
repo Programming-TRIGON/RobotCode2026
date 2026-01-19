@@ -18,7 +18,7 @@ public class Intake extends MotorSubsystem {
     private final CANcoderEncoder angleEncoder = IntakeConstants.ANGLE_ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
-    private Rotation2d targetAngle = Rotation2d.fromDegrees(0);
+    private IntakeConstants.IntakeState targetState = IntakeConstants.IntakeState.REST;
 
     public Intake() {
         setName("Intake");
@@ -30,11 +30,6 @@ public class Intake extends MotorSubsystem {
                 .angularPosition(Units.Rotations.of(getCurrentAngle().getRotations()))
                 .angularVelocity(Units.RotationsPerSecond.of(angleMotor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(angleMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
-
-        /*log.motor("IntakeWheelMotor")
-                .angularPosition(Units.Rotations.of(getWheelPosition().getRotations()))
-                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVoltage()))
-                .voltage(Units.Volts.of(intakeMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));*/
     }
 
     @Override
@@ -124,7 +119,7 @@ public class Intake extends MotorSubsystem {
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0,0 ),
-                new Rotation3d(0, getCurrentAngle().getRadians(), 0) //- check why i did -getCurrentAngle()
+                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)
         );
         return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
     }

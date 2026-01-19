@@ -30,14 +30,17 @@ public class IntakeConstants {
             INTAKE_MOTOR_NAME = "IntakeMotor",
             ANGLE_MOTOR_NAME = "IntakeAngleMotor",
             ANGLE_ENCODER_NAME = "IntakeAngleEncoder";
-    static final TalonFXMotor INTAKE_MOTOR = new TalonFXMotor(INTAKE_MOTOR_ID, INTAKE_MOTOR_NAME);
-    static final TalonFXMotor ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
+    static final TalonFXMotor
+            INTAKE_MOTOR = new TalonFXMotor(INTAKE_MOTOR_ID, INTAKE_MOTOR_NAME),
+            ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
 
-
-    private static final DCMotor ANGLE_GEARBOX = DCMotor.getKrakenX60Foc(1);
-    private static final DCMotor INTAKE_GEARBOX = DCMotor.getFalcon500Foc(1);
-    private static final double ANGLE_MOTOR_MAX_ACCELERATION = RobotHardwareStats.isSimulation() ? 5 : 0;
+    private static final int
+            ANGLE_MOTOR_AMOUNT = 1,
+            INTAKE_MOTOR_AMOUNT = 1;
+    private static final DCMotor
+            ANGLE_GEARBOX = DCMotor.getKrakenX60Foc(ANGLE_MOTOR_AMOUNT),
+            INTAKE_GEARBOX = DCMotor.getFalcon500Foc(INTAKE_MOTOR_AMOUNT);
     private static final double
             INTAKE_LENGTH_METERS = 0.23,
             INTAKE_MASS_KILOGRAMS = 3;
@@ -78,7 +81,7 @@ public class IntakeConstants {
     static final SingleJointedArmMechanism2d ANGLE_MOTOR_MECHANISM = new SingleJointedArmMechanism2d(
             ANGLE_MOTOR_MECHANISM_NAME,
             INTAKE_LENGTH_METERS,
-            Color.kLightSeaGreen
+            Color.kOrange
     );
 
     static final SpeedMechanism2d WHEEL_MOTOR_MECHANISM = new SpeedMechanism2d(
@@ -119,14 +122,13 @@ public class IntakeConstants {
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
-        config.MotionMagic.MotionMagicJerk = ANGLE_MOTOR_MAX_ACCELERATION * 10;
+        config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 60;
 
         ANGLE_MOTOR.applyConfiguration(config);
         ANGLE_MOTOR.setPhysicsSimulation(INTAKE_ANGLE_SIMULATION);
-
         ANGLE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
@@ -168,28 +170,6 @@ public class IntakeConstants {
         ANGLE_ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
         ANGLE_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
     }
-
-/*    public enum AngleMotorState {
-        REST(Rotation2d.fromDegrees(0)),
-        INTAKE(Rotation2d.fromDegrees(90));
-
-        public final Rotation2d targetAngle;
-
-        AngleMotorState(Rotation2d angle) {
-            this.targetAngle = angle;
-        }
-    }
-
-    public enum WheelMotorState {
-        COLLECT(6),
-        REST(0);
-
-        public final double targetVoltage;
-
-        WheelMotorState(double targetVoltage) {
-            this.targetVoltage = targetVoltage;
-        }
-    }*/
 
     public enum IntakeState {
         REST(Rotation2d.fromDegrees(0), 0),
