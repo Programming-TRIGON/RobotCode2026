@@ -43,7 +43,6 @@ public class HoodConstants {
             MINIMUM_ANGLE = Rotation2d.fromDegrees(50),
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(90);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
-    private static final Color MECHANISM_COLOR = Color.kYellow;
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
             GEARBOX,
             GEAR_RATIO,
@@ -54,8 +53,10 @@ public class HoodConstants {
             SHOULD_SIMULATE_GRAVITY
     );
 
+    private static final String MECHANISM_NAME = "HoodMechanism";
+    private static final Color MECHANISM_COLOR = Color.kYellow;
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
-            "HoodMechanism",
+            MECHANISM_NAME,
             HOOD_LENGTH_METERS,
             MECHANISM_COLOR
     );
