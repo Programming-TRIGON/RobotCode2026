@@ -1,16 +1,25 @@
 package frc.trigon.robot.poseestimation.apriltagcamera.io;
 
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraConstants;
+import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraInputsAutoLogged;
+import frc.trigon.robot.poseestimation.apriltagcamera.DynamicCameraTransform;
 import org.photonvision.simulation.PhotonCameraSim;
 
 public class AprilTagSimulationCameraIO extends AprilTagPhotonCameraIO {
+    private final PhotonCameraSim cameraSimulation;
 
-    public AprilTagSimulationCameraIO(String cameraName, Transform3d robotToCamera) {
-        super(cameraName, robotToCamera);
+    public AprilTagSimulationCameraIO(String cameraName, DynamicCameraTransform dynamicCameraTransform) {
+        super(cameraName, dynamicCameraTransform);
 
-        final PhotonCameraSim cameraSimulation = new PhotonCameraSim(photonCamera, AprilTagCameraConstants.SIMULATION_CAMERA_PROPERTIES);
+        cameraSimulation = new PhotonCameraSim(photonCamera, AprilTagCameraConstants.SIMULATION_CAMERA_PROPERTIES);
         cameraSimulation.enableDrawWireframe(true);
-        AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, robotToCamera);
+        AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()));
+    }
+
+    @Override
+    protected void updateInputs(AprilTagCameraInputsAutoLogged inputs) {
+        AprilTagCameraConstants.VISION_SIMULATION.adjustCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()));
+        super.updateInputs(inputs);
     }
 }
