@@ -11,6 +11,7 @@ import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 
 public class Shooter extends MotorSubsystem {
+    private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
@@ -67,7 +68,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimAtHub() {
-        final double targetVelocityFromShootingCalculations = ShootingCalculations.getInstance().getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        final double targetVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
         setTargetVelocity(targetVelocityFromShootingCalculations);
     }
 
