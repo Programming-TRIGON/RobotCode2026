@@ -24,6 +24,9 @@ import frc.trigon.robot.subsystems.climber.Climber;
 import frc.trigon.robot.subsystems.shooter.Shooter;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.swerve.Swerve;
+import frc.trigon.robot.subsystems.loader.Loader;
+import frc.trigon.robot.subsystems.loader.LoaderCommands;
+import frc.trigon.robot.subsystems.loader.LoaderConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -35,6 +38,7 @@ public class RobotContainer {
     );
     public static final Swerve SWERVE = new Swerve();
     public static final Climber CLIMBER = new Climber();
+    public static final Loader LOADER = new Loader();
     public static final Shooter SHOOTER = new Shooter();
     private LoggedDashboardChooser<Command> autoChooser;
 
@@ -54,10 +58,12 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
+        configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
+        LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
     }
 

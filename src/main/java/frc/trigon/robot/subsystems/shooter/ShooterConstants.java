@@ -16,11 +16,11 @@ import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
 public class ShooterConstants {
     private static final int
-            MASTER_MOTOR_ID = 14,
-            FOLLOWER_MOTOR_ID = 15;
+            MASTER_MOTOR_ID = 16,
+            FOLLOWER_MOTOR_ID = 17;
     private static final String
-            MASTER_MOTOR_NAME = "MasterShooterMotor",
-            FOLLOWER_MOTOR_NAME = "FollowerShooterMotor";
+            MASTER_MOTOR_NAME = "ShooterMasterMotor",
+            FOLLOWER_MOTOR_NAME = "ShooterFollowerMotor";
     static final TalonFXMotor
             MASTER_MOTOR = new TalonFXMotor(MASTER_MOTOR_ID, MASTER_MOTOR_NAME),
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
@@ -43,7 +43,9 @@ public class ShooterConstants {
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 15;
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
 
+    static final double TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND = 10;
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 3;
+    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.05;
 
     static {
         configureMasterMotor();
