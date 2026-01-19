@@ -91,12 +91,11 @@ public class Turret extends MotorSubsystem {
     private Rotation2d calculateTargetAngleForDelivery() {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
-            return calculateTargetAngleToPose(FieldConstants.LEFT_DELIVERY_POSITION.get());
-        return calculateTargetAngleToPose(FieldConstants.RIGHT_DELIVERY_POSITION.get());
+            return calculateTargetAngleToPose(FieldConstants.LEFT_DELIVERY_POSITION.get(), currentPosition);
+        return calculateTargetAngleToPose(FieldConstants.RIGHT_DELIVERY_POSITION.get(), currentPosition);
     }
 
-    private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation) {
-        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+    private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation, Pose2d currentPosition) {
         final Translation2d difference = targetTranslation.minus(currentPosition.getTranslation());
         return difference.getAngle().minus(currentPosition.getRotation());
     }
