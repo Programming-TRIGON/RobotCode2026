@@ -21,8 +21,8 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 
 public class HoodConstants {
     private static final int
-            MOTOR_ID = 16,
-            ENCODER_ID = 16;
+            MOTOR_ID = 17,
+            ENCODER_ID = 17;
     private static final String
             MOTOR_NAME = "HoodMotor",
             ENCODER_NAME = "HoodEncoder";
@@ -30,7 +30,7 @@ public class HoodConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 40;
+    private static final double GEAR_RATIO = 50;
     private static final Rotation2d ANGLE_ENCODER_GRAVITY_OFFSET = Rotation2d.fromRotations(0);
     static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET = RobotHardwareStats.isSimulation() ? 0 : ANGLE_ENCODER_GRAVITY_OFFSET.getRotations();
 
@@ -109,7 +109,7 @@ public class HoodConstants {
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 50;
+        config.CurrentLimits.StatorCurrentLimit = 40;
 
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);
