@@ -24,16 +24,13 @@ public class AprilTagCamera {
     private Pose2d estimatedRobotPose = new Pose2d();
 
     /**
-     * Constructs a new AprilTagCamera.
+     * Constructs a new AprilTagCamera with a static camera transform.
      *
      * @param aprilTagCameraType  the type of camera
      * @param name                the camera's name
-     * @param robotCenterToCamera the transform of the robot's origin point to the camera.
-     *                            only the x, y and yaw values will be used for transforming the camera pose to the robot's center,
-     *                            to avoid more inaccuracies like pitch and roll.
-     *                            The reset will be used for creating a camera in simulation
+     * @param robotCenterToCamera the static transform from robot center to camera
      * @param standardDeviations  the initial calibrated standard deviations for the camera's estimated pose,
-     *                            will be changed as the distance from the tag(s) changes and the number of tags changes
+     *                            adjusted based on distance from tags and number of visible tags
      */
     public AprilTagCamera(AprilTagCameraConstants.AprilTagCameraType aprilTagCameraType,
                           String name, Transform3d robotCenterToCamera,
@@ -42,16 +39,14 @@ public class AprilTagCamera {
     }
 
     /**
-     * Constructs a new AprilTagCamera.
+     * Constructs a new AprilTagCamera with a dynamic camera transform.
      *
      * @param aprilTagCameraType     the type of camera
      * @param name                   the camera's name
-     * @param dynamicCameraTransform the transform of the robot's origin point to the camera.
-     *                               only the x, y and yaw values will be used for transforming the camera pose to the robot's center,
-     *                               to avoid more inaccuracies like pitch and roll.
-     *                               The reset will be used for creating a camera in simulation
+     * @param dynamicCameraTransform the dynamic transform from robot center to camera,
+     *                               supports time-dependent camera positioning
      * @param standardDeviations     the initial calibrated standard deviations for the camera's estimated pose,
-     *                               will be changed as the distance from the tag(s) changes and the number of tags changes
+     *                               adjusted based on distance from tags and number of visible tags
      */
     public AprilTagCamera(AprilTagCameraConstants.AprilTagCameraType aprilTagCameraType,
                           String name, DynamicCameraTransform dynamicCameraTransform,
