@@ -84,7 +84,7 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d calculateTargetAngleForDelivery() {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        if (currentPosition.getY() < FieldConstants.HUB_Y)
+        if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
             return calculateTargetAngleToPose(FieldConstants.LEFT_DELIVERY_POSITION.get());
         return calculateTargetAngleToPose(FieldConstants.RIGHT_DELIVERY_POSITION.get());
     }
