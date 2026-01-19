@@ -87,13 +87,13 @@ public class Hood extends MotorSubsystem {
 
     void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle;
-        motor.setControl(positionRequest.withPosition(this.targetAngle.getRotations()));
+        motor.setControl(positionRequest.withPosition(this.targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION));
     }
 
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
+                new Rotation3d(0, getCurrentAngle().getRadians() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION, 0)//TODO implement turret rotation and conversion of rotations to radians
         );
         return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
     }
