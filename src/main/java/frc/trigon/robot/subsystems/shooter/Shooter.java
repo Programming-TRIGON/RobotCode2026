@@ -67,7 +67,9 @@ public class Shooter extends MotorSubsystem {
 
     void aimAtHub() {
         final double targetVelocityFromShootingCalculations = 0/*ShootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond()*/;
-        setTargetVelocity(targetVelocityFromShootingCalculations);
+        final double targetVelocityWithSlippageCompensation = targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
+
+        setTargetVelocity(targetVelocityWithSlippageCompensation);
     }
 
     void aimForDelivery() {
@@ -76,7 +78,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
-        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
+        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         motor.setControl(velocityRequest.withVelocity(this.targetVelocityMetersPerSecond));
     }
 
