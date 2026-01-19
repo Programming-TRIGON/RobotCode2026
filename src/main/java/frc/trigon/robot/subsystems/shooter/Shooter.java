@@ -73,7 +73,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimForDelivery() {
-        final double targetDeliveryVelocity = 0;//TODO: Implement
+        final double targetDeliveryVelocity = ShooterConstants.TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND;//TODO: Update with integration logic
         setTargetVelocity(targetDeliveryVelocity);
     }
 
