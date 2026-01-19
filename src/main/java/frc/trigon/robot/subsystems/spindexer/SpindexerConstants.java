@@ -1,8 +1,11 @@
-package frc.trigon.robot.subsystems.loader;
+package frc.trigon.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -12,13 +15,13 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
-public class LoaderConstants {
-    private static final int MOTOR_ID = 12;
-    private static final String MOTOR_NAME = "LoaderMotor";
+public class SpindexerConstants {
+    private static final int MOTOR_ID = 11;
+    private static final String MOTOR_NAME = "SpindexerMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 12.53188528;
+    private static final double GEAR_RATIO = 25;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -35,38 +38,40 @@ public class LoaderConstants {
             null
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 8;
-    private static final String LOADER_MECHANISM_NAME = "LoaderMechanism";
-    static final SpeedMechanism2d LOADER_MECHANISM = new SpeedMechanism2d(
-            LOADER_MECHANISM_NAME,
+    static final Pose3d VISUALIZATION_ORIGIN_POSE = new Pose3d(
+            new Translation3d(0, 0, 0),
+            new Rotation3d(0, 0, 0)
+    );
+
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 2;
+    private static final String MECHANISM_NAME = "SpindexerMechanism";
+    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d(
+            MECHANISM_NAME,
             MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
-    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
+    static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 0.2;
 
     static {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
-        config.Audio.BeepOnBoot = false;
-        config.Audio.BeepOnConfig = false;
-
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.Feedback.withSensorToMechanismRatio(GEAR_RATIO);
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 2 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 1.4763 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0059739 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.9447 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
 
-        config.CurrentLimits.StatorCurrentLimit = 50;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 50;
 
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);
@@ -78,15 +83,15 @@ public class LoaderConstants {
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
-    public enum LoaderState {
-        LOAD(2),
-        EJECT(-2),
-        STOP(0);
+    public enum SpindexerState {
+        FEED_TO_TURRET(1.0),
+        AGITATE(0.6),
+        STOP(0.0);
 
-        public final double targetVelocityMetersPerSecond;
+        public final double targetVelocityRotationsPerSecond;
 
-        LoaderState(double targetVelocityMetersPerSecond) {
-            this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
+        SpindexerState(double targetVelocityRotationsPerSecond) {
+            this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
         }
     }
 }

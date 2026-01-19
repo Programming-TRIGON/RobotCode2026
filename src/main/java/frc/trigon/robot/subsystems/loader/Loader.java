@@ -25,11 +25,6 @@ public class Loader extends MotorSubsystem {
     }
 
     @Override
-    public void setBrake(boolean brake) {
-        motor.setBrake(brake);
-    }
-
-    @Override
     public void stop() {
         motor.stopMotor();
     }
