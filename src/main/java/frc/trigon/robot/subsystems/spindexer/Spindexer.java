@@ -24,14 +24,14 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("SpindexerMotor")
-                .angularPosition(Units.Rotations.of(getCurrentPosition().getRotations()))
+                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSSignal.POSITION)))
                 .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
-        SpindexerConstants.SPINDEXER_MECHANISM.update(
+        SpindexerConstants.MECHANISM.update(
                 getCurrentVelocityRotationsPerSecond(),
                 motor.getSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE)
         );
@@ -69,18 +69,18 @@ public class Spindexer extends MotorSubsystem {
         return atTargetVelocity(getCurrentVelocityRotationsPerSecond(), targetState.targetVelocityRotationsPerSecond);
     }
 
+    void setTargetState(SpindexerConstants.SpindexerState targetState) {
+        setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
+    }
+
+    void setTargetVelocity(double targetVelocityRotationsPerSecond) {
+        this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
+        motor.setControl(velocityRequest.withVelocity(targetVelocityRotationsPerSecond));
+    }
+
     private boolean atTargetVelocity(double currentVelocity, double targetVelocity) {
         return Math.abs(currentVelocity - targetVelocity)
                 <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
-    }
-
-    void setTargetState(SpindexerConstants.SpindexerState targetState) {
-        setTargetVelocityRotationsPerSecond(targetState.targetVelocityRotationsPerSecond);
-    }
-
-    void setTargetVelocityRotationsPerSecond(double targetVelocity) {
-        this.targetVelocityRotationsPerSecond = targetVelocity;
-        motor.setControl(velocityRequest.withVelocity(targetVelocity));
     }
 
     private double getCurrentVelocityRotationsPerSecond() {
@@ -90,12 +90,8 @@ public class Spindexer extends MotorSubsystem {
     private Pose3d calculateComponentPose() {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, getCurrentPosition().getRadians())
+                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION)).getRadians())
         );
         return SpindexerConstants.SPINDEXER_VISUALIZATION_POSE.transformBy(yawTransform);
-    }
-
-    private Rotation2d getCurrentPosition() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION));
     }
 }

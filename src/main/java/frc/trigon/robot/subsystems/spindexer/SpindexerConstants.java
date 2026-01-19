@@ -23,9 +23,10 @@ public class SpindexerConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 25;
 
-    private static final DCMotor GEARBOX = DCMotor.getMinion(1);
+    private static final int MOTOR_AMOUNT = 1;
+    private static final DCMotor GEARBOX = DCMotor.getMinion(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
-    static final SimpleMotorSimulation SPINDEXER_SIMULATION = new SimpleMotorSimulation(
+    static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
             GEAR_RATIO,
             MOMENT_OF_INERTIA
@@ -43,9 +44,9 @@ public class SpindexerConstants {
     );
 
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 2;
-    private static final String SPINDEXER_MECHANISM_NAME = "SpindexerMechanism";
-    static final SpeedMechanism2d SPINDEXER_MECHANISM = new SpeedMechanism2d(
-            SPINDEXER_MECHANISM_NAME,
+    private static final String MECHANISM_NAME = "SpindexerMechanism";
+    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d(
+            MECHANISM_NAME,
             MAXIMUM_DISPLAYABLE_VELOCITY
     );
 
@@ -73,7 +74,7 @@ public class SpindexerConstants {
         config.CurrentLimits.StatorCurrentLimit = 50;
 
         MOTOR.applyConfiguration(config);
-        MOTOR.setPhysicsSimulation(SPINDEXER_SIMULATION);
+        MOTOR.setPhysicsSimulation(SIMULATION);
 
         MOTOR.registerSignal(TalonFXSSignal.POSITION, 100);
         MOTOR.registerSignal(TalonFXSSignal.VELOCITY, 100);

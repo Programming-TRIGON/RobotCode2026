@@ -10,7 +10,7 @@ import java.util.Set;
 public class SpindexerCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                RobotContainer.SPINDEXER::setTargetVelocityRotationsPerSecond,
+                RobotContainer.SPINDEXER::setTargetVelocity,
                 false,
                 Set.of(RobotContainer.SPINDEXER),
                 "Debugging/SpindexerTargetVelocityRotationsPerSecond"
@@ -27,7 +27,7 @@ public class SpindexerCommands {
 
     public static Command getSetTargetVelocityCommand(double targetVelocityRotationsPerSecond) {
         return new StartEndCommand(
-                () -> RobotContainer.SPINDEXER.setTargetVelocityRotationsPerSecond(targetVelocityRotationsPerSecond),
+                () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocityRotationsPerSecond),
                 RobotContainer.SPINDEXER::stop,
                 RobotContainer.SPINDEXER
         );
