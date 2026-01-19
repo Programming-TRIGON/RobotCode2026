@@ -70,7 +70,7 @@ public class TurretConstants {
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
-    static final double ROBOT_SPEED_TO_TURRET_ANGLE_CONSTANT = 0.2;
+    static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE = 0.2;
 
     static {
         configureMasterMotor();

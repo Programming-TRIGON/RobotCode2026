@@ -33,8 +33,8 @@ public class Turret extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("TurretMotor")
-                .angularPosition(Units.Rotations.of(getCurrentEncoderAngle().getRotations()))
-                .angularVelocity(Units.RotationsPerSecond.of(encoder.getSignal(CANcoderSignal.VELOCITY)))
+                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
+                .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
@@ -96,10 +96,10 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
-        final Rotation2d currentRobotRotationalSpeed = new Rotation2d(RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
-        final Rotation2d rotationalSpeedToAngle = currentRobotRotationalSpeed.times(TurretConstants.ROBOT_SPEED_TO_TURRET_ANGLE_CONSTANT);
-        final Rotation2d targetAngleAdjustedToRobotSpeed = targetAngle.plus(rotationalSpeedToAngle);
-        if (isAngleOutOfRange(targetAngle))
+        final double currentRobotRotationalSpeedRadiansPerSecond = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond;
+        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE);
+        final Rotation2d targetAngleAdjustedToRobotSpeed = targetAngle.plus(velocityAngleChange);
+        if (isAngleOutOfRange(targetAngleAdjustedToRobotSpeed))
             return targetAngleAdjustedToRobotSpeed.getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
         if (targetAngleAdjustedToRobotSpeed.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
             return targetAngle.minus(TurretConstants.TOTAL_ANGULAR_RANGE);
@@ -113,11 +113,11 @@ public class Turret extends MotorSubsystem {
     }
 
     private Pose3d calculateVisualizationPose() {
-        final Transform3d tawTransform = new Transform3d(
+        final Transform3d yawTransform = new Transform3d(
                 new Translation3d(),
                 new Rotation3d(0, 0, getCurrentEncoderAngle().getRadians())
         );
-        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(tawTransform);
+        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
     }
 
     private Rotation2d getCurrentEncoderAngle() {

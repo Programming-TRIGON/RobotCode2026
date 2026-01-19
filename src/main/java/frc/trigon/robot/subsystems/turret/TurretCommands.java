@@ -22,6 +22,14 @@ public class TurretCommands {
         );
     }
 
+    public static Command getGearRatioCalibrationCommand() {
+        return new GearRatioCalculationCommand(
+                TurretConstants.MASTER_MOTOR,
+                TurretConstants.ENCODER,
+                RobotContainer.TURRET
+        );
+    }
+
     public static Command getAlignToHubCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.TURRET::alignToHub,
@@ -50,14 +58,6 @@ public class TurretCommands {
     public static Command getSetTargetAngleCommand(Supplier<Rotation2d> targetAngle) {
         return new RunCommand(
                 () -> RobotContainer.TURRET.setTargetAngle(targetAngle.get()),
-                RobotContainer.TURRET
-        );
-    }
-
-    public static Command getGearRatioCalibrationCommand() {
-        return new GearRatioCalculationCommand(
-                TurretConstants.MASTER_MOTOR,
-                TurretConstants.ENCODER,
                 RobotContainer.TURRET
         );
     }
