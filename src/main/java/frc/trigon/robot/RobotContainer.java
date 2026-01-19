@@ -63,6 +63,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
+        //configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {
@@ -77,7 +78,6 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
-        OperatorConstants.OPERATOR_CONTROLLER.a().whileTrue(HoodCommands.getDeliveryCommand());
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
