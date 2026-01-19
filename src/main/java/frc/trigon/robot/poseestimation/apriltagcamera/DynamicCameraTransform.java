@@ -37,8 +37,8 @@ public class DynamicCameraTransform {
      * @return the robot's pose on the field
      */
     public Pose2d calculate2dRobotPose(Pose2d cameraPose, double timestampSeconds) {
-        final Transform2d robotCenterToCamera = get2dRobotCenterToCamera(timestampSeconds);
-        return cameraPose.transformBy(robotCenterToCamera);
+        final Transform2d cameraToRobotCenter = get2dCameraToRobotCenter(timestampSeconds);
+        return cameraPose.transformBy(cameraToRobotCenter);
     }
 
     /**
@@ -49,8 +49,8 @@ public class DynamicCameraTransform {
      * @return the robot's pose in 3D space
      */
     public Pose3d calculate3dRobotPose(Pose3d cameraPose, double timestampSeconds) {
-        final Transform3d robotCenterToCamera = get3dRobotCenterToCamera(timestampSeconds);
-        return cameraPose.transformBy(robotCenterToCamera);
+        final Transform3d cameraToRobotCenter = get3dCameraToRobotCenter(timestampSeconds);
+        return cameraPose.transformBy(cameraToRobotCenter);
     }
 
     /**
