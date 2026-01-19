@@ -55,12 +55,12 @@ public class LoaderConstants {
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.08612 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0057719 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.35355 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014576 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 1.4763 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
