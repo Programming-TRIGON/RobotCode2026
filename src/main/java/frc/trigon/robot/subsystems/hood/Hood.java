@@ -87,7 +87,7 @@ public class Hood extends MotorSubsystem {
 
     void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle;
-        final double targetAngleRotationsWithVisualizationOffset = targetAngle.getRotations() + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        final double targetAngleRotationsWithVisualizationOffset = targetAngle.getRotations() - HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
         motor.setControl(positionRequest.withPosition(targetAngleRotationsWithVisualizationOffset));
     }
 
@@ -100,7 +100,7 @@ public class Hood extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentAngle() {
-        final double currentAngleRotationWithoutVisualizationOffset = motor.getSignal(TalonFXSignal.POSITION) - HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        final double currentAngleRotationWithoutVisualizationOffset = motor.getSignal(TalonFXSignal.POSITION) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
         return Rotation2d.fromRotations(currentAngleRotationWithoutVisualizationOffset);
     }
 }
