@@ -80,8 +80,9 @@ public class VisualizeFuelShootingCommand extends Command {
         final Translation3d gravitySpeedVector = calculateCurrentGravitySpeedVector();
         final Translation3d dragSpeedVector = calculateCurrentDragSpeedVector(currentGamePieceVelocity);
         final Translation3d magnusSpeedVector = calculateCurrentMagnusSpeedVector(currentGamePieceVelocity);
-        updateSpin(gravitySpeedVector);
         currentGamePieceVelocity = currentGamePieceVelocity.plus(gravitySpeedVector).plus(dragSpeedVector).plus(magnusSpeedVector);
+        updateSpinDecay(currentGamePieceVelocity);
+
         VISUALIZED_POSITIONS.remove(currentGamePiecePosition);
         currentGamePiecePosition = currentGamePiecePosition.plus(currentGamePieceVelocity.times(FuelShootingVisualizationConstants.TIME_STEP_SECONDS));
         VISUALIZED_POSITIONS.add(currentGamePiecePosition);
@@ -123,8 +124,8 @@ public class VisualizeFuelShootingCommand extends Command {
         );
     }
 
-    private void updateSpin(Translation3d currentGamePieceVelocity) {
+    private void updateSpinDecay(Translation3d currentGamePieceVelocityVector) {
         final double coefficient = (0.5 * FuelShootingVisualizationConstants.SPIN_DECAY_COEFFICIENT * FuelShootingVisualizationConstants.AIR_DENSITY * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.MOMENT_OF_INERTIA;
-        currentSpinRadiansPerSecond -= coefficient * currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.TIME_STEP_SECONDS * currentGamePieceVelocity.getNorm();
+        currentSpinRadiansPerSecond -= coefficient * currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.TIME_STEP_SECONDS * currentGamePieceVelocityVector.getNorm();
     }
 }
