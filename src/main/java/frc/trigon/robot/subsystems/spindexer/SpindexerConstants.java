@@ -1,6 +1,5 @@
 package frc.trigon.robot.subsystems.spindexer;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -11,7 +10,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
-import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
@@ -34,8 +32,8 @@ public class SpindexerConstants {
     );
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(2).per(Units.Seconds),
-            Units.Volts.of(8),
+            Units.Volts.of(1).per(Units.Seconds),
+            Units.Volts.of(4),
             null
     );
 
@@ -61,15 +59,15 @@ public class SpindexerConstants {
 
         config.ExternalFeedback.withSensorToMechanismRatio(GEAR_RATIO);
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.4 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 2 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0012991 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.61844 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011144 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.010616 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.3152 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 7 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 50;
