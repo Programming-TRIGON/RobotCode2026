@@ -38,6 +38,14 @@ public class TurretCommands {
         );
     }
 
+    public static Command getAlignToClosestAprilTagCommand() {
+        return new ExecuteEndCommand(
+                RobotContainer.TURRET::alignToClosestAprilTag,
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
+
     public static Command getAlignForDeliveryCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.TURRET::alignForDelivery,

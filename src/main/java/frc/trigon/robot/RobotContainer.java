@@ -63,6 +63,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
+        //configureSysIDBindings(LOADER);
     }
 
     private void bindDefaultCommands() {
@@ -70,7 +71,7 @@ public class RobotContainer {
         LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
-        TURRET.setDefaultCommand(TurretCommands.getStopCommand());
+        TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
     }
 
     private void bindControllerCommands() {

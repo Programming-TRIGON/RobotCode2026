@@ -74,6 +74,10 @@ public class Turret extends MotorSubsystem {
         // TODO: add logic
     }
 
+    void alignToClosestAprilTag() {
+        // TODO: add logic
+    }
+
     void alignForDelivery() {
         final Rotation2d targetAngle = calculateTargetAngleForDelivery();
         setTargetAngle(targetAngle);
@@ -155,7 +159,7 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d getAngleAdjustedForRobotSpeed(Rotation2d targetAngle) {
         final double currentRobotRotationalSpeedRadiansPerSecond = RobotContainer.SWERVE.getSelfRelativeChassisSpeeds().omegaRadiansPerSecond;
-        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE);
+        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE_DEGREES);
         return Rotation2d.fromDegrees(velocityAngleChange.getDegrees() + targetAngle.getDegrees());
     }
 

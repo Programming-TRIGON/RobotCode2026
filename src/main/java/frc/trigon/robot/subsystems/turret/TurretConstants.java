@@ -50,9 +50,11 @@ public class TurretConstants {
             MOMENT_OF_INERTIA
     );
 
+    private static final String MECHANISM_NAME = "TurretMechanism";
+    private static final Color MECHANISM_COLOR = Color.kMediumPurple;
     static final SingleJointedArmMechanism2d MECHANISM = new SingleJointedArmMechanism2d(
-            "TurretMechanism",
-            Color.kMediumPurple
+            MECHANISM_NAME,
+            MECHANISM_COLOR
     );
     static final Pose3d TURRET_VISUALIZATION_ORIGIN_POINT = new Pose3d(
             new Translation3d(),
@@ -69,7 +71,7 @@ public class TurretConstants {
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
-    static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE = 0.2;
+    static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_DEGREES = 0.2;
 
     static {
         configureMasterMotor();
@@ -120,7 +122,14 @@ public class TurretConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = 40;
+
         FOLLOWER_MOTOR.applyConfiguration(config);
+
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+
         final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_MOTOR.setControl(followRequest);
     }
