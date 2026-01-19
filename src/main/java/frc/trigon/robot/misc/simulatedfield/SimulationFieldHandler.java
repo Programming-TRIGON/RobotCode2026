@@ -65,7 +65,7 @@ public class SimulationFieldHandler {
         if (isCollectingFuel() && HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL) {
             final ArrayList<SimulatedGamePiece> collectedFuel = getCollectedFuel(collectionPose);
             for (SimulatedGamePiece fuel : collectedFuel) {
-                if (HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL)
+                if (HELD_FUEL.size() >= SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL)
                     return;
 
                 HELD_FUEL.add(fuel);
