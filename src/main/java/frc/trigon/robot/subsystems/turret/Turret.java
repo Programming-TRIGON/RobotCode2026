@@ -16,7 +16,7 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Turret extends MotorSubsystem {
-    private final TalonFXMotor motor = TurretConstants.MOTOR;
+    private final TalonFXMotor motor = TurretConstants.MASTER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED);
@@ -33,9 +33,9 @@ public class Turret extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("TurretMotor")
-                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)))
                 .angularPosition(Units.Rotations.of(getCurrentEncoderAngle().getRotations()))
-                .angularVelocity(Units.RotationsPerSecond.of(encoder.getSignal(CANcoderSignal.VELOCITY)));
+                .angularVelocity(Units.RotationsPerSecond.of(encoder.getSignal(CANcoderSignal.VELOCITY)))
+                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
@@ -91,19 +91,19 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation) {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return targetTranslation.minus(currentPosition.getTranslation())
-                .getAngle()
-                .minus(currentPosition.getRotation());
+        final Translation2d difference = targetTranslation.minus(currentPosition.getTranslation());
+        return difference.getAngle().minus(currentPosition.getRotation());
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle) {
         final Rotation2d currentRobotRotationalSpeed = new Rotation2d(RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().omegaRadiansPerSecond);
-        final Rotation2d rotationalSpeedToAngle = currentRobotRotationalSpeed.times(TurretConstants.ROBOT_SPEED_CONSTANT);
+        final Rotation2d rotationalSpeedToAngle = currentRobotRotationalSpeed.times(TurretConstants.ROBOT_SPEED_TO_TURRET_ANGLE_CONSTANT);
+        final Rotation2d targetAngleAdjustedToRobotSpeed = targetAngle.plus(rotationalSpeedToAngle);
         if (isAngleOutOfRange(targetAngle))
-            return targetAngle.plus(rotationalSpeedToAngle).getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
-        if (targetAngle.plus(rotationalSpeedToAngle).getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
+            return targetAngleAdjustedToRobotSpeed.getDegrees() > 0 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
+        if (targetAngleAdjustedToRobotSpeed.getDegrees() > TurretConstants.MAXIMUM_ANGLE.getDegrees())
             return targetAngle.minus(TurretConstants.TOTAL_ANGULAR_RANGE);
-        if (targetAngle.plus(rotationalSpeedToAngle).getDegrees() < -TurretConstants.MINIMUM_ANGLE.getDegrees())
+        if (targetAngleAdjustedToRobotSpeed.getDegrees() < -TurretConstants.MINIMUM_ANGLE.getDegrees())
             return targetAngle.plus(TurretConstants.TOTAL_ANGULAR_RANGE);
         return targetAngle;
     }
@@ -113,11 +113,11 @@ public class Turret extends MotorSubsystem {
     }
 
     private Pose3d calculateVisualizationPose() {
-        final Transform3d transform = new Transform3d(
+        final Transform3d tawTransform = new Transform3d(
                 new Translation3d(),
                 new Rotation3d(0, 0, getCurrentEncoderAngle().getRadians())
         );
-        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(transform);
+        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(tawTransform);
     }
 
     private Rotation2d getCurrentEncoderAngle() {
