@@ -37,11 +37,6 @@ public class OperatorConstants {
 
     public static final Trigger
             RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
-            DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
-            TEST_TYPE_SHIT = OPERATOR_CONTROLLER.b(),
-            WHEEL_TEST_TYPE_SHIT = OPERATOR_CONTROLLER.v(),
-            /*WHEEL_TO_STATE_TRIGGER = OPERATOR_CONTROLLER.n(),
-            ARM_TO_STATE_TRIGGER = OPERATOR_CONTROLLER.b(),*/
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             FORWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.right(),
