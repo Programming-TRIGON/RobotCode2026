@@ -72,6 +72,8 @@ public class Loader extends MotorSubsystem {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) <= LoaderConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
+    void feedToShooter() {}
+
     void setTargetState(LoaderConstants.LoaderState targetState) {
         setTargetVelocity(targetState.targetVelocityMetersPerSecond);
     }

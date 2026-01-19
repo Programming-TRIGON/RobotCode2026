@@ -50,7 +50,7 @@ public class LoaderConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.08612 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;

@@ -33,4 +33,12 @@ public class LoaderCommands {
         );
     }
 
+    public static Command getFeedToShooterCommand() {
+        return new StartEndCommand(
+                () -> RobotContainer.LOADER.feedToShooter(),
+                RobotContainer.LOADER::stop,
+                RobotContainer.LOADER
+        );
+    }
+    
 }
