@@ -90,7 +90,6 @@ public class IntakeConstants {
             INTAKE_MOTOR_MECHANISM_NAME,
             INTAKE_MOTOR_MAXIMUM_DISPLAYABLE_VOLTAGE
     );
-
     static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT = new Pose3d(
             new Translation3d(0, 0, 0),
             new Rotation3d(0, 0, 0)
