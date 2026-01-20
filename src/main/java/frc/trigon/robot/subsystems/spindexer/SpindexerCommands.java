@@ -5,14 +5,11 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
-import java.util.Set;
-
 public class SpindexerCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                RobotContainer.SPINDEXER::setTargetVelocity,
+                SpindexerCommands::getSetTargetVelocityCommand,
                 false,
-                Set.of(RobotContainer.SPINDEXER),
                 "Debugging/SpindexerTargetVelocityRotationsPerSecond"
         );
     }

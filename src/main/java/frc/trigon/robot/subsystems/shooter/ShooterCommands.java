@@ -6,14 +6,11 @@ import frc.trigon.lib.commands.ExecuteEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
-import java.util.Set;
-
 public class ShooterCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
                 ShooterCommands::getSetTargetVelocityCommand,
                 false,
-                Set.of(RobotContainer.SHOOTER),
                 "Debugging/TargetShooterVelocityMetersPerSecond"
         );
     }
