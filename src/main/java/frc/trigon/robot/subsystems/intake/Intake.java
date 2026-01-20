@@ -86,6 +86,7 @@ public class Intake extends MotorSubsystem {
 
     void setTargetState(IntakeConstants.IntakeState targetState) {
         this.targetState = targetState;
+        final double offsettedTargetAngleRotations = targetState.targetAngle.getRotations() - IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
         setTargetState(targetState.targetAngle, targetState.targetVoltage);
     }
 
