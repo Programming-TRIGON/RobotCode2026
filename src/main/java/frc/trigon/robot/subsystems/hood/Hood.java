@@ -101,11 +101,7 @@ public class Hood extends MotorSubsystem {
                 new Rotation3d(0, getCurrentAngle().getRadians(), 0)
         );
         final Transform3d turretToPitcher = hoodPoseAtTurretZeroRotation.minus(turretOrigin);
-        final Transform3d pitchTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, -getCurrentAngle().getRadians(), turretPose.getRotation().getZ())
-        );
-        return turretPose.plus(turretToPitcher).plus(pitchTransform);
+        return turretPose.plus(turretToPitcher);
     }
 
     private Rotation2d getCurrentAngle() {
