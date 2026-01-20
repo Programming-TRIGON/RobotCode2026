@@ -8,6 +8,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import org.littletonrobotics.junction.Logger;
@@ -41,7 +42,7 @@ public class VisualizeFuelShootingCommand extends Command {
 
     @Override
     public void execute() {
-        for (int i = 0; i < (int) (0.02 / FuelShootingVisualizationConstants.TIME_STEP_SECONDS); i++)
+        for (int i = 0; i < (int) (RobotHardwareStats.getPeriodicTimeSeconds() / FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS); i++)
             stepSimulation();
 
         Logger.recordOutput("Poses/GamePieces/ShotFuelPoses", VISUALIZED_POSITIONS.toArray(Translation3d[]::new));
@@ -84,12 +85,12 @@ public class VisualizeFuelShootingCommand extends Command {
         updateSpinDecay(currentGamePieceVelocity);
 
         VISUALIZED_POSITIONS.remove(currentGamePiecePosition);
-        currentGamePiecePosition = currentGamePiecePosition.plus(currentGamePieceVelocity.times(FuelShootingVisualizationConstants.TIME_STEP_SECONDS));
+        currentGamePiecePosition = currentGamePiecePosition.plus(currentGamePieceVelocity.times(FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS));
         VISUALIZED_POSITIONS.add(currentGamePiecePosition);
     }
 
     private Translation3d calculateCurrentGravitySpeedVector() {
-        return new Translation3d(0, 0, -FuelShootingVisualizationConstants.G_FORCE * FuelShootingVisualizationConstants.TIME_STEP_SECONDS);
+        return new Translation3d(0, 0, -FuelShootingVisualizationConstants.G_FORCE * FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS);
     }
 
     private Translation3d calculateCurrentDragSpeedVector(Translation3d currentGamePieceVelocity) {
@@ -98,7 +99,7 @@ public class VisualizeFuelShootingCommand extends Command {
             return new Translation3d();
         final double dragForceMagnitude = 0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * velocityMagnitude * velocityMagnitude * FuelShootingVisualizationConstants.DRAG_COEFFICIENT * FuelShootingVisualizationConstants.GAME_PIECE_AREA;
         final double dragAccelerationMagnitude = dragForceMagnitude / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
-        final double dragVelocityMagnitude = dragAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
+        final double dragVelocityMagnitude = dragAccelerationMagnitude * FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS;
         final Translation3d velocityDirection = currentGamePieceVelocity.div(velocityMagnitude);
 
         return velocityDirection.times(-dragVelocityMagnitude);
@@ -128,11 +129,11 @@ public class VisualizeFuelShootingCommand extends Command {
         final double spinParameter = (currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS) / gamePieceVelocityMagnitude;
         final double magnusLiftCoefficient = FuelShootingVisualizationConstants.MAGNUS_LIFT_FACTOR * spinParameter;
         final double magnusAccelerationMagnitude = (0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * gamePieceVelocityMagnitude * gamePieceVelocityMagnitude * magnusLiftCoefficient * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
-        return magnusAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
+        return magnusAccelerationMagnitude * FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS;
     }
 
     private void updateSpinDecay(Translation3d currentGamePieceVelocityVector) {
         final double coefficient = (0.5 * FuelShootingVisualizationConstants.SPIN_DECAY_COEFFICIENT * FuelShootingVisualizationConstants.AIR_DENSITY * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.MOMENT_OF_INERTIA;
-        currentSpinRadiansPerSecond -= coefficient * currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.TIME_STEP_SECONDS * currentGamePieceVelocityVector.getNorm();
+        currentSpinRadiansPerSecond -= coefficient * currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS * currentGamePieceVelocityVector.getNorm();
     }
 }

@@ -35,7 +35,7 @@ public class ShootingCalculations {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Rotation2d hoodPitch = RobotContainer.HOOD.getCurrentAngle();
         final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getCurrentSelfRelativeAngle();
-        return calculateFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
+        return calculateFieldRelativeFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
     @AutoLogOutput(key = "Shooting/TargetFuelExitPosition")
@@ -43,10 +43,10 @@ public class ShootingCalculations {
         final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(ShootingCalculationsConstants.POSE_PREDICTION_TIME_SECONDS);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
         final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getTargetSelfRelativeAngle();
-        return calculateFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
+        return calculateFieldRelativeFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
-    public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
+    public Translation3d calculateFieldRelativeFuelExitPose(Pose2d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
         final Transform3d robotToFuelExitPosition = calculateRobotToFuelExitTransform(hoodPitch, turretSelfRelativeYaw);
         return new Pose3d(robotPose).transformBy(robotToFuelExitPosition).getTranslation();
     }
@@ -92,7 +92,7 @@ public class ShootingCalculations {
         final Translation2d targetFuelExitPosition = calculateTargetFuelExitPosition().toTranslation2d();
         final Translation2d robotVelocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
         final Translation2d allianceHubPosition = FieldConstants.HUB_POSITION.get();
-        final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToFieldPoint(allianceHubPosition, targetFuelExitPosition, robotVelocity);
+        final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToPoint(allianceHubPosition, targetFuelExitPosition, robotVelocity);
         final Rotation2d fuelAngleToHub = calculateAngleToPoint(allianceHubPosition, targetFuelExitPosition);
 
         final Translation3d radialShotVector = calculateRadialShotVector(hubRelativeRobotVelocity, fuelAngleToHub, targetFuelExitPosition);
@@ -112,7 +112,7 @@ public class ShootingCalculations {
         return new Translation3d(targetShootingSpeedMetersPerSecond, new Rotation3d(0, -targetHoodAngleRadians, fuelAngleToHub.getRadians()));
     }
 
-    private Translation2d calculateVelocityRelativeToFieldPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
+    private Translation2d calculateVelocityRelativeToPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
         final Rotation2d angleToPoint = calculateAngleToPoint(fieldPoint, currentPosition);
         return robotFieldRelativeVelocity.rotateBy(angleToPoint.unaryMinus());
     }
