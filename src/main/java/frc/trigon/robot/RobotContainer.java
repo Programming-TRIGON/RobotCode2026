@@ -8,6 +8,8 @@ package frc.trigon.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
@@ -17,14 +19,17 @@ import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.LEDConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import frc.trigon.robot.misc.shootingphysics.shootingvisualization.VisualizeFuelShootingCommand;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
+import frc.trigon.robot.misc.simulatedfield.SimulationFieldHandler;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import frc.trigon.robot.subsystems.hood.Hood;
+import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.Intake;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
-import frc.trigon.robot.subsystems.hood.Hood;
-import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.loader.Loader;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
@@ -37,6 +42,8 @@ import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.turret.Turret;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import java.util.Random;
 
 public class RobotContainer {
     public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator();
@@ -87,6 +94,14 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.DRIVER_CONTROLLER.leftBumper().whileTrue(new ParallelCommandGroup(
+                new RunCommand(ShootingCalculations.getInstance()::updateCalculations),
+                HoodCommands.getAimAtHubCommand(),
+                TurretCommands.getAlignToHubCommand(),
+                ShooterCommands.getAimAtHubCommand()
+        ));
+        var rand = new Random();
+        OperatorConstants.DRIVER_CONTROLLER.rightBumper().onTrue(VisualizeFuelShootingCommand.getScheduleShotCommand(() -> (SimulationFieldHandler.getSimulatedGamePieces().get(rand.nextInt(0, SimulationFieldHandler.getSimulatedGamePieces().size() - 1)))));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

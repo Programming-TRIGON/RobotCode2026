@@ -12,9 +12,7 @@ import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
-import org.littletonrobotics.junction.Logger;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +21,6 @@ import java.util.function.Supplier;
  */
 public class VisualizeFuelShootingCommand extends Command {
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
-    private static final ArrayList<SimulatedGamePiece> VISUALIZED_GAME_PIECES = new ArrayList<>();
     private final SimulatedGamePiece shotFuel;
     private Translation3d currentFuelVelocity;
     private double currentSpinRadiansPerSecond;
@@ -39,7 +36,6 @@ public class VisualizeFuelShootingCommand extends Command {
     @Override
     public void initialize() {
         shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateCurrentFuelExitPose());
-        VISUALIZED_GAME_PIECES.add(shotFuel);
         currentFuelVelocity = calculateFuelExitVelocityVector();
         initializeSpin(currentFuelVelocity.getNorm());
     }
@@ -48,9 +44,6 @@ public class VisualizeFuelShootingCommand extends Command {
     public void execute() {
         for (int i = 0; i < (int) (RobotHardwareStats.getPeriodicTimeSeconds() / FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS); i++)
             stepSimulation();
-
-        final Translation3d[] shotFuelPositions = VISUALIZED_GAME_PIECES.stream().map((gamePiece) -> gamePiece.getPose().getTranslation()).toArray(Translation3d[]::new);
-        Logger.recordOutput("Poses/GamePieces/ShotFuelPositions", shotFuelPositions);
     }
 
     @Override
@@ -60,7 +53,7 @@ public class VisualizeFuelShootingCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        VISUALIZED_GAME_PIECES.remove(shotFuel);
+        // TODO: Implement back to field logic
     }
 
     private Translation3d calculateFuelExitVelocityVector() {

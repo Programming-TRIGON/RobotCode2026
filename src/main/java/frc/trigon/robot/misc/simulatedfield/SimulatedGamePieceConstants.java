@@ -1,5 +1,6 @@
 package frc.trigon.robot.misc.simulatedfield;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import frc.trigon.lib.utilities.flippable.FlippablePose3d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
@@ -21,6 +22,11 @@ public class SimulatedGamePieceConstants {
      */
     public static final ArrayList<SimulatedGamePiece>
             STARTING_GAME_PIECES = new ArrayList<>(List.of(
+            new SimulatedGamePiece(new Pose3d(), GamePieceType.GAME_PIECE_TYPE),
+            new SimulatedGamePiece(new Pose3d(), GamePieceType.GAME_PIECE_TYPE),
+            new SimulatedGamePiece(new Pose3d(), GamePieceType.GAME_PIECE_TYPE),
+            new SimulatedGamePiece(new Pose3d(), GamePieceType.GAME_PIECE_TYPE),
+            new SimulatedGamePiece(new Pose3d(), GamePieceType.GAME_PIECE_TYPE)
     ));
 
     public static final FlippablePose3d SCORING_LOCATION = new FlippablePose3d(0, 0, 0, new Rotation3d(), true);

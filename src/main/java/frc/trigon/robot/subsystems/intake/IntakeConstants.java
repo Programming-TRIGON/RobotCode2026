@@ -35,7 +35,7 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
 
-    private static final  double ANGLE_MOTOR_GEAR_RATIO = 40;
+    private static final double ANGLE_MOTOR_GEAR_RATIO = 40;
     private static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
     private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
@@ -134,8 +134,9 @@ public class IntakeConstants {
         ANGLE_MOTOR.applyConfiguration(config);
         ANGLE_MOTOR.setPhysicsSimulation(INTAKE_ANGLE_SIMULATION);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        ANGLE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
+        ANGLE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        ANGLE_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
@@ -156,7 +157,6 @@ public class IntakeConstants {
         INTAKE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         INTAKE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         INTAKE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        INTAKE_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         INTAKE_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
