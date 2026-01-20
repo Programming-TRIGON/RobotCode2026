@@ -99,7 +99,7 @@ public class Hood extends MotorSubsystem {
         Logger.recordOutput("Poses/Components/TurretPose", turretPose);
         final Pose3d hoodPoseAtTurretZeroRotation = new Pose3d(
                 new Translation3d(-0.06114, 0.14542, 0.46867),
-                new Rotation3d(0, Math.toRadians(90), 0)
+                new Rotation3d(0, Math.toRadians(87), 0)
         );
 
         final Transform3d turretToPitcher = hoodPoseAtTurretZeroRotation.minus(turretOrigin);
