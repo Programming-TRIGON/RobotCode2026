@@ -49,11 +49,6 @@ public class Shooter extends MotorSubsystem {
     }
 
     @Override
-    public void setBrake(boolean brake) {
-        motor.setBrake(brake);
-    }
-
-    @Override
     public void updateMechanism() {
         ShooterConstants.MECHANISM.update(
                 getCurrentVelocityMetersPerSecond(),
@@ -79,7 +74,7 @@ public class Shooter extends MotorSubsystem {
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
-        motor.setControl(velocityRequest.withVelocity(this.targetVelocityMetersPerSecond));
+        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
     private double getCurrentVelocityMetersPerSecond() {
