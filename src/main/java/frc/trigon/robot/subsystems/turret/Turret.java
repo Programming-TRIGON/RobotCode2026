@@ -75,6 +75,14 @@ public class Turret extends MotorSubsystem {
     public void stop() {
         masterMotor.stopMotor();
     }
+    
+    public Pose3d calculateVisualizationPose() {
+        final Transform3d yawTransform = new Transform3d(
+                new Translation3d(),
+                new Rotation3d(0, 0, getSelfRelativeAngle().getRadians())
+        );
+        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
+    }
 
     public Rotation2d getFieldRelativeAngle() {
         return getSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
@@ -204,13 +212,5 @@ public class Turret extends MotorSubsystem {
 
     private boolean isAngleInRange(Rotation2d angle) {
         return angle.getDegrees() > TurretConstants.MINIMUM_ANGLE.getDegrees() && angle.getDegrees() < TurretConstants.MAXIMUM_ANGLE.getDegrees();
-    }
-
-    private Pose3d calculateVisualizationPose() {
-        final Transform3d yawTransform = new Transform3d(
-                new Translation3d(),
-                new Rotation3d(0, 0, getSelfRelativeAngle().getRadians())
-        );
-        return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
     }
 }
