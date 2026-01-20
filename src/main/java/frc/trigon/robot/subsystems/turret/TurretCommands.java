@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class TurretCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetAngleDegrees) -> RobotContainer.TURRET.setTargetSelfRelativeAngleAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
+                (targetAngleDegrees) -> RobotContainer.TURRET.setTargetSelfRelativeAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
                 false,
                 Set.of(RobotContainer.TURRET),
                 "Debugging/TurretTargetAngleDegrees"

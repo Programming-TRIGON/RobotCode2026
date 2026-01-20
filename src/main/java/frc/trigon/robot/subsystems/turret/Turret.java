@@ -18,7 +18,9 @@ import org.littletonrobotics.junction.Logger;
 import java.util.ArrayList;
 
 public class Turret extends MotorSubsystem {
-    private final TalonFXMotor motor = TurretConstants.MASTER_MOTOR;
+    private final TalonFXMotor
+            masterMotor = TurretConstants.MASTER_MOTOR,
+            followerMotor = TurretConstants.FOLLOWER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED);
@@ -29,15 +31,15 @@ public class Turret extends MotorSubsystem {
 
     @Override
     public void sysIDDrive(double targetDrivePower) {
-        motor.setControl(voltageRequest.withOutput(targetDrivePower));
+        masterMotor.setControl(voltageRequest.withOutput(targetDrivePower));
     }
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("TurretMotor")
-                .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSignal.POSITION)))
-                .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
-                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
+                .angularPosition(Units.Rotations.of(masterMotor.getSignal(TalonFXSignal.POSITION)))
+                .angularVelocity(Units.RotationsPerSecond.of(masterMotor.getSignal(TalonFXSignal.VELOCITY)))
+                .voltage(Units.Volts.of(masterMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
@@ -47,29 +49,39 @@ public class Turret extends MotorSubsystem {
 
     @Override
     public void setBrake(boolean brake) {
-        motor.setBrake(brake);
+        masterMotor.setBrake(brake);
+        followerMotor.setBrake(brake);
     }
 
     @Override
     public void updatePeriodically() {
-        motor.update();
+        masterMotor.update();
+        followerMotor.update();
         encoder.update();
 
-        Logger.recordOutput("Turret/CurrentAngleDegrees", getCurrentEncoderAngle().getDegrees());
+        Logger.recordOutput("Turret/CurrentAngleDegrees", getSelfRelativeAngle().getDegrees());
     }
 
     @Override
     public void updateMechanism() {
         TurretConstants.MECHANISM.update(
-                getCurrentEncoderAngle(),
-                Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                getSelfRelativeAngle(),
+                Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
         Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
     }
 
     @Override
     public void stop() {
-        motor.stopMotor();
+        masterMotor.stopMotor();
+    }
+
+    public Rotation2d getFieldRelativeAngle() {
+        return getSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
+    }
+
+    public Rotation2d getSelfRelativeAngle() {
+        return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
     }
 
     void alignToHub() {
@@ -82,17 +94,17 @@ public class Turret extends MotorSubsystem {
 
     void alignForDelivery() {
         final Rotation2d targetAngle = calculateTargetAngleForDelivery();
-        setTargetSelfRelativeAngleAngle(targetAngle);
+        setTargetSelfRelativeAngle(targetAngle);
     }
 
     void setTargetFieldRelativeAngle(Rotation2d targetAngle) {
         final Rotation2d targetRobotRelativeAngle = Rotation2d.fromDegrees(targetAngle.getDegrees() - RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees());
-        setTargetSelfRelativeAngleAngle(targetRobotRelativeAngle);
+        setTargetSelfRelativeAngle(targetRobotRelativeAngle);
     }
 
-    void setTargetSelfRelativeAngleAngle(Rotation2d targetAngle) {
+    void setTargetSelfRelativeAngle(Rotation2d targetAngle) {
         final Rotation2d targetAngleAfterLimitCheck = limitAngle(targetAngle);
-        motor.setControl(positionRequest.withPosition(targetAngleAfterLimitCheck.getRotations()));
+        masterMotor.setControl(positionRequest.withPosition(targetAngleAfterLimitCheck.getRotations()));
     }
 
     private Rotation2d calculateTargetAngleForDelivery() {
@@ -183,7 +195,7 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d getAngleAdjustedForRobotSpeed(Rotation2d targetAngle) {
         final double currentRobotRotationalSpeedRadiansPerSecond = RobotContainer.SWERVE.getSelfRelativeChassisSpeeds().omegaRadiansPerSecond;
-        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE_DEGREES);
+        final Rotation2d velocityAngleChange = Rotation2d.fromRadians(currentRobotRotationalSpeedRadiansPerSecond * TurretConstants.ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS);
         return Rotation2d.fromDegrees(velocityAngleChange.getDegrees() + targetAngle.getDegrees());
     }
 
@@ -194,12 +206,8 @@ public class Turret extends MotorSubsystem {
     private Pose3d calculateVisualizationPose() {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(),
-                new Rotation3d(0, 0, getCurrentEncoderAngle().getRadians())
+                new Rotation3d(0, 0, getSelfRelativeAngle().getRadians())
         );
         return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
-    }
-
-    private Rotation2d getCurrentEncoderAngle() {
-        return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
     }
 }
