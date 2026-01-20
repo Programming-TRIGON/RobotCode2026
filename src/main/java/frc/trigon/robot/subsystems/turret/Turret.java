@@ -164,9 +164,7 @@ public class Turret extends MotorSubsystem {
                 Math.abs(bestAngle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees())
         );
         for (Rotation2d angle : angles) {
-            final double distanceFromMinimumLimit = Math.abs(angle.getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees());
-            final double distanceFromMaximumLimit = Math.abs(angle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees());
-            final double distanceFromLimit = Math.min(distanceFromMinimumLimit, distanceFromMaximumLimit);
+            final double distanceFromLimit = getDistanceFromLimits(angle);
             if (distanceFromLimit < bestDistanceFromLimit) {
                 bestAngle = angle;
                 bestDistanceFromLimit = distanceFromLimit;
@@ -182,15 +180,20 @@ public class Turret extends MotorSubsystem {
                 Math.abs(bestAngle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees())
         );
         for (int i : indices) {
-            final double distanceFromMinimumLimit = Math.abs(angles[i].getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees());
-            final double distanceFromMaximumLimit = Math.abs(angles[i].getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees());
-            final double distanceFromLimit = Math.min(distanceFromMinimumLimit, distanceFromMaximumLimit);
+            final double distanceFromLimit = getDistanceFromLimits(angles[i]);
             if (distanceFromLimit > bestDistanceFromLimit) {
                 bestAngle = angles[i];
                 bestDistanceFromLimit = distanceFromLimit;
             }
         }
         return bestAngle;
+    }
+
+    private double getDistanceFromLimits(Rotation2d angle) {
+        return Math.min(
+                Math.abs(angle.getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees()),
+                Math.abs(angle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees())
+        );
     }
 
     private Rotation2d getAngleAdjustedForRobotSpeed(Rotation2d targetAngle) {
