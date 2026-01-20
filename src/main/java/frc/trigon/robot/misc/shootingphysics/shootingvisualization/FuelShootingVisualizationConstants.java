@@ -8,7 +8,7 @@ public class FuelShootingVisualizationConstants {
             TOP_TRACTION_COEFFICIENT = 0.8,
             BOTTOM_TRACTION_COEFFICIENT = 1;
     static final double
-            GAME_PIECE_MASS_KG = 0.2,
+            GAME_PIECE_MASS_KG = 0.21,
             GAME_PIECE_RADIUS_METERS = 0.075,
             GAME_PIECE_AREA = Math.PI * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS,
             MOMENT_OF_INERTIA = 2.0 / 5.0 * GAME_PIECE_MASS_KG * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS;
