@@ -10,7 +10,6 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import frc.trigon.robot.subsystems.hood.HoodConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends MotorSubsystem {
@@ -87,7 +86,10 @@ public class Intake extends MotorSubsystem {
     void setTargetState(IntakeConstants.IntakeState targetState) {
         this.targetState = targetState;
         final double offsettedTargetAngleRotations = targetState.targetAngle.getRotations() - IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
-        setTargetState(targetState.targetAngle, targetState.targetVoltage);
+        setTargetState(
+                Rotation2d.fromRotations(offsettedTargetAngleRotations),
+                targetState.targetVoltage
+        );
     }
 
     void setTargetState(Rotation2d targetAngle, double targetVoltage) {
