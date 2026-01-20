@@ -10,6 +10,7 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import frc.trigon.robot.subsystems.hood.HoodConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends MotorSubsystem {
@@ -72,9 +73,10 @@ public class Intake extends MotorSubsystem {
     public void stop() {
         angleMotor.stopMotor();
         intakeMotor.stopMotor();
+        IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(0);
     }
 
-    public boolean atTargetState(IntakeConstants.IntakeState targetState) {
+    public boolean atState(IntakeConstants.IntakeState targetState) {
         return atAngle(targetState.targetAngle) && targetState == this.targetState;
     }
 
@@ -86,16 +88,17 @@ public class Intake extends MotorSubsystem {
 
     void setTargetState(IntakeConstants.IntakeState targetState) {
         this.targetState = targetState;
-        final double offsettedTargetAngleRotations = targetState.targetAngle.getRotations() - IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
-        setTargetState(
-                Rotation2d.fromRotations(offsettedTargetAngleRotations),
-                targetState.targetVoltage
-        );
+        setTargetState(targetState.targetAngle,targetState.targetVoltage);
     }
 
     void setTargetState(Rotation2d targetAngle, double targetVoltage) {
         setTargetAngle(targetAngle);
         setTargetIntakeVoltage(targetVoltage);
+    }
+
+    private void setTargetAngle(Rotation2d targetAngle) {
+        final double offsettedTargetAngleRotations = targetAngle.getRotations() - IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        angleMotor.setControl(positionRequest.withPosition(offsettedTargetAngleRotations));
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {
@@ -113,10 +116,6 @@ public class Intake extends MotorSubsystem {
                 new Rotation3d(0, -getCurrentArmAngle().getRadians(), 0)
         );
         return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
-    }
-
-    private void setTargetAngle(Rotation2d targetAngle) {
-        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
     }
 
     private Rotation2d getCurrentArmAngle() {
