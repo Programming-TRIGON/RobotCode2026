@@ -2,7 +2,6 @@ package frc.trigon.robot.subsystems.turret;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.ExecuteEndCommand;
 import frc.trigon.lib.commands.GearRatioCalculationCommand;
@@ -26,6 +25,7 @@ public class TurretCommands {
         return new GearRatioCalculationCommand(
                 TurretConstants.MASTER_MOTOR,
                 TurretConstants.ENCODER,
+                0.5,
                 RobotContainer.TURRET
         );
     }
@@ -63,9 +63,18 @@ public class TurretCommands {
         );
     }
 
-    public static Command getSetTargetAngleCommand(Supplier<Rotation2d> targetAngle) {
-        return new RunCommand(
+    public static Command getSetTargetFieldRelativeAngleCommand(Supplier<Rotation2d> targetAngle) {
+        return new ExecuteEndCommand(
                 () -> RobotContainer.TURRET.setTargetFieldRelativeAngle(targetAngle.get()),
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
+
+    public static Command getSetTargetSelfRelativeAngleAngleCommand(Supplier<Rotation2d> targetAngle) {
+        return new ExecuteEndCommand(
+                () -> RobotContainer.TURRET.setTargetSelfRelativeAngle(targetAngle.get()),
+                RobotContainer.TURRET::stop,
                 RobotContainer.TURRET
         );
     }
