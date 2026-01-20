@@ -37,7 +37,7 @@ public class Intake extends MotorSubsystem {
     public void updateMechanism() {
         IntakeConstants.ANGLE_MECHANISM.update(
                 getCurrentArmAngle(),
-                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION)
         );
         IntakeConstants.INTAKE_MOTOR_MECHANISM.update(
                 getCurrentIntakeVoltage()
