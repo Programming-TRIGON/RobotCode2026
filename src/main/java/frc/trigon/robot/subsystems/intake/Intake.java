@@ -38,7 +38,7 @@ public class Intake extends MotorSubsystem {
                 getCurrentArmAngle(),
                 Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
-        IntakeConstants.WHEEL_MECHANISM.update(
+        IntakeConstants.INTAKE_MOTOR_MECHANISM.update(
                 getCurrentIntakeVoltage()
         );
 
@@ -63,6 +63,7 @@ public class Intake extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         angleMotor.update();
+        intakeMotor.update();
         angleEncoder.update();
         Logger.recordOutput("Arm/CurrentPositionDegrees", getCurrentArmAngle().getDegrees());
     }
@@ -98,7 +99,7 @@ public class Intake extends MotorSubsystem {
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {
-        IntakeConstants.WHEEL_MECHANISM.setTargetVelocity(targetVoltage);
+        IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(targetVoltage);
         intakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 

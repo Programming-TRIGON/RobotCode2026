@@ -35,9 +35,9 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
 
+    private static final  double ANGLE_MOTOR_GEAR_RATIO = 40;
+    private static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
-    static final double ANGLE_MOTOR_GEAR_RATIO = 40;
-    static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
     private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
     static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
@@ -78,17 +78,17 @@ public class IntakeConstants {
 
     private static final String
             ANGLE_MOTOR_MECHANISM_NAME = "IntakeAngleMotorMechanism",
-            WHEEL_MOTOR_MECHANISM_NAME = "IntakeWheelMotorMechanism";
-    private static final Color ANGLE_MECHANISM_COLOR = Color.kOrange;
-    private static final double WHEEL_MAXIMUM_DISPLAYABLE_VOLTAGE = 12;
+            INTAKE_MOTOR_MECHANISM_NAME = "IntakeWheelMotorMechanism";
+    private static final Color ANGLE_MOTOR_MECHANISM_COLOR = Color.kOrange;
+    private static final double INTAKE_MOTOR_MAXIMUM_DISPLAYABLE_VOLTAGE = 12;
     static final SingleJointedArmMechanism2d ANGLE_MECHANISM = new SingleJointedArmMechanism2d(
             ANGLE_MOTOR_MECHANISM_NAME,
             INTAKE_LENGTH_METERS,
-            ANGLE_MECHANISM_COLOR
+            ANGLE_MOTOR_MECHANISM_COLOR
     );
-    static final SpeedMechanism2d WHEEL_MECHANISM = new SpeedMechanism2d(
-            WHEEL_MOTOR_MECHANISM_NAME,
-            WHEEL_MAXIMUM_DISPLAYABLE_VOLTAGE
+    static final SpeedMechanism2d INTAKE_MOTOR_MECHANISM = new SpeedMechanism2d(
+            INTAKE_MOTOR_MECHANISM_NAME,
+            INTAKE_MOTOR_MAXIMUM_DISPLAYABLE_VOLTAGE
     );
 
     static final Pose3d INTAKE_VISUALIZATION_ORIGIN_POINT = new Pose3d(
@@ -135,7 +135,6 @@ public class IntakeConstants {
         ANGLE_MOTOR.applyConfiguration(config);
         ANGLE_MOTOR.setPhysicsSimulation(INTAKE_ANGLE_SIMULATION);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        ANGLE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
