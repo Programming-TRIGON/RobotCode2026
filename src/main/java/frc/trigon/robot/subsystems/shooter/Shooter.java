@@ -36,6 +36,7 @@ public class Shooter extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
+        ShooterConstants.FOLLOWER_MOTOR.update();
     }
 
     @Override
