@@ -94,12 +94,6 @@ public class Intake extends MotorSubsystem {
         setTargetIntakeVoltage(targetVoltage);
     }
 
-    private void setTargetAngle(Rotation2d targetAngle) {
-        angleMotor.setControl(
-                positionRequest.withPosition(targetAngle.getRotations())
-        );
-    }
-
     private void setTargetIntakeVoltage(double targetVoltage) {
         IntakeConstants.WHEEL_MECHANISM.setTargetVelocity(targetVoltage);
         intakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
@@ -115,6 +109,10 @@ public class Intake extends MotorSubsystem {
                 new Rotation3d(0, -getCurrentArmAngle().getRadians(), 0)
         );
         return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
+    }
+
+    private void setTargetAngle(Rotation2d targetAngle) {
+        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
     }
 
     private Rotation2d getCurrentArmAngle() {
