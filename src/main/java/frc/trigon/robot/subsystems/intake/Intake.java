@@ -86,6 +86,10 @@ public class Intake extends MotorSubsystem {
         ) < IntakeConstants.ANGLE_MOTOR_TOLERANCE.getDegrees();
     }
 
+    public boolean atTargetState() {
+        return atAngle(this.targetState.targetAngle);
+    }
+
     void setTargetState(IntakeConstants.IntakeState targetState) {
         this.targetState = targetState;
         setTargetState(targetState.targetAngle,targetState.targetVoltage);
