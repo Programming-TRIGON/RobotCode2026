@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 public class FuelShootingVisualizationConstants {
     static final double G_FORCE = 9.81;
     static final double
-            TOP_TRACTION_COEFFICIENT = 0.81,
+            TOP_TRACTION_COEFFICIENT = 0.8,
             BOTTOM_TRACTION_COEFFICIENT = 1;
     static final double
             GAME_PIECE_MASS_KG = 0.2,
