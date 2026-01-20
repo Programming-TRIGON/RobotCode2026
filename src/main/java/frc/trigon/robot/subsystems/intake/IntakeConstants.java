@@ -38,6 +38,8 @@ public class IntakeConstants {
     static final boolean FOC_ENABLED = true;
     static final double ANGLE_MOTOR_GEAR_RATIO = 40;
     static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
+    private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
+    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
@@ -164,7 +166,7 @@ public class IntakeConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
+        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);
@@ -176,6 +178,7 @@ public class IntakeConstants {
 
     public enum IntakeState {
         REST(Rotation2d.fromDegrees(120), 0),
+        PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0),
         INTAKE(Rotation2d.fromDegrees(0), 6),
         EJECT(Rotation2d.fromDegrees(0), -6);
 
