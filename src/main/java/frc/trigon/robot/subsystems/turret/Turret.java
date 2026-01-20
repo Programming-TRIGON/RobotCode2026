@@ -206,7 +206,7 @@ public class Turret extends MotorSubsystem {
         return angle.getDegrees() > TurretConstants.MINIMUM_ANGLE.getDegrees() && angle.getDegrees() < TurretConstants.MAXIMUM_ANGLE.getDegrees();
     }
 
-    private Pose3d calculateVisualizationPose() {
+    public Pose3d calculateVisualizationPose() {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(),
                 new Rotation3d(0, 0, getSelfRelativeAngle().getRadians())

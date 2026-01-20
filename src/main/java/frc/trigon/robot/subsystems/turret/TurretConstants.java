@@ -57,9 +57,9 @@ public class TurretConstants {
             MECHANISM_NAME,
             MECHANISM_COLOR
     );
-    static final Pose3d TURRET_VISUALIZATION_ORIGIN_POINT = new Pose3d(
-            new Translation3d(),
-            new Rotation3d()
+    public static final Pose3d TURRET_VISUALIZATION_ORIGIN_POINT = new Pose3d(
+            new Translation3d(0.14542, -0.14542, -0.34578),
+            new Rotation3d(0, 0, 0)
     ); //TODO: set correct pose
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(

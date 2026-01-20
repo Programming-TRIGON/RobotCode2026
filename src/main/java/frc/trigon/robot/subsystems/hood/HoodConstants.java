@@ -62,7 +62,7 @@ public class HoodConstants {
     );
 
     static final Pose3d HOOD_VISUALIZATION_ORIGIN_POINT = new Pose3d(
-            new Translation3d(0, 0, 0),
+            new Translation3d(0.06144, -0.14542, -0.46867),
             new Rotation3d(0, 0, 0)
     );
 
