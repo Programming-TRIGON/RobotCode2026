@@ -77,10 +77,6 @@ public class Spindexer extends MotorSubsystem {
         return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }
 
-    public Rotation2d getCurrentRotation() {
-        return Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION));
-    }
-
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
         setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
     }

@@ -117,7 +117,7 @@ public class SimulationFieldHandler {
         final Pose3d
                 robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()),
                 loaderPose = SimulatedGamePieceConstants.LOADER_CHECK_POSE;
-        return loaderPose.plus(toTransform(robotPose));
+        return robotPose.plus(toTransform(loaderPose));
     }
 
     private static void ejectGamePiece(SimulatedGamePiece ejectedGamePiece) {
@@ -161,7 +161,7 @@ public class SimulationFieldHandler {
         final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
         final Pose3d robotRelativeSpindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
 
-        final Rotation3d spindexerRotationOffset = new Rotation3d(RobotContainer.SPINDEXER.getCurrentRotation().plus(heldFuelSpindexerRelativeRotation));
+        final Rotation3d spindexerRotationOffset = new Rotation3d(heldFuelSpindexerRelativeRotation);
         final Translation3d fuelDistanceFromSpindexerOrigin = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS;
         final Transform3d fuelOffsetFromSpindexerPose = new Transform3d(
                 fuelDistanceFromSpindexerOrigin,

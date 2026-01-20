@@ -44,6 +44,7 @@ public class SimulatedGamePiece {
         velocityAtRelease = fieldRelativeReleaseVelocity;
         poseAtRelease = fieldRelativePose;
         timestampAtRelease = Timer.getTimestamp();
+        CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.remove(spindexerRelativeRotation);
 
         updateIsTouchingGround();
     }
@@ -66,7 +67,12 @@ public class SimulatedGamePiece {
 
     public void resetIndexing() {
         spindexerRelativeRotation = calculateClosestSpindexerRotationFromCurrentPose();
-        isIndexed = spindexerRelativeRotation != null;
+        if (spindexerRelativeRotation == null) {
+            isIndexed = false;
+            return;
+        }
+        isIndexed = true;
+        CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.add(spindexerRelativeRotation);
     }
 
     public Rotation2d getSpindexerRelativeRotation() {
@@ -116,7 +122,11 @@ public class SimulatedGamePiece {
         final Pose3d spindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
         final double yOffset = spindexerPose.getY() - fieldRelativePose.getY();
         final double fuelTargetOffsetFromSpindexer = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.getNorm();
-        final Rotation2d closestSpindexerRotation = Rotation2d.fromRadians(Math.asin(yOffset / fuelTargetOffsetFromSpindexer));
+
+        final double closestSpindexerRotationRadians = Math.asin(yOffset / fuelTargetOffsetFromSpindexer);
+        if (Double.isNaN(closestSpindexerRotationRadians))
+            return null;
+        final Rotation2d closestSpindexerRotation = Rotation2d.fromRadians(closestSpindexerRotationRadians);
 
         return findClosestOpenRotationInSpindexer(closestSpindexerRotation);
     }
