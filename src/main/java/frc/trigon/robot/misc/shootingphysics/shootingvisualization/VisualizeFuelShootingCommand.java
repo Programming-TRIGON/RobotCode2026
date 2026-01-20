@@ -65,9 +65,9 @@ public class VisualizeFuelShootingCommand extends Command {
     }
 
     private Translation3d calculateShootingVelocityVector() {
-        final double fuelExitSpeedMetersPerSecond = SHOOTING_CALCULATIONS.getTargetShootingState().targetShootingVelocityMetersPerSecond(); // TODO: get from shooter subsystem
-        final Rotation2d fuelExitPitch = SHOOTING_CALCULATIONS.getTargetShootingState().targetPitch(); // TODO: get from hood subsystem
-        final Rotation2d turretFieldRelativeAngle = SHOOTING_CALCULATIONS.getTargetShootingState().targetFieldRelativeYaw().get(); // TODO: get from turret subsystem
+        final double fuelExitSpeedMetersPerSecond = RobotContainer.SHOOTER.getCurrentVelocityMetersPerSecond();
+        final Rotation2d fuelExitPitch = RobotContainer.HOOD.getCurrentAngle();
+        final Rotation2d turretFieldRelativeAngle = RobotContainer.TURRET.getCurrentFieldRelativeAngle();
         return new Translation3d(fuelExitSpeedMetersPerSecond, new Rotation3d(0, -fuelExitPitch.getRadians(), turretFieldRelativeAngle.getRadians()));
     }
 

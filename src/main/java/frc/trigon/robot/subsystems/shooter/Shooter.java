@@ -63,6 +63,10 @@ public class Shooter extends MotorSubsystem {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
+    public double getCurrentVelocityMetersPerSecond() {
+        return motor.getSignal(TalonFXSignal.VELOCITY);
+    }
+
     void aimAtHub() {
         final double targetVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
         final double targetVelocityWithSlippageCompensation = targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
@@ -78,9 +82,5 @@ public class Shooter extends MotorSubsystem {
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
-    }
-
-    private double getCurrentVelocityMetersPerSecond() {
-        return motor.getSignal(TalonFXSignal.VELOCITY);
     }
 }

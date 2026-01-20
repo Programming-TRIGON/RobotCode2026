@@ -1,7 +1,6 @@
 package frc.trigon.robot.misc.shootingphysics;
 
 import edu.wpi.first.math.geometry.*;
-import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -22,7 +21,7 @@ public class ShootingCalculations {
 
     public void updateCalculations() {
         targetShootingState = calculateTargetShootingState();
-        Logger.recordOutput("Shooting/TargetShootingYawDegrees", targetShootingState.targetFieldRelativeYaw().get().getDegrees());
+        Logger.recordOutput("Shooting/TargetShootingYawDegrees", targetShootingState.targetFieldRelativeYaw().getDegrees());
         Logger.recordOutput("Shooting/TargetShootingPitchDegrees", targetShootingState.targetPitch().getDegrees());
         Logger.recordOutput("Shooting/TargetShootingVelocityMPS", targetShootingState.targetShootingVelocityMetersPerSecond());
     }
@@ -30,12 +29,12 @@ public class ShootingCalculations {
     public ShootingState getTargetShootingState() {
         return targetShootingState;
     }
-    
+
     @AutoLogOutput(key = "Shooting/CurrentFuelExitPosition")
     public Translation3d calculateCurrentFuelExitPose() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Rotation2d hoodPitch = RobotContainer.HOOD.getCurrentAngle();
-        final Rotation2d turretSelfRelativeYaw = /*RobotContainer.TURRET.getCurrentSelfRelativeAngle()*/ new Rotation2d();
+        final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getCurrentSelfRelativeAngle();
         return calculateFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
@@ -43,7 +42,7 @@ public class ShootingCalculations {
     public Translation3d calculateTargetFuelExitPosition() {
         final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(ShootingCalculationsConstants.POSE_PREDICTION_TIME_SECONDS);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
-        final Rotation2d turretSelfRelativeYaw = /*RobotContainer.TURRET.getTargetSelfRelativeAngle()*/ new Rotation2d();
+        final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getTargetSelfRelativeAngle();
         return calculateFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
@@ -79,7 +78,7 @@ public class ShootingCalculations {
 
     private ShootingState calculateTargetShootingState() {
         final Translation3d totalShotVector = calculateTotalShotVector();
-        final FlippableRotation2d targetRobotAngle = new FlippableRotation2d(getYaw(totalShotVector), false);
+        final Rotation2d targetRobotAngle = getYaw(totalShotVector);
         final Rotation2d targetPitch = getPitch(totalShotVector);
         final double targetShootingVelocityMetersPerSecond = totalShotVector.getNorm();
         return new ShootingState(
