@@ -54,6 +54,8 @@ public class Turret extends MotorSubsystem {
     public void updatePeriodically() {
         motor.update();
         encoder.update();
+
+        Logger.recordOutput("Turret/CurrentAngleDegrees", getCurrentEncoderAngle().getDegrees());
     }
 
     @Override
@@ -80,10 +82,16 @@ public class Turret extends MotorSubsystem {
 
     void alignForDelivery() {
         final Rotation2d targetAngle = calculateTargetAngleForDelivery();
-        setTargetAngle(targetAngle);
+        setTargetSelfRelativeAngleAngle(targetAngle);
     }
 
-    void setTargetAngle(Rotation2d targetAngle) {
+    void setTargetFieldRelativeAngle(Rotation2d targetAngle) {
+        final Rotation2d targetRobotRelativeAngle = Rotation2d.fromDegrees(targetAngle.getDegrees() - RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees());
+        final Rotation2d targetTurretRelativeAngle = Rotation2d.fromDegrees(targetRobotRelativeAngle.getDegrees() + 180);
+        setTargetSelfRelativeAngleAngle(targetTurretRelativeAngle);
+    }
+
+    void setTargetSelfRelativeAngleAngle(Rotation2d targetAngle) {
         final Rotation2d targetAngleAfterLimitCheck = limitAngle(targetAngle);
         motor.setControl(positionRequest.withPosition(targetAngleAfterLimitCheck.getRotations()));
     }
@@ -130,12 +138,30 @@ public class Turret extends MotorSubsystem {
         }
 
         if (targetAngleInRangeIndices.isEmpty())
-            return adjustedAngleOptions[0].getDegrees() > TurretConstants.TOTAL_ANGULAR_RANGE.getDegrees() / 2 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
+            return getClosestAngleToLimits(adjustedAngleOptions).getDegrees() > TurretConstants.TOTAL_ANGULAR_RANGE.getDegrees() / 2 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
         if (targetAngleInRangeIndices.size() == 1)
             return angleOptions[targetAngleInRangeIndices.get(0)];
         if (bothInRangeIndices.size() == 1)
             return angleOptions[bothInRangeIndices.get(0)];
         return getAngleFurthestFromLimits(angleOptions, bothInRangeIndices);
+    }
+
+    private Rotation2d getClosestAngleToLimits(Rotation2d[] angles) {
+        Rotation2d bestAngle = angles[0];
+        double bestDistanceFromLimit = Math.min(
+                Math.abs(bestAngle.getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees()),
+                Math.abs(bestAngle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees())
+        );
+        for (Rotation2d angle : angles) {
+            final double distanceFromMinimumLimit = Math.abs(angle.getDegrees() - TurretConstants.MINIMUM_ANGLE.getDegrees());
+            final double distanceFromMaximumLimit = Math.abs(angle.getDegrees() - TurretConstants.MAXIMUM_ANGLE.getDegrees());
+            final double distanceFromLimit = Math.min(distanceFromMinimumLimit, distanceFromMaximumLimit);
+            if (distanceFromLimit < bestDistanceFromLimit) {
+                bestAngle = angle;
+                bestDistanceFromLimit = distanceFromLimit;
+            }
+        }
+        return bestAngle;
     }
 
     private Rotation2d getAngleFurthestFromLimits(Rotation2d[] angles, ArrayList<Integer> indices) {

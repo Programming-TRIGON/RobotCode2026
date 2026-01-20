@@ -98,7 +98,7 @@ public class TurretConstants {
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.14659 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 7 : 5;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 3 : 5;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 2 : 5;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
