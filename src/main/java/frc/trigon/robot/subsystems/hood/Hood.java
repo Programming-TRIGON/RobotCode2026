@@ -91,11 +91,35 @@ public class Hood extends MotorSubsystem {
     }
 
     private Pose3d calculateVisualizationPose() {
+        final Pose3d turretOrigin = new Pose3d(
+                new Translation3d(-0.14542, 0.14542, 0.34578),
+                new Rotation3d(0, 0, 0)
+        );
+        final Pose3d turretPose = calculateTurretVisualizationPose();
+        Logger.recordOutput("Poses/Components/TurretPose", turretPose);
+        final Pose3d hoodPoseAtTurretZeroRotation = new Pose3d(
+                new Translation3d(-0.06114, 0.14542, 0.46867),
+                new Rotation3d(0, Math.toRadians(90), 0)
+        );
+
+        final Transform3d turretToPitcher = hoodPoseAtTurretZeroRotation.minus(turretOrigin);
         final Transform3d pitchTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
+                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
         );
-        return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
+        return turretPose.plus(turretToPitcher).plus(pitchTransform);
+    }
+
+    private Pose3d calculateTurretVisualizationPose() {
+        final Pose3d turretOrigin = new Pose3d(
+                new Translation3d(-0.14542, 0.14542, 0.34578),
+                new Rotation3d(0, 0, 0)
+        );
+        final Transform3d turretRotationTransform = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, 0, Math.toRadians(getCurrentAngle().getDegrees()))
+        );
+        return turretOrigin.transformBy(turretRotationTransform);
     }
 
     private Rotation2d getCurrentAngle() {

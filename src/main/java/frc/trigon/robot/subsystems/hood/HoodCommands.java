@@ -55,15 +55,6 @@ public class HoodCommands {
     public static Command getSetTargetAngleCommand(Rotation2d targetAngle) {
         return new StartEndCommand(
                 () -> RobotContainer.HOOD.setTargetAngle(targetAngle),
-                () -> {
-                },
-                RobotContainer.HOOD
-        );
-    }
-
-    public static Command getStopMotorCommand() {
-        return new StartEndCommand(
-                RobotContainer.HOOD::stop,
                 RobotContainer.HOOD::stop,
                 RobotContainer.HOOD
         );
