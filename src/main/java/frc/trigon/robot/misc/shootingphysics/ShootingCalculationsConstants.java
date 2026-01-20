@@ -18,7 +18,7 @@ public class ShootingCalculationsConstants {
     static final Transform3d
             TURRET_TO_HOOD = ROBOT_RELATIVE_HOOD_ORIGIN_AT_ZEROED_TURRET.minus(ROBOT_RELATIVE_TURRET_ORIGIN),
             HOOD_TO_FUEL_EXIT_POSITION = new Transform3d(
-                    new Translation3d(0.1016, 0, 0.0508),
+                    new Translation3d(-0.1016, 0, 0.0508),
                     new Rotation3d(0, 0, 0)
             );
 
