@@ -30,8 +30,7 @@ public class ShootingCalculations {
     public ShootingState getTargetShootingState() {
         return targetShootingState;
     }
-
-
+    
     @AutoLogOutput(key = "Shooting/CurrentFuelExitPosition")
     public Translation3d calculateCurrentFuelExitPose() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
