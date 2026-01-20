@@ -92,7 +92,7 @@ public class Intake extends MotorSubsystem {
 
     void setTargetState(IntakeConstants.IntakeState targetState) {
         this.targetState = targetState;
-        setTargetState(targetState.targetAngle,targetState.targetVoltage);
+        setTargetState(targetState.targetAngle, targetState.targetVoltage);
     }
 
     void setTargetState(Rotation2d targetAngle, double targetVoltage) {
