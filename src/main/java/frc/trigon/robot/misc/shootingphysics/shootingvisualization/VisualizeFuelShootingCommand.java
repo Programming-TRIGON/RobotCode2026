@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 /**
  * A command to visualize note shooting.
@@ -21,23 +23,25 @@ import java.util.ArrayList;
  */
 public class VisualizeFuelShootingCommand extends Command {
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
-    private static final ArrayList<Translation3d> VISUALIZED_POSITIONS = new ArrayList<>();
-    private Translation3d currentGamePiecePosition, currentGamePieceVelocity;
+    private static final ArrayList<SimulatedGamePiece> VISUALIZED_GAME_PIECES = new ArrayList<>();
+    private final SimulatedGamePiece shotFuel;
+    private Translation3d currentFuelVelocity;
     private double currentSpinRadiansPerSecond;
 
-    private VisualizeFuelShootingCommand() {
+    private VisualizeFuelShootingCommand(SimulatedGamePiece shotFuel) {
+        this.shotFuel = shotFuel;
     }
 
-    public static InstantCommand getScheduleShotCommand() {
-        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand()));
+    public static InstantCommand getScheduleShotCommand(Supplier<SimulatedGamePiece> shotFuelSupplier) {
+        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(shotFuelSupplier.get())));
     }
 
     @Override
     public void initialize() {
-        currentGamePiecePosition = SHOOTING_CALCULATIONS.calculateCurrentFuelExitPose();
-        VISUALIZED_POSITIONS.add(currentGamePiecePosition);
-        currentGamePieceVelocity = calculateFuelExitVelocityVector();
-        initializeSpin(currentGamePieceVelocity.getNorm());
+        shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateCurrentFuelExitPose());
+        VISUALIZED_GAME_PIECES.add(shotFuel);
+        currentFuelVelocity = calculateFuelExitVelocityVector();
+        initializeSpin(currentFuelVelocity.getNorm());
     }
 
     @Override
@@ -45,17 +49,18 @@ public class VisualizeFuelShootingCommand extends Command {
         for (int i = 0; i < (int) (RobotHardwareStats.getPeriodicTimeSeconds() / FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS); i++)
             stepSimulation();
 
-        Logger.recordOutput("Poses/GamePieces/ShotFuelPoses", VISUALIZED_POSITIONS.toArray(Translation3d[]::new));
+        final Translation3d[] shotFuelPositions = VISUALIZED_GAME_PIECES.stream().map((gamePiece) -> gamePiece.getPose().getTranslation()).toArray(Translation3d[]::new);
+        Logger.recordOutput("Poses/GamePieces/ShotFuelPositions", shotFuelPositions);
     }
 
     @Override
     public boolean isFinished() {
-        return currentGamePiecePosition.getZ() < 0.6 && currentGamePieceVelocity.getZ() < 0;
+        return shotFuel.getPose().getZ() < FuelShootingVisualizationConstants.END_SIMULATION_HEIGHT_METERS && currentFuelVelocity.getZ() < 0;
     }
 
     @Override
     public void end(boolean interrupted) {
-        VISUALIZED_POSITIONS.remove(currentGamePiecePosition);
+        VISUALIZED_GAME_PIECES.remove(shotFuel);
     }
 
     private Translation3d calculateFuelExitVelocityVector() {
@@ -79,14 +84,13 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private void stepSimulation() {
         final Translation3d gravitySpeedVector = calculateCurrentGravitySpeedVector();
-        final Translation3d dragSpeedVector = calculateCurrentDragSpeedVector(currentGamePieceVelocity);
-        final Translation3d magnusSpeedVector = calculateCurrentMagnusSpeedVector(currentGamePieceVelocity);
-        currentGamePieceVelocity = currentGamePieceVelocity.plus(gravitySpeedVector).plus(dragSpeedVector).plus(magnusSpeedVector);
-        updateSpinDecay(currentGamePieceVelocity);
+        final Translation3d dragSpeedVector = calculateCurrentDragSpeedVector(currentFuelVelocity);
+        final Translation3d magnusSpeedVector = calculateCurrentMagnusSpeedVector(currentFuelVelocity);
+        currentFuelVelocity = currentFuelVelocity.plus(gravitySpeedVector).plus(dragSpeedVector).plus(magnusSpeedVector);
+        updateSpinDecay(currentFuelVelocity);
 
-        VISUALIZED_POSITIONS.remove(currentGamePiecePosition);
-        currentGamePiecePosition = currentGamePiecePosition.plus(currentGamePieceVelocity.times(FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS));
-        VISUALIZED_POSITIONS.add(currentGamePiecePosition);
+        final Translation3d currentGamePiecePosition = shotFuel.getPose().getTranslation();
+        shotFuel.updatePosition(currentGamePiecePosition.plus(currentFuelVelocity.times(FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS)));
     }
 
     private Translation3d calculateCurrentGravitySpeedVector() {

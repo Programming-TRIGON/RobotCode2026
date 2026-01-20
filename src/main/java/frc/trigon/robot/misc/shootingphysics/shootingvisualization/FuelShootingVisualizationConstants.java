@@ -18,5 +18,7 @@ public class FuelShootingVisualizationConstants {
             MAGNUS_LIFT_FACTOR = 0.6,
             SPIN_DECAY_COEFFICIENT = 0.01;
     static final Translation3d MAGNUS_SPIN_AXIS = new Translation3d(0, 1, 0);
+
     static final double SIMULATION_TIME_STEP_SECONDS = 0.001;
+    static final double END_SIMULATION_HEIGHT_METERS = 0.6;
 }
