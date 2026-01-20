@@ -116,7 +116,7 @@ public class Intake extends MotorSubsystem {
 
     private Pose3d calculateVisualizationPose() {
         final Transform3d pitchTransform = new Transform3d(
-                new Translation3d(0, 0,0 ),
+                new Translation3d(0, 0, 0),
                 new Rotation3d(0, -getCurrentArmAngle().getRadians(), 0)
         );
         return IntakeConstants.INTAKE_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
