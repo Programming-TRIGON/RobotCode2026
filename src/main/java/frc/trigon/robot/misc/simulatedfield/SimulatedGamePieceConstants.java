@@ -61,7 +61,7 @@ public class SimulatedGamePieceConstants {
     }
 
     public enum GamePieceType {
-        FUEL(0.15 / 2.0, 0);
+        FUEL(FUEL_DIAMETER_METERS / 2.0, 0);
 
         public final double originPointHeightOffGroundMeters;
         public final int id;
