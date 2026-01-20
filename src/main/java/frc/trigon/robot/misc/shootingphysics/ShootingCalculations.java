@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ShootingCalculations {
@@ -30,6 +31,8 @@ public class ShootingCalculations {
         return targetShootingState;
     }
 
+
+    @AutoLogOutput(key = "Shooting/CurrentFuelExitPosition")
     public Translation3d calculateCurrentFuelExitPose() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Rotation2d hoodPitch = RobotContainer.HOOD.getCurrentAngle();
@@ -37,11 +40,12 @@ public class ShootingCalculations {
         return calculateFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
-    public Translation2d calculateTargetFuelExitPosition() {
+    @AutoLogOutput(key = "Shooting/TargetFuelExitPosition")
+    public Translation3d calculateTargetFuelExitPosition() {
         final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(ShootingCalculationsConstants.POSE_PREDICTION_TIME_SECONDS);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
         final Rotation2d turretSelfRelativeYaw = /*RobotContainer.TURRET.getTargetSelfRelativeAngle()*/ new Rotation2d();
-        return calculateFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw).toTranslation2d();
+        return calculateFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
     public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
@@ -87,7 +91,7 @@ public class ShootingCalculations {
     }
 
     private Translation3d calculateTotalShotVector() {
-        final Translation2d targetFuelExitPosition = calculateTargetFuelExitPosition();
+        final Translation2d targetFuelExitPosition = calculateTargetFuelExitPosition().toTranslation2d();
         final Translation2d robotVelocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
         final Translation2d allianceHubPosition = FieldConstants.HUB_POSITION.get();
         final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToFieldPoint(allianceHubPosition, targetFuelExitPosition, robotVelocity);
