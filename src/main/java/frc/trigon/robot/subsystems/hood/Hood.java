@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
+    private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = HoodConstants.MOTOR;
     private final CANcoderEncoder encoder = HoodConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
@@ -73,8 +75,19 @@ public class Hood extends MotorSubsystem {
         return Math.abs(angle.getDegrees() - getCurrentAngle().getDegrees()) < HoodConstants.ANGLE_TOLERANCE.getDegrees();
     }
 
+    public Rotation2d getTargetAngle() {
+        return targetAngle;
+    }
+
+    public Rotation2d getCurrentAngle() {
+        final double offsettedCurrentAngleRotations = motor.getSignal(TalonFXSignal.POSITION) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
+        return Rotation2d.fromRotations(offsettedCurrentAngleRotations);
+    }
+
     void aimAtHub() {
-    }//TODO implement
+        final Rotation2d targetAngleFromShootingCalculations = shootingCalculations.getTargetShootingState().targetPitch();
+        setTargetAngle(targetAngleFromShootingCalculations);
+    }
 
     void aimForDelivery() {
         setTargetAngle(HoodConstants.DELIVERY_ANGLE);
@@ -96,10 +109,5 @@ public class Hood extends MotorSubsystem {
                 new Rotation3d(0, getCurrentAngle().getRadians(), 0)//TODO implement turret rotation
         );
         return HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.transformBy(pitchTransform);
-    }
-
-    private Rotation2d getCurrentAngle() {
-        final double offsettedCurrentAngleRotations = motor.getSignal(TalonFXSignal.POSITION) + HoodConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
-        return Rotation2d.fromRotations(offsettedCurrentAngleRotations);
     }
 }

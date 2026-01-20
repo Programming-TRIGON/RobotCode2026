@@ -32,19 +32,46 @@ public class ShootingCalculations {
 
     public Translation3d calculateCurrentFuelExitPose() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return new Translation3d(robotPose.getTranslation().getX(), robotPose.getTranslation().getY(), 0.5);
-
-//        return null; // TODO: Implement fuel exit pose calculation
+        final Rotation2d hoodPitch = RobotContainer.HOOD.getCurrentAngle();
+        final Rotation2d turretSelfRelativeYaw = /*RobotContainer.TURRET.getCurrentSelfRelativeAngle()*/ new Rotation2d();
+        return calculateFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
     public Translation2d calculateTargetFuelExitPosition() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return robotPose.getTranslation();
-//        return null; // TODO: Implement fuel exit pose calculation
+        final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(ShootingCalculationsConstants.POSE_PREDICTION_TIME_SECONDS);
+        final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
+        final Rotation2d turretSelfRelativeYaw = /*RobotContainer.TURRET.getTargetSelfRelativeAngle()*/ new Rotation2d();
+        return calculateFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw).toTranslation2d();
     }
 
-    public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d pitch, Rotation2d turretFieldRelativeYaw) {
-        return null; // TODO: Implement fuel exit pose calculation
+    public Translation3d calculateFuelExitPose(Pose2d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
+        final Transform3d robotToFuelExitPosition = calculateRobotToFuelExitTransform(hoodPitch, turretSelfRelativeYaw);
+        return new Pose3d(robotPose).transformBy(robotToFuelExitPosition).getTranslation();
+    }
+
+    private Transform3d calculateRobotToFuelExitTransform(Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
+        final Pose3d robotRelativeHoodPose = calculateRobotRelativeHoodPose(hoodPitch, turretSelfRelativeYaw);
+
+        final Pose3d fuelExitRobotRelativePosition = robotRelativeHoodPose.transformBy(ShootingCalculationsConstants.HOOD_TO_FUEL_EXIT_POSITION);
+        return new Transform3d(
+                fuelExitRobotRelativePosition.getTranslation(),
+                fuelExitRobotRelativePosition.getRotation()
+        );
+    }
+
+    private Pose3d calculateRobotRelativeHoodPose(Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
+        final Transform3d turretYawTransform = new Transform3d(
+                new Translation3d(),
+                new Rotation3d(0, 0, turretSelfRelativeYaw.getRadians())
+        );
+        final Pose3d robotRelativeTurretPose = ShootingCalculationsConstants.ROBOT_RELATIVE_TURRET_ORIGIN.transformBy(turretYawTransform);
+        final Pose3d robotRelativeHoodOrigin = robotRelativeTurretPose.transformBy(ShootingCalculationsConstants.TURRET_TO_HOOD);
+
+        final Transform3d hoodPitchTransform = new Transform3d(
+                new Translation3d(),
+                new Rotation3d(0, -hoodPitch.getRadians(), 0)
+        );
+        return robotRelativeHoodOrigin.transformBy(hoodPitchTransform);
     }
 
     private ShootingState calculateTargetShootingState() {
