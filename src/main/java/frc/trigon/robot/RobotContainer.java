@@ -31,6 +31,8 @@ import frc.trigon.robot.subsystems.spindexer.Spindexer;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
+import frc.trigon.robot.subsystems.turret.Turret;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -45,6 +47,7 @@ public class RobotContainer {
     public static final Loader LOADER = new Loader();
     public static final Shooter SHOOTER = new Shooter();
     public static final Spindexer SPINDEXER = new Spindexer();
+    public static final Turret TURRET = new Turret();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -72,6 +75,7 @@ public class RobotContainer {
         LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
+        TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
     }
 
     private void bindControllerCommands() {
