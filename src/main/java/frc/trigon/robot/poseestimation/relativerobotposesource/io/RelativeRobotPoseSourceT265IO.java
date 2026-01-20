@@ -1,13 +1,13 @@
 package frc.trigon.robot.poseestimation.relativerobotposesource.io;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.trigon.lib.utilities.JsonHandler;
 import frc.trigon.robot.poseestimation.relativerobotposesource.RelativeRobotPoseSourceIO;
 import frc.trigon.robot.poseestimation.relativerobotposesource.RelativeRobotPoseSourceInputsAutoLogged;
-import frc.trigon.lib.utilities.JsonHandler;
 
 public class RelativeRobotPoseSourceT265IO extends RelativeRobotPoseSourceIO {
     private final NetworkTableEntry jsonDumpEntry;
@@ -43,18 +43,18 @@ public class RelativeRobotPoseSourceT265IO extends RelativeRobotPoseSourceIO {
         return JsonHandler.parseJsonStringToObject(jsonDumpEntry.getString(""), T265JsonDump.class);
     }
 
-    private Pose2d extractPose(T265JsonDump jsonDump) {
-        final Translation2d translation = extractTranslation(jsonDump);
-        final Rotation2d heading = extractHeading(jsonDump);
-        return new Pose2d(translation, heading);
+    private Pose3d extractPose(T265JsonDump jsonDump) {
+        final Translation3d translation = extractTranslation(jsonDump);
+        final Rotation3d rotation = extractHeading(jsonDump);
+        return new Pose3d(translation, rotation);
     }
 
-    private Translation2d extractTranslation(T265JsonDump jsonDump) {
-        return new Translation2d(jsonDump.xPositionMeters, jsonDump.yPositionMeters);
+    private Translation3d extractTranslation(T265JsonDump jsonDump) {
+        return new Translation3d(jsonDump.xPositionMeters, jsonDump.yPositionMeters, jsonDump.zPositionMeters);
     }
 
-    private Rotation2d extractHeading(T265JsonDump jsonDump) {
-        return Rotation2d.fromRadians(jsonDump.rotationRadians);
+    private Rotation3d extractHeading(T265JsonDump jsonDump) {
+        return new Rotation3d(0, 0, jsonDump.yawRadians);
     }
 
     private static class T265JsonDump {
@@ -62,6 +62,7 @@ public class RelativeRobotPoseSourceT265IO extends RelativeRobotPoseSourceIO {
         private double batteryPercentage = 0;
         private double xPositionMeters = 0;
         private double yPositionMeters = 0;
-        private double rotationRadians = 0;
+        private double zPositionMeters = 0;
+        private double yawRadians = 0;
     }
 }

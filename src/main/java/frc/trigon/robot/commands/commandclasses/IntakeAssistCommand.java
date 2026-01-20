@@ -112,7 +112,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
     }
 
     private Translation2d calculateSelfRelativeDistanceFromBestGamePiece() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d();
         final Translation2d bestGamePieceFieldRelativePosition = getBestGamePieceFieldRelativePosition(robotPose);
 
         if (bestGamePieceFieldRelativePosition == null)

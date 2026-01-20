@@ -109,6 +109,8 @@ public class SwerveConstants {
         GYRO.applyConfiguration(config);
         GYRO.setSimulationYawVelocitySupplier(() -> RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond());//IMPORTANT: Leave as lambda expression, method reference will crash code
 
+        GYRO.registerThreadedSignal(Pigeon2Signal.ROLL, RobotPoseEstimatorConstants.ODOMETRY_FREQUENCY_HERTZ);
+        GYRO.registerThreadedSignal(Pigeon2Signal.PITCH, RobotPoseEstimatorConstants.ODOMETRY_FREQUENCY_HERTZ);
         GYRO.registerThreadedSignal(Pigeon2Signal.YAW, RobotPoseEstimatorConstants.ODOMETRY_FREQUENCY_HERTZ);
     }
 

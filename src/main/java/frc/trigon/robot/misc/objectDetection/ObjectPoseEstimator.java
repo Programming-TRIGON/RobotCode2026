@@ -76,7 +76,7 @@ public class ObjectPoseEstimator extends SubsystemBase {
      * @param intakeTransform the transform of the intake relative to the robot
      */
     public void removeClosestObjectToIntake(Transform2d intakeTransform) {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d();
         final Translation2d closestObjectToIntake = getClosestTrackedObjectToPosition(robotPose.transformBy(intakeTransform).getTranslation());
         if (closestObjectToIntake == null)
             return;
@@ -129,7 +129,7 @@ public class ObjectPoseEstimator extends SubsystemBase {
      * @return the closest object to the robot
      */
     public Translation2d getClosestObjectToRobot() {
-        return getClosestTrackedObjectToPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+        return getClosestTrackedObjectToPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d().getTranslation());
     }
 
     private void updateTrackedObjectsPositions() {

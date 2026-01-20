@@ -139,12 +139,13 @@ public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
             return null;
 
         Pose3d fieldToRobotSeed = bestCameraSolvePNPPose.transformBy(this.robotToCamera.inverse());
-        final Rotation2d robotYawAtTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(result.getTimestampSeconds()).getRotation();
+        final Rotation2d robotYawAtTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(result.getTimestampSeconds()).toPose2d().getRotation();
+        final Rotation3d robotYawAtTimestampRotation = new Rotation3d(robotYawAtTimestamp);
 
         if (!AprilTagCameraConstants.CONSTRAINED_SOLVE_PNP_PARAMS.headingFree()) {
             fieldToRobotSeed = new Pose3d(
                     fieldToRobotSeed.getTranslation(),
-                    new Rotation3d(robotYawAtTimestamp)
+                    robotYawAtTimestampRotation
             );
         }
 

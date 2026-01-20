@@ -2,6 +2,7 @@ package frc.trigon.robot.subsystems.swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -9,18 +10,18 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimatorConstants;
-import frc.trigon.robot.constants.AutonomousConstants;
-import frc.trigon.robot.subsystems.MotorSubsystem;
-import frc.trigon.robot.subsystems.swerve.swervemodule.SwerveModule;
-import frc.trigon.robot.subsystems.swerve.swervemodule.SwerveModuleConstants;
 import frc.trigon.lib.hardware.phoenix6.Phoenix6SignalThread;
 import frc.trigon.lib.hardware.phoenix6.pigeon2.Pigeon2Gyro;
 import frc.trigon.lib.hardware.phoenix6.pigeon2.Pigeon2Signal;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.constants.AutonomousConstants;
+import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimatorConstants;
+import frc.trigon.robot.subsystems.MotorSubsystem;
+import frc.trigon.robot.subsystems.swerve.swervemodule.SwerveModule;
+import frc.trigon.robot.subsystems.swerve.swervemodule.SwerveModuleConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -92,7 +93,7 @@ public class Swerve extends MotorSubsystem {
 
     public ChassisSpeeds getFieldRelativeChassisSpeeds() {
         final ChassisSpeeds selfRelativeSpeeds = getSelfRelativeChassisSpeeds();
-        return ChassisSpeeds.fromRobotRelativeSpeeds(selfRelativeSpeeds, RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
+        return ChassisSpeeds.fromRobotRelativeSpeeds(selfRelativeSpeeds, getPoseEstimatorHeading());
     }
 
     public Translation2d getSelfRelativeVelocity() {
@@ -130,7 +131,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     public boolean atAngle(FlippableRotation2d angle) {
-        final boolean atTargetAngle = Math.abs(angle.get().minus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation()).getDegrees()) < SwerveConstants.ROTATION_TOLERANCE_DEGREES;
+        final boolean atTargetAngle = Math.abs(angle.get().minus(getPoseEstimatorHeading()).getDegrees()) < SwerveConstants.ROTATION_TOLERANCE_DEGREES;
         final boolean isAngleStill = Math.abs(getSelfRelativeChassisSpeeds().omegaRadiansPerSecond) < SwerveConstants.ROTATION_VELOCITY_TOLERANCE;
         Logger.recordOutput("Swerve/AtTargetAngle/atTargetAngle", atTargetAngle);
         Logger.recordOutput("Swerve/AtTargetAngle/isStill", isAngleStill);
@@ -177,7 +178,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     public Rotation2d getDriveRelativeAngle() {
-        final Rotation2d currentAngle = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation();
+        final Rotation2d currentAngle = getPoseEstimatorHeading();
         return Flippable.isRedAlliance() ? currentAngle.rotateBy(Rotation2d.k180deg) : currentAngle;
     }
 
@@ -187,7 +188,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     void resetRotationController() {
-        SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.reset(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees());
+        SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.reset(getPoseEstimatorHeading().getDegrees());
     }
 
     /**
@@ -250,6 +251,10 @@ public class Swerve extends MotorSubsystem {
         selfRelativeDrive(speeds);
     }
 
+    private Rotation2d getPoseEstimatorHeading() {
+        return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d().getRotation();
+    }
+
     private void setTargetModuleStates(SwerveModuleState[] swerveModuleStates) {
         for (int i = 0; i < swerveModules.length; i++)
             swerveModules[i].setTargetState(swerveModuleStates[i]);
@@ -281,7 +286,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     private ChassisSpeeds calculateSelfRelativePIDSpeedsToPose(FlippablePose2d targetPose) {
-        final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(SwerveConstants.PID_TO_POSE_PREDICTION_TIME_SECONDS);
+        final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(SwerveConstants.PID_TO_POSE_PREDICTION_TIME_SECONDS).toPose2d();
         final Pose2d flippedTargetPose = targetPose.get();
 
         final double xSpeed = SwerveConstants.X_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
@@ -302,14 +307,23 @@ public class Swerve extends MotorSubsystem {
     }
 
     private void updatePoseEstimatorStates() {
-        final double[] odometryUpdatesYawDegrees = gyro.getThreadedSignal(Pigeon2Signal.YAW);
-        final int totalOdometryUpdates = odometryUpdatesYawDegrees.length;
+        final double[][] odometryUpdatesDegrees = new double[][]{
+                gyro.getThreadedSignal(Pigeon2Signal.ROLL),
+                gyro.getThreadedSignal(Pigeon2Signal.PITCH),
+                gyro.getThreadedSignal(Pigeon2Signal.YAW)
+        };
+        final int totalOdometryUpdates = odometryUpdatesDegrees[0].length;
+
         final SwerveModulePosition[][] swerveWheelPositions = new SwerveModulePosition[totalOdometryUpdates][];
-        final Rotation2d[] gyroRotations = new Rotation2d[totalOdometryUpdates];
+        final Rotation3d[] gyroRotations = new Rotation3d[totalOdometryUpdates];
 
         for (int i = 0; i < totalOdometryUpdates; i++) {
             swerveWheelPositions[i] = getSwerveWheelPositions(i);
-            gyroRotations[i] = Rotation2d.fromDegrees(odometryUpdatesYawDegrees[i]);
+            gyroRotations[i] = new Rotation3d(
+                    Units.degreesToRadians(odometryUpdatesDegrees[0][i]),
+                    Units.degreesToRadians(odometryUpdatesDegrees[1][i]),
+                    Units.degreesToRadians(odometryUpdatesDegrees[2][i])
+            );
         }
 
         RobotContainer.ROBOT_POSE_ESTIMATOR.updatePoseEstimatorOdometry(swerveWheelPositions, gyroRotations, phoenix6SignalThread.getLatestTimestamps());
@@ -332,7 +346,7 @@ public class Swerve extends MotorSubsystem {
             return 0;
         SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.setGoal(targetAngle.get().getDegrees());
 
-        final Rotation2d currentAngle = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation();
+        final Rotation2d currentAngle = getPoseEstimatorHeading();
         final double outputSpeedRadians = Units.degreesToRadians(SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.calculate(currentAngle.getDegrees()));
         final boolean atGoal = SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.atGoal();
         Logger.recordOutput("Swerve/ProfiledRotationPIDController/Setpoint", SwerveConstants.PROFILED_ROTATION_PID_CONTROLLER_DEGREES.getSetpoint().position);
