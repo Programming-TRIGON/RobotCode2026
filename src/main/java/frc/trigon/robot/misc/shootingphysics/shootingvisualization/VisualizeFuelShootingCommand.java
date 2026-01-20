@@ -108,11 +108,8 @@ public class VisualizeFuelShootingCommand extends Command {
         final double gamePieceVelocityMagnitude = currentGamePieceVelocity.getNorm();
         if (gamePieceVelocityMagnitude < 1e-6)
             return new Translation3d();
-        
-        final double spinParameter = (currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS) / (gamePieceVelocityMagnitude);
-        final double magnusLiftCoefficient = FuelShootingVisualizationConstants.MAGNUS_LIFT_FACTOR * spinParameter;
-        final double magnusAccelerationMagnitude = (0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * gamePieceVelocityMagnitude * gamePieceVelocityMagnitude * magnusLiftCoefficient * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
-        final double magnusVelocityMagnitude = magnusAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
+
+        final double magnusVelocityMagnitude = calculateMagnusVelocityMagnitude(gamePieceVelocityMagnitude);
 
         final Vector<N3> magnusDirection = FuelShootingVisualizationConstants.MAGNUS_SPIN_AXIS.cross(currentGamePieceVelocity);
         final double magnusDirectionNorm = magnusDirection.norm();
@@ -125,6 +122,13 @@ public class VisualizeFuelShootingCommand extends Command {
                 magnusVelocityVector.get(1),
                 magnusVelocityVector.get(2)
         );
+    }
+
+    private double calculateMagnusVelocityMagnitude(double gamePieceVelocityMagnitude) {
+        final double spinParameter = (currentSpinRadiansPerSecond * FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS) / gamePieceVelocityMagnitude;
+        final double magnusLiftCoefficient = FuelShootingVisualizationConstants.MAGNUS_LIFT_FACTOR * spinParameter;
+        final double magnusAccelerationMagnitude = (0.5 * FuelShootingVisualizationConstants.AIR_DENSITY * gamePieceVelocityMagnitude * gamePieceVelocityMagnitude * magnusLiftCoefficient * FuelShootingVisualizationConstants.GAME_PIECE_AREA) / FuelShootingVisualizationConstants.GAME_PIECE_MASS_KG;
+        return magnusAccelerationMagnitude * FuelShootingVisualizationConstants.TIME_STEP_SECONDS;
     }
 
     private void updateSpinDecay(Translation3d currentGamePieceVelocityVector) {
