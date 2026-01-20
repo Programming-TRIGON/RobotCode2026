@@ -28,9 +28,9 @@ public final class MatchTracker {
         final int currentShiftNumber = getCurrentShiftNumber();
         if (currentShiftNumber == -1)
             return true;
-        if (didRedAllianceWinAutonomous && (currentShiftNumber == 1 || currentShiftNumber == 3))
+        if (didRedAllianceWinAutonomous && currentShiftNumber % 2 != 0)
             return false;
-        if (!didRedAllianceWinAutonomous && (currentShiftNumber == 2 || currentShiftNumber == 4))
+        if (!didRedAllianceWinAutonomous && currentShiftNumber % 2 == 0)
             return false;
         return true;
     }
