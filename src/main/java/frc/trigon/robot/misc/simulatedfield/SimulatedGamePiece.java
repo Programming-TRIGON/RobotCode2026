@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class SimulatedGamePiece {
-    private static ArrayList<Rotation2d> CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS = new ArrayList<>(List.of());
+    private static final ArrayList<Rotation2d> CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS = new ArrayList<>(List.of());
     protected SimulatedGamePieceConstants.GamePieceType gamePieceType;
     private Pose3d fieldRelativePose;
     private Pose3d poseAtRelease;
