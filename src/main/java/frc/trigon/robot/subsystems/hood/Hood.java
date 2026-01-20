@@ -11,8 +11,6 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import frc.trigon.robot.subsystems.turret.Turret;
-import frc.trigon.robot.subsystems.turret.TurretConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
@@ -94,14 +92,12 @@ public class Hood extends MotorSubsystem {
     }
 
     private Pose3d calculateVisualizationPose() {
-        final Pose3d turretOrigin = TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT;
         final Pose3d turretPose = RobotContainer.TURRET.calculateVisualizationPose();
-        final Pose3d hoodPoseAtTurretZeroRotation = new Pose3d(
-                HoodConstants.HOOD_VISUALIZATION_ORIGIN_POINT.getTranslation(),
-                new Rotation3d(0, getCurrentAngle().getRadians(), 0)
+        final Transform3d hoodTransform = new Transform3d(
+                new Translation3d(),
+                new Rotation3d(0, -getCurrentAngle().getRadians(), 0)
         );
-        final Transform3d turretToPitcher = hoodPoseAtTurretZeroRotation.minus(turretOrigin);
-        return turretPose.plus(turretToPitcher);
+        return turretPose.plus(HoodConstants.TURRET_TO_HOOD_OFFSET).plus(hoodTransform);
     }
 
     private Rotation2d getCurrentAngle() {
