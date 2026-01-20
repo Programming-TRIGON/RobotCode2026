@@ -7,6 +7,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 
@@ -21,6 +22,10 @@ public class FieldConstants {
     private static final List<Integer> I_HATE_YOU = List.of(
             //Tags to ignore
     );
+
+    public static final FlippableTranslation2d
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 1.76), true),
+            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 7.065), true);
 
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = createAprilTagFieldLayout();
