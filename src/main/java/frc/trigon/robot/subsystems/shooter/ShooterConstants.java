@@ -28,6 +28,7 @@ public class ShooterConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 6.22853402;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
+    private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
@@ -40,8 +41,12 @@ public class ShooterConstants {
             null
     );
 
+    private static final String MECHANISM_NAME = "ShooterMechanism";
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 15;
-    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
+    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d(
+            MECHANISM_NAME,
+            MAXIMUM_DISPLAYABLE_VELOCITY
+    );
 
     static final double TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND = 10;
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
@@ -74,7 +79,7 @@ public class ShooterConstants {
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 80;
+        config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;
 
         MASTER_MOTOR.applyConfiguration(config);
         MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
@@ -84,7 +89,7 @@ public class ShooterConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.TORQUE_CURRENT, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
     }
 
     private static void configureFollowerMotor() {
@@ -96,7 +101,14 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;
+
         FOLLOWER_MOTOR.applyConfiguration(config);
+
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
 
         final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_MOTOR.setControl(followRequest);
