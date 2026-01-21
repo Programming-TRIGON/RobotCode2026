@@ -1,8 +1,7 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.*;
+import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
@@ -14,8 +13,18 @@ import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class ShootingCommands {
     public static Command getShootFuelCommand() {
-        return new ParallelCommandGroup(
+        return new SequentialCommandGroup(
                 getAimAtHubCommand(),
+                new WaitUntilCommand(() ->
+                        RobotContainer.SHOOTER.atTargetVelocity()
+                                && RobotContainer.HOOD.atTargetAngle()
+                ),
+                getFeedToShooterCommand()
+        );
+    }
+
+    public static Command getFeedToShooterCommand() {
+        return new ParallelCommandGroup(
                 SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET),
                 LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
         );
