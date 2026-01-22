@@ -25,7 +25,7 @@ public class Turret extends MotorSubsystem {
             followerMotor = TurretConstants.FOLLOWER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
-    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED);
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private Rotation2d targetSelfRelativeAngle = Rotation2d.fromDegrees(0);
 
     public Turret() {
@@ -61,17 +61,22 @@ public class Turret extends MotorSubsystem {
         masterMotor.update();
         followerMotor.update();
         encoder.update();
-
-        Logger.recordOutput("Turret/CurrentAngleDegrees", getCurrentSelfRelativeAngle().getDegrees());
     }
 
     @Override
     public void updateMechanism() {
+        final Rotation2d currentSelfRelativeAngle = getCurrentSelfRelativeAngle();
+        final Rotation2d targetProfiledSelfRelativeAngle = Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
         TurretConstants.MECHANISM.update(
-                getCurrentSelfRelativeAngle(),
-                Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                currentSelfRelativeAngle,
+                targetProfiledSelfRelativeAngle
         );
         Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
+
+        Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", currentSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
+        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngle", targetProfiledSelfRelativeAngle.getDegrees());
     }
 
     @Override
@@ -85,6 +90,10 @@ public class Turret extends MotorSubsystem {
                 new Rotation3d(0, 0, getCurrentSelfRelativeAngle().getRadians())
         );
         return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
+    }
+
+    public Rotation2d getTargetFieldRelativeAngle() {
+        return targetSelfRelativeAngle.plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
     }
 
     public Rotation2d getTargetSelfRelativeAngle() {

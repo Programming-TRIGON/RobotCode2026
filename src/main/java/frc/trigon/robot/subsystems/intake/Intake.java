@@ -10,7 +10,6 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import frc.trigon.robot.subsystems.hood.HoodConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends MotorSubsystem {
@@ -37,7 +36,7 @@ public class Intake extends MotorSubsystem {
     public void updateMechanism() {
         IntakeConstants.ANGLE_MECHANISM.update(
                 getCurrentArmAngle(),
-                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE) + IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION)
+                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
         IntakeConstants.INTAKE_MOTOR_MECHANISM.update(
                 getCurrentIntakeVoltage()
@@ -101,8 +100,7 @@ public class Intake extends MotorSubsystem {
     }
 
     private void setTargetAngle(Rotation2d targetAngle) {
-        final double offsettedTargetAngleRotations = targetAngle.getRotations() - IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
-        angleMotor.setControl(positionRequest.withPosition(offsettedTargetAngleRotations));
+        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {
@@ -123,7 +121,6 @@ public class Intake extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentArmAngle() {
-        final double offsettedCurrentAngleRotations = angleMotor.getSignal(TalonFXSignal.POSITION) + IntakeConstants.POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION;
-        return Rotation2d.fromRotations(offsettedCurrentAngleRotations);
+        return Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.POSITION));
     }
 }

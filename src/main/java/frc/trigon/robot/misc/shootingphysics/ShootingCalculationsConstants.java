@@ -24,5 +24,5 @@ public class ShootingCalculationsConstants {
                     new Rotation3d(0, 0, 0)
             );
 
-    static final double POSE_PREDICTION_TIME_SECONDS = 0.2;
+    static final double POSE_PREDICTION_TIME_SECONDS = 0.00;
 }

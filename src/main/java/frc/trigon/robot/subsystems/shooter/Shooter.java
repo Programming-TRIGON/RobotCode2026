@@ -9,6 +9,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
@@ -53,10 +54,16 @@ public class Shooter extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
+        final double currentVelocityMetersPerSecond = getCurrentVelocityMetersPerSecond();
+        final double targetProfiledVelocityMetersPerSecond = motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE);
         ShooterConstants.MECHANISM.update(
-                getCurrentVelocityMetersPerSecond(),
-                targetVelocityMetersPerSecond
+                currentVelocityMetersPerSecond,
+                targetProfiledVelocityMetersPerSecond
         );
+
+        Logger.recordOutput("Shooter/CurrentVelocityMetersPerSecond", currentVelocityMetersPerSecond);
+        Logger.recordOutput("Shooter/TargetVelocityMetersPerSecond", this.targetVelocityMetersPerSecond);
+        Logger.recordOutput("Shooter/TargetProfiledVelocityMetersPerSecond", targetProfiledVelocityMetersPerSecond);
     }
 
     public boolean atTargetVelocity() {

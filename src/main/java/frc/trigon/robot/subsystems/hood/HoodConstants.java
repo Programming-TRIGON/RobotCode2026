@@ -29,8 +29,6 @@ public class HoodConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 50;
-    private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
@@ -65,8 +63,8 @@ public class HoodConstants {
     static final Transform3d TURRET_TO_HOOD_OFFSET = HOOD_VISUALIZATION_ORIGIN_POINT.minus(TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT);
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(0.5).per(Units.Seconds),
-            Units.Volts.of(1),
+            Units.Volts.of(0.3).per(Units.Seconds),
+            Units.Volts.of(0.7),
             null
     );
 
@@ -93,15 +91,16 @@ public class HoodConstants {
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 1 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.039753 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.45 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.GravityArmPositionOffset = 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 0;
@@ -125,7 +124,7 @@ public class HoodConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
+        config.MagnetSensor.MagnetOffset = 0;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

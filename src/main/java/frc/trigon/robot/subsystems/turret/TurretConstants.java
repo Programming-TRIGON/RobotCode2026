@@ -3,10 +3,7 @@ package frc.trigon.robot.subsystems.turret;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -90,15 +87,16 @@ public class TurretConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 80 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00083758 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.6478 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.14659 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.03 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.8 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.12329 : 0;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 7 : 5;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 2 : 5;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1 : 5;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 70 : 5;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;

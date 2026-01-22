@@ -95,20 +95,22 @@ public class ShootingCalculations {
         final Translation2d hubRelativeRobotVelocity = calculateVelocityRelativeToPoint(allianceHubPosition, targetFuelExitPosition, robotVelocity);
         final Rotation2d fuelAngleToHub = calculateAngleToPoint(allianceHubPosition, targetFuelExitPosition);
 
-        final Translation3d radialShotVector = calculateRadialShotVector(hubRelativeRobotVelocity, fuelAngleToHub, targetFuelExitPosition);
-        final Translation3d tangentialRobotVelocityVector = calculateTangentialRobotVelocityVector(hubRelativeRobotVelocity, fuelAngleToHub);
+        final Translation3d radialShotVector = calculateRadialShotVector(hubRelativeRobotVelocity.getX(), fuelAngleToHub, targetFuelExitPosition);
+        final Translation3d tangentialRobotVelocityVector = calculateTangentialRobotVelocityVector(hubRelativeRobotVelocity.getY(), fuelAngleToHub);
         return radialShotVector.minus(tangentialRobotVelocityVector);
     }
 
-    private Translation3d calculateTangentialRobotVelocityVector(Translation2d hubRelativeRobotVelocity, Rotation2d fuelAngleToHub) {
+    private Translation3d calculateTangentialRobotVelocityVector(double tangentialVelocityTowardsHub, Rotation2d fuelAngleToHub) {
         final Rotation2d anglePerpendicularToHub = fuelAngleToHub.rotateBy(new Rotation2d(Math.PI / 2));
-        return new Translation3d(hubRelativeRobotVelocity.getY(), new Rotation3d(anglePerpendicularToHub));
+        return new Translation3d(tangentialVelocityTowardsHub, new Rotation3d(anglePerpendicularToHub));
     }
 
-    private Translation3d calculateRadialShotVector(Translation2d hubRelativeRobotVelocity, Rotation2d fuelAngleToHub, Translation2d fuelExitPosition) {
+    private Translation3d calculateRadialShotVector(double radialVelocityTowardsHub, Rotation2d fuelAngleToHub, Translation2d fuelExitPosition) {
         final double distanceFromHub = FieldConstants.HUB_POSITION.get().minus(fuelExitPosition).getNorm();
-        final double targetShootingSpeedMetersPerSecond = ShootingLookupTable.calculateVelocity(distanceFromHub, hubRelativeRobotVelocity.getX());
-        final double targetHoodAngleRadians = ShootingLookupTable.calculatePitch(distanceFromHub, hubRelativeRobotVelocity.getX());
+        Logger.recordOutput("Shooting/DistanceFromHubMeters", distanceFromHub);
+        Logger.recordOutput("Shooting/RadialVelocityTowardsHub", radialVelocityTowardsHub);
+        final double targetShootingSpeedMetersPerSecond = ShootingLookupTable.calculateVelocity(distanceFromHub, radialVelocityTowardsHub);
+        final double targetHoodAngleRadians = ShootingLookupTable.calculatePitch(distanceFromHub, radialVelocityTowardsHub);
         return new Translation3d(targetShootingSpeedMetersPerSecond, new Rotation3d(0, -targetHoodAngleRadians, fuelAngleToHub.getRadians()));
     }
 

@@ -38,8 +38,6 @@ public class IntakeConstants {
     private static final double ANGLE_MOTOR_GEAR_RATIO = 40;
     private static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
-    private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
@@ -122,6 +120,7 @@ public class IntakeConstants {
         config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.GravityArmPositionOffset = 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 0;
@@ -164,7 +163,7 @@ public class IntakeConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
+        config.MagnetSensor.MagnetOffset = 0;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);
