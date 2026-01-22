@@ -31,9 +31,9 @@ public class LoaderCommands {
         );
     }
 
-    public static Command getFeedToShooterCommand() {
+    public static Command getLoadToShooterCommand() {
         return new ExecuteEndCommand(
-                RobotContainer.LOADER::feedToShooter,
+                RobotContainer.LOADER::loadToShooter,
                 RobotContainer.LOADER::stop,
                 RobotContainer.LOADER
         );

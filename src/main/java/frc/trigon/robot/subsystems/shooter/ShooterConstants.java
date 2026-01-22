@@ -74,7 +74,7 @@ public class ShooterConstants {
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.019077 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 80 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 0;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
