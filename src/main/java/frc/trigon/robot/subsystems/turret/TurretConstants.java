@@ -60,6 +60,8 @@ public class TurretConstants {
             new Rotation3d(0, 0, 0)
     );
 
+    static final double ANGLE_TOLERANCE_ROTATION = 0.2;
+
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(1).per(Units.Seconds),
             Units.Volts.of(3),

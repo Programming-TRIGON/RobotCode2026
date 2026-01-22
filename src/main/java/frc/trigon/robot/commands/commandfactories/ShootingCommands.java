@@ -18,6 +18,7 @@ public class ShootingCommands {
                 new WaitUntilCommand(() ->
                         RobotContainer.SHOOTER.atTargetVelocity()
                                 && RobotContainer.HOOD.atTargetAngle()
+                                && RobotContainer.TURRET.atTargetSelfRelativeAngle()
                 ),
                 getFeedToShooterCommand()
         );
