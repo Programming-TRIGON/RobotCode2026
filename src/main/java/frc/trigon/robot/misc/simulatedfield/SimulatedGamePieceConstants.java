@@ -20,7 +20,8 @@ public class SimulatedGamePieceConstants {
      * Starts out with the game pieces the start on the field.
      */
     public static final ArrayList<SimulatedGamePiece>
-            STARTING_GAME_PIECES = new ArrayList<>(List.of());
+            STARTING_GAME_PIECES = new ArrayList<>(List.of(
+    ));
 
     public static final FlippablePose3d SCORING_LOCATION = new FlippablePose3d(0, 0, 0, new Rotation3d(), true);
     public static final FlippableTranslation2d FEEDER_POSITION = new FlippableTranslation2d(0, 0, true);
