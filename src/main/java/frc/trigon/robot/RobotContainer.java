@@ -20,11 +20,11 @@ import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import frc.trigon.robot.subsystems.hood.Hood;
+import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.Intake;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
-import frc.trigon.robot.subsystems.hood.Hood;
-import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.loader.Loader;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
@@ -70,7 +70,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        //configureSysIDBindings(LOADER);
+//        configureSysIDBindings(TURRET);
     }
 
     private void bindDefaultCommands() {

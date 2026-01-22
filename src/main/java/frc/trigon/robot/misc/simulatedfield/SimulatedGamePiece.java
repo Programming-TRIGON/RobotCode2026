@@ -40,6 +40,10 @@ public class SimulatedGamePiece {
         updateIsTouchingGround();
     }
 
+    public void updatePosition(Translation3d fieldRelativePosition) {
+        this.fieldRelativePose = new Pose3d(fieldRelativePosition, fieldRelativePose.getRotation());
+    }
+
     public void updatePose(Pose3d fieldRelativePose) {
         this.fieldRelativePose = fieldRelativePose;
     }
