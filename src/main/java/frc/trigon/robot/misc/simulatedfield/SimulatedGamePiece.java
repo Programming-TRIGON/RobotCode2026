@@ -2,80 +2,64 @@ package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.wpilibj.Timer;
 import frc.trigon.robot.RobotContainer;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SimulatedGamePiece {
-    private static final ArrayList<Rotation2d> CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS = new ArrayList<>(List.of());
-    protected SimulatedGamePieceConstants.GamePieceType gamePieceType;
-    private Pose3d fieldRelativePose;
-    private Pose3d poseAtRelease;
-    private Translation3d velocityAtRelease = new Translation3d();
-    private double timestampAtRelease = 0;
-    private boolean
-            isIndexed = true,
-            isTouchingGround = true;
+    private static final ArrayList<SimulatedGamePiece> SIMULATED_GAME_PIECES = new ArrayList<>();
+    private static final ArrayList<Rotation2d> CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS = new ArrayList<>();
+
+    private Translation3d fieldRelativePosition;
+    private boolean isIndexed = true;
     private Rotation2d spindexerRelativeRotation;
-    private Pose3d unindexedRobotRelativeStorePose;
+    private Translation3d unindexedRobotRelativeStorePosition;
 
     public SimulatedGamePiece(double startingPoseXMeters, double startingPoseYMeters) {
-        this.gamePieceType = SimulatedGamePieceConstants.GamePieceType.FUEL;
-        fieldRelativePose = new Pose3d(startingPoseXMeters, startingPoseYMeters, this.gamePieceType.originPointHeightOffGroundMeters, new Rotation3d());
+        SimulatedGamePieceConstants.GamePieceType gamePieceType = SimulatedGamePieceConstants.GamePieceType.FUEL;
+        fieldRelativePosition = new Translation3d(startingPoseXMeters, startingPoseYMeters, gamePieceType.originPointHeightOffGroundMeters);
+
+        SIMULATED_GAME_PIECES.add(this);
     }
 
-    public void updatePeriodically() {
-        if (!isIndexed) {
-            resetIndexing();
-            return;
-        }
-        if (!isTouchingGround)
-            applyGravity();
+    public static ArrayList<SimulatedGamePiece> getSimulatedGamePieces() {
+        return SIMULATED_GAME_PIECES;
     }
 
-    /**
-     * Releases the game piece from the robot.
-     *
-     * @param fieldRelativeReleaseVelocity the velocity that the object is released at, relative to the field
-     */
-    public void release(Translation3d fieldRelativeReleaseVelocity) {
-        velocityAtRelease = fieldRelativeReleaseVelocity;
-        poseAtRelease = fieldRelativePose;
-        timestampAtRelease = Timer.getTimestamp();
+    public static ArrayList<SimulatedGamePiece> getUnheldGamePieces() {
+        final ArrayList<SimulatedGamePiece> unheldGamePieces = new ArrayList<>(SIMULATED_GAME_PIECES);
+        unheldGamePieces.removeIf(SimulatedGamePiece::isHeld);
 
-        CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.remove(spindexerRelativeRotation);
-        spindexerRelativeRotation = null;
-        unindexedRobotRelativeStorePose = null;
-
-        updateIsTouchingGround();
+        return unheldGamePieces;
     }
 
     public void updatePosition(Translation3d fieldRelativePosition) {
-        this.fieldRelativePose = new Pose3d(fieldRelativePosition, fieldRelativePose.getRotation());
+        this.fieldRelativePosition = fieldRelativePosition;
     }
 
-    public void updatePose(Pose3d fieldRelativePose) {
-        this.fieldRelativePose = fieldRelativePose;
+    public Translation3d getPosition() {
+        return fieldRelativePosition;
     }
 
-    public Pose3d getPose() {
-        return fieldRelativePose;
+    void release() {
+        CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.remove(spindexerRelativeRotation);
+        spindexerRelativeRotation = null;
+        unindexedRobotRelativeStorePosition = null;
     }
 
-    public double getDistanceFromPoseMeters(Pose3d pose) {
-        return fieldRelativePose.minus(pose).getTranslation().getNorm();
+    double getDistanceFromPositionMeters(Translation3d position) {
+        return fieldRelativePosition.getDistance(position);
     }
 
-    public boolean isIndexed() {
+    boolean isIndexed() {
         return isIndexed;
     }
 
-    public void resetIndexing() {
+    void resetIndexing() {
         spindexerRelativeRotation = calculateClosestSpindexerRotationFromCurrentPose();
-        if (spindexerRelativeRotation == null && unindexedRobotRelativeStorePose == null) {
-            unindexedRobotRelativeStorePose = calculateRobotRelativeStorePose();
+        if (spindexerRelativeRotation == null && unindexedRobotRelativeStorePosition == null) {
+            unindexedRobotRelativeStorePosition = calculateRobotRelativeStorePosition();
             isIndexed = false;
             return;
         } else if (spindexerRelativeRotation == null)
@@ -85,51 +69,27 @@ public class SimulatedGamePiece {
         CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.add(spindexerRelativeRotation);
     }
 
-    public Rotation2d getSpindexerRelativeRotation() {
+    Rotation2d getSpindexerRelativeRotation() {
         return spindexerRelativeRotation;
     }
 
-    public Pose3d getUnindexedRobotRelativeStorePose() {
-        return unindexedRobotRelativeStorePose;
+    Translation3d getUnindexedRobotRelativeStorePosition() {
+        return unindexedRobotRelativeStorePosition;
     }
 
-    private void applyGravity() {
-        if (poseAtRelease == null)
-            return;
-        final double timeSinceEject = Timer.getTimestamp() - timestampAtRelease;
-        this.fieldRelativePose = new Pose3d(poseAtRelease.getTranslation(), new Rotation3d()).transformBy(calculateVelocityPoseTransform(timeSinceEject));
-
-        updateIsTouchingGround();
+    static void logAll() {
+        Logger.recordOutput("Poses/GamePieces/Fuel", getSimulatedFuelAsPoseArray());
     }
 
-    private Transform3d calculateVelocityPoseTransform(double elapsedTime) {
-        return new Transform3d(
-                velocityAtRelease.getX() * elapsedTime,
-                velocityAtRelease.getY() * elapsedTime,
-                velocityAtRelease.getZ() * elapsedTime - ((SimulatedGamePieceConstants.G_FORCE / 2) * elapsedTime * elapsedTime),
-                poseAtRelease.getRotation()
-        );
+    private static Pose3d[] getSimulatedFuelAsPoseArray() {
+        final Pose3d[] poses = new Pose3d[SimulatedGamePiece.SIMULATED_GAME_PIECES.size()];
+        for (int i = 0; i < poses.length; i++)
+            poses[i] = new Pose3d(SimulatedGamePiece.SIMULATED_GAME_PIECES.get(i).getPosition(), new Rotation3d());
+        return poses;
     }
 
-    private void updateIsTouchingGround() {
-        if (fieldRelativePose.getZ() < gamePieceType.originPointHeightOffGroundMeters) {
-            isTouchingGround = true;
-            velocityAtRelease = new Translation3d();
-
-            final Translation3d fieldRelativeTranslation = new Translation3d(
-                    fieldRelativePose.getTranslation().getX(),
-                    fieldRelativePose.getTranslation().getY(),
-                    gamePieceType.originPointHeightOffGroundMeters
-            );
-            final Rotation3d fieldRelativeRotation = new Rotation3d(
-                    fieldRelativePose.getRotation().getX(),
-                    0,
-                    fieldRelativePose.getRotation().getZ()
-            );
-            fieldRelativePose = new Pose3d(fieldRelativeTranslation, fieldRelativeRotation);
-            return;
-        }
-        isTouchingGround = false;
+    private boolean isHeld() {
+        return spindexerRelativeRotation != null || unindexedRobotRelativeStorePosition != null;
     }
 
     private Rotation2d calculateClosestSpindexerRotationFromCurrentPose() {
@@ -140,7 +100,7 @@ public class SimulatedGamePiece {
                 spindexerRobotRelativePose
         );
 
-        final double yOffset = fieldRelativePose.relativeTo(new Pose3d(robotPose).plus(spindexerRobotRelativeTransform)).getY();
+        final double yOffset = new Pose3d(fieldRelativePosition, new Rotation3d()).relativeTo(new Pose3d(robotPose).plus(spindexerRobotRelativeTransform)).getY();
         final double fuelTargetOffsetFromSpindexer = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
 
         final double closestSpindexerRotationRadians = Math.asin(MathUtil.clamp(yOffset / fuelTargetOffsetFromSpindexer, -1, 1));
@@ -149,9 +109,9 @@ public class SimulatedGamePiece {
     }
 
     //WARNING: 100% vibe coded from this point
-    private Pose3d calculateRobotRelativeStorePose() {
-        final Pose3d cornerA = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START;
-        final Pose3d cornerB = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END;
+    private Translation3d calculateRobotRelativeStorePosition() {
+        final Translation3d cornerA = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START;
+        final Translation3d cornerB = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END;
 
         // Calculate radius to ensure the center is far enough from walls
         final double fuelRadius = SimulatedGamePieceConstants.FUEL_DIAMETER_METERS / 2.0;
@@ -187,7 +147,7 @@ public class SimulatedGamePiece {
         double randomY = minY + (Math.random() * (maxY - minY));
         double randomZ = minZ + (Math.random() * (maxZ - minZ));
 
-        return new Pose3d(randomX, randomY, randomZ, new Rotation3d());
+        return new Translation3d(randomX, randomY, randomZ);
     }
 
     private Rotation2d findClosestOpenRotationInSpindexer(Rotation2d targetRotation, Rotation2d currentSpindexerRotation) {
@@ -284,5 +244,10 @@ public class SimulatedGamePiece {
             // Sector crosses the PI/-PI boundary
             return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
         }
+    }
+
+    private void updatePeriodically() {
+        if (!isIndexed)
+            resetIndexing();
     }
 }

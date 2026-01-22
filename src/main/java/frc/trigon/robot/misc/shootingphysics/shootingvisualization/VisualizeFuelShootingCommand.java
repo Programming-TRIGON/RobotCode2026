@@ -23,12 +23,12 @@ public class VisualizeFuelShootingCommand extends Command {
     private Translation3d currentFuelVelocity;
     private double currentSpinRadiansPerSecond;
 
-    private VisualizeFuelShootingCommand(SimulatedGamePiece shotFuel) {
+    public VisualizeFuelShootingCommand(SimulatedGamePiece shotFuel) {
         this.shotFuel = shotFuel;
     }
 
-    public static InstantCommand getScheduleShotCommand(SimulatedGamePiece shotFuelSupplier) {
-        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(shotFuelSupplier)));
+    public static InstantCommand getScheduleShotCommand(SimulatedGamePiece shotFuel) {
+        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(shotFuel)));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class VisualizeFuelShootingCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return shotFuel.getPose().getZ() < FuelShootingVisualizationConstants.END_SIMULATION_HEIGHT_METERS && currentFuelVelocity.getZ() < 0;
+        return shotFuel.getPosition().getZ() < FuelShootingVisualizationConstants.END_SIMULATION_HEIGHT_METERS && currentFuelVelocity.getZ() < 0;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class VisualizeFuelShootingCommand extends Command {
         currentFuelVelocity = currentFuelVelocity.plus(gravitySpeedVector).plus(dragSpeedVector).plus(magnusSpeedVector);
         updateSpinDecay(currentFuelVelocity);
 
-        final Translation3d currentGamePiecePosition = shotFuel.getPose().getTranslation();
+        final Translation3d currentGamePiecePosition = shotFuel.getPosition();
         shotFuel.updatePosition(currentGamePiecePosition.plus(currentFuelVelocity.times(FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS)));
     }
 

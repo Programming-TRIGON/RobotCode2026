@@ -1,7 +1,5 @@
 package frc.trigon.robot.misc.simulatedfield;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 import java.util.ArrayList;
@@ -13,9 +11,9 @@ public class SimulatedGamePieceConstants {
     static final double
             INTAKE_TOLERANCE_METERS = 0.2,
             LOADER_TOLERANCE_METERS = 0.05;
-    static final Pose3d
-            COLLECTION_CHECK_POSE = new Pose3d(0.4, 0, 0, new Rotation3d()),//TODO: Calibrate
-            LOADER_CHECK_POSE = new Pose3d(0, 0.13455, 0.2, new Rotation3d());
+    static final Translation3d
+            COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),//TODO: Calibrate
+            LOADER_CHECK_POSITION = new Translation3d(0, 0.13455, 0.2);
 
     static final int MAXIMUM_HELD_FUEL = 40;
     static final Translation3d ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS = new Translation3d(
@@ -24,19 +22,16 @@ public class SimulatedGamePieceConstants {
             0.2
     );
 
-    static final Pose3d
-            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START = new Pose3d(
+    static final Translation3d
+            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START = new Translation3d(
             0.35,
             0.35,
-            0.13,
-            new Rotation3d()
+            0.13
     ),
-            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END = new Pose3d(
+            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END = new Translation3d(
                     -0.35,
                     -0.35,
-                    0.4,
-                    new Rotation3d()
-
+                    0.4
             );
 
     static final double FUEL_DIAMETER_METERS = 0.15;

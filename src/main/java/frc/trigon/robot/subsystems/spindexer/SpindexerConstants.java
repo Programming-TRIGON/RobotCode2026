@@ -84,9 +84,8 @@ public class SpindexerConstants {
     }
 
     public enum SpindexerState {
-        FEED_TO_TURRET(1.0),
-        AGITATE(0.6),
-        STOP(0.0);
+        FEED_TO_TURRET(3),
+        STOP(0);
 
         public final double targetVelocityRotationsPerSecond;
 

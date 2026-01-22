@@ -2,10 +2,9 @@ package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.OperatorConstants;
-import org.littletonrobotics.junction.Logger;
+import frc.trigon.robot.misc.shootingphysics.shootingvisualization.VisualizeFuelShootingCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +13,7 @@ import java.util.List;
  * Handles the simulation of game pieces.
  */
 public class SimulationFieldHandler {
-    private static final ArrayList<SimulatedGamePiece>
-            FUEL_ON_FIELD = SimulatedGamePieceConstants.STARTING_FUEL,
-            HELD_FUEL = new ArrayList<>(List.of());
-
-    public static ArrayList<SimulatedGamePiece> getSimulatedFuel() {
-        final ArrayList<SimulatedGamePiece> allSimulatedFuel = new ArrayList<>(List.of());
-
-        allSimulatedFuel.addAll(FUEL_ON_FIELD);
-        allSimulatedFuel.addAll(HELD_FUEL);
-
-        return allSimulatedFuel;
-    }
+    private static final ArrayList<SimulatedGamePiece> HELD_FUEL = new ArrayList<>(List.of());
 
     public static boolean hasFuel() {
         return !HELD_FUEL.isEmpty();
@@ -33,36 +21,21 @@ public class SimulationFieldHandler {
 
     public static void update() {
         updateGamePieces();
-        logGamePieces();
+        SimulatedGamePiece.logAll();
     }
 
     /**
      * Updates the state of all game pieces.
      */
     private static void updateGamePieces() {
-        updateFuelPeriodically();
         updateCollection();
         updateHeldFuelPoses();
         updateEjection();
     }
 
-    /**
-     * Logs the position of all the game pieces.
-     */
-    private static void logGamePieces() {
-        Logger.recordOutput("Poses/GamePieces/Fuel", mapSimulatedGamePieceListToPoseArray(getSimulatedFuel()));
-    }
-
-    private static void updateFuelPeriodically() {
-        for (SimulatedGamePiece fuel : FUEL_ON_FIELD)
-            fuel.updatePeriodically();
-        for (SimulatedGamePiece fuel : HELD_FUEL)
-            fuel.updatePeriodically();
-    }
-
     private static void updateCollection() {
-        final Pose3d robotRelativeCollectionPose = SimulatedGamePieceConstants.COLLECTION_CHECK_POSE;
-        final Pose3d collectionPose = robotRelativeToFieldRelative(robotRelativeCollectionPose);
+        final Translation3d robotRelativeCollectionPosition = SimulatedGamePieceConstants.COLLECTION_CHECK_POSITION;
+        final Translation3d collectionPose = robotRelativeToFieldRelative(robotRelativeCollectionPosition);
 
         if (isCollectingFuel() && HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL) {
             final ArrayList<SimulatedGamePiece> collectedFuel = getCollectedFuel(collectionPose);
@@ -71,7 +44,6 @@ public class SimulationFieldHandler {
                     return;
 
                 HELD_FUEL.add(fuel);
-                FUEL_ON_FIELD.remove(fuel);
                 fuel.resetIndexing();
             }
         }
@@ -80,13 +52,13 @@ public class SimulationFieldHandler {
     /**
      * Gets the fuel object that is being collected.
      *
-     * @param collectionPose the pose of the collection mechanism
+     * @param collectionPosition the pose of the collection mechanism
      * @return the fuel object that is being collected
      */
-    private static ArrayList<SimulatedGamePiece> getCollectedFuel(Pose3d collectionPose) {
+    private static ArrayList<SimulatedGamePiece> getCollectedFuel(Translation3d collectionPosition) {
         final ArrayList<SimulatedGamePiece> collectedFuel = new ArrayList<>(List.of());
-        for (SimulatedGamePiece gamePiece : FUEL_ON_FIELD)
-            if (gamePiece.getDistanceFromPoseMeters(collectionPose) <= SimulatedGamePieceConstants.INTAKE_TOLERANCE_METERS)
+        for (SimulatedGamePiece gamePiece : SimulatedGamePiece.getUnheldGamePieces())
+            if (gamePiece.getDistanceFromPositionMeters(collectionPosition) <= SimulatedGamePieceConstants.INTAKE_TOLERANCE_METERS)
                 collectedFuel.add(gamePiece);
         return collectedFuel;
     }
@@ -98,8 +70,9 @@ public class SimulationFieldHandler {
     private static void updateEjection() {
         if (hasFuel()) {
             final SimulatedGamePiece ejectableFuel = getEjectableFuel();
-            if (ejectableFuel != null)
+            if (ejectableFuel != null) {
                 ejectGamePiece(ejectableFuel);
+            }
         }
     }
 
@@ -108,44 +81,35 @@ public class SimulationFieldHandler {
             if (!heldFuel.isIndexed())
                 continue;
 
-            final double distanceFromLoaderPose = heldFuel.getDistanceFromPoseMeters(getFuelLoaderFieldRelativePose());
+            final double distanceFromLoaderPose = heldFuel.getDistanceFromPositionMeters(getFuelLoaderFieldRelativePose());
             if (distanceFromLoaderPose < SimulatedGamePieceConstants.LOADER_TOLERANCE_METERS)
                 return heldFuel;
         }
         return null;
     }
 
-    private static Pose3d getFuelLoaderFieldRelativePose() {
-        final Pose3d loaderPose = SimulatedGamePieceConstants.LOADER_CHECK_POSE;
+    private static Translation3d getFuelLoaderFieldRelativePose() {
+        final Translation3d loaderPose = SimulatedGamePieceConstants.LOADER_CHECK_POSITION;
         return robotRelativeToFieldRelative(loaderPose);
     }
 
     private static void ejectGamePiece(SimulatedGamePiece ejectedGamePiece) {
-        final Translation3d robotSelfRelativeVelocity = new Translation3d(RobotContainer.SWERVE.getSelfRelativeVelocity());
-        final Translation3d robotRelativeReleaseVelocity = new Translation3d();//TODO: Get from SHOOTER, PITCHER, and TURRET
-
-        ejectedGamePiece.release(robotSelfRelativeVelocity.plus(robotRelativeReleaseVelocity).rotateBy(new Rotation3d(RobotContainer.SWERVE.getHeading())));
-
-        FUEL_ON_FIELD.add(ejectedGamePiece);
+        ejectedGamePiece.release();
         HELD_FUEL.remove(ejectedGamePiece);
-
-        CommandScheduler.getInstance().schedule(new WaitUntilCommand(() -> ejectedGamePiece.getPose().getZ() <= 0).andThen(() -> FUEL_ON_FIELD.remove(ejectedGamePiece)));
-    }
-
-    private static boolean isEjectingFuel() {
-        return false;//TODO: SHOOTER, SPINDEXER, and LOADER at state
+        CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(ejectedGamePiece));
     }
 
     private static void updateHeldFuelPoses() {
         for (SimulatedGamePiece heldFuel : HELD_FUEL) {
             if (!heldFuel.isIndexed()) {
-                final Pose3d unindexedRobotRelativeStorePose = heldFuel.getUnindexedRobotRelativeStorePose();
-                heldFuel.updatePose(robotRelativeToFieldRelative(unindexedRobotRelativeStorePose));
+                heldFuel.resetIndexing();
+                final Translation3d unindexedRobotRelativeStorePose = heldFuel.getUnindexedRobotRelativeStorePosition();
+                heldFuel.updatePosition(robotRelativeToFieldRelative(unindexedRobotRelativeStorePose));
                 continue;
             }
 
             final Rotation2d spindexerRelativeRotation = heldFuel.getSpindexerRelativeRotation();
-            heldFuel.updatePose(calculateHeldFuelFieldRelativePose(spindexerRelativeRotation));
+            heldFuel.updatePosition(calculateHeldFuelFieldRelativePosition(spindexerRelativeRotation));
         }
     }
 
@@ -154,7 +118,7 @@ public class SimulationFieldHandler {
      *
      * @return the position of the held fuel relative to the field
      */
-    private static Pose3d calculateHeldFuelFieldRelativePose(Rotation2d heldFuelSpindexerRelativeRotation) {
+    private static Translation3d calculateHeldFuelFieldRelativePosition(Rotation2d heldFuelSpindexerRelativeRotation) {
         final Pose3d robotRelativeSpindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
 
         final Rotation3d spindexerRotationOffset = new Rotation3d(heldFuelSpindexerRelativeRotation);
@@ -165,7 +129,7 @@ public class SimulationFieldHandler {
                 new Rotation3d()
         );
 
-        return robotRelativeToFieldRelative(robotRelativeSpindexerPose.plus(fuelOffsetFromSpindexerPose));
+        return robotRelativeToFieldRelative(robotRelativeSpindexerPose.plus(fuelOffsetFromSpindexerPose).getTranslation());
     }
 
     /**
@@ -174,9 +138,9 @@ public class SimulationFieldHandler {
      * @param robotRelativePose the robot relative pose to convert
      * @return the field relative pose
      */
-    private static Pose3d robotRelativeToFieldRelative(Pose3d robotRelativePose) {
-        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
-        return robotPose.plus(toTransform(robotRelativePose));
+    private static Translation3d robotRelativeToFieldRelative(Translation3d robotRelativePose) {
+        final Translation3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()).getTranslation();
+        return robotPose.plus(robotRelativePose);
     }
 
     /**
@@ -187,12 +151,5 @@ public class SimulationFieldHandler {
      */
     private static Transform3d toTransform(Pose3d pose) {
         return new Transform3d(pose.getTranslation(), pose.getRotation());
-    }
-
-    private static Pose3d[] mapSimulatedGamePieceListToPoseArray(ArrayList<SimulatedGamePiece> gamePieces) {
-        final Pose3d[] poses = new Pose3d[gamePieces.size()];
-        for (int i = 0; i < poses.length; i++)
-            poses[i] = gamePieces.get(i).getPose();
-        return poses;
     }
 }
