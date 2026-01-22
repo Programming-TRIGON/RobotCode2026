@@ -55,6 +55,8 @@ public class SimulationFieldHandler {
     private static void updateFuelPeriodically() {
         for (SimulatedGamePiece fuel : FUEL_ON_FIELD)
             fuel.updatePeriodically();
+        for (SimulatedGamePiece fuel : HELD_FUEL)
+            fuel.updatePeriodically();
     }
 
     private static void updateCollection() {
@@ -162,10 +164,11 @@ public class SimulationFieldHandler {
         final Pose3d robotRelativeSpindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
 
         final Rotation3d spindexerRotationOffset = new Rotation3d(heldFuelSpindexerRelativeRotation);
-        final Translation3d fuelDistanceFromSpindexerOrigin = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS;
+        final Translation3d fuelDistanceFromSpindexerOrigin = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS
+                .rotateBy(spindexerRotationOffset);
         final Transform3d fuelOffsetFromSpindexerPose = new Transform3d(
                 fuelDistanceFromSpindexerOrigin,
-                spindexerRotationOffset
+                new Rotation3d()
         );
 
         return robotPose.plus(toTransform(robotRelativeSpindexerPose.plus(fuelOffsetFromSpindexerPose)));

@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.trigon.robot.RobotContainer;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class SimulatedGamePiece {
@@ -119,87 +118,83 @@ public class SimulatedGamePiece {
     }
 
     private Rotation2d calculateClosestSpindexerRotationFromCurrentPose() {
-        final Pose3d spindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
-        final double yOffset = spindexerPose.getY() - fieldRelativePose.getY();
-        final double fuelTargetOffsetFromSpindexer = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.getNorm();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose3d spindexerRobotRelativePose = RobotContainer.SPINDEXER.calculateComponentPose();
+        final Transform3d spindexerRobotRelativeTransform = new Transform3d(
+                new Pose3d(),
+                spindexerRobotRelativePose
+        );
 
-        final double closestSpindexerRotationRadians = Math.asin(yOffset / fuelTargetOffsetFromSpindexer);
-        if (Double.isNaN(closestSpindexerRotationRadians))
-            return null;
+        final double yOffset = fieldRelativePose.relativeTo(new Pose3d(robotPose).plus(spindexerRobotRelativeTransform)).getY();
+        final double fuelTargetOffsetFromSpindexer = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
+
+        final double closestSpindexerRotationRadians = Math.asin(MathUtil.clamp(yOffset / fuelTargetOffsetFromSpindexer, -1, 1));
         final Rotation2d closestSpindexerRotation = Rotation2d.fromRadians(closestSpindexerRotationRadians);
 
         return findClosestOpenRotationInSpindexer(closestSpindexerRotation);
     }
 
+    //WARNING: 100% vibe coded from this point
     private Rotation2d findClosestOpenRotationInSpindexer(Rotation2d targetRotation) {
         final ArrayList<Rotation2d> occupiedRotations = CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS;
-        final double
-                fuelDiameterMeters = SimulatedGamePieceConstants.FUEL_DIAMETER_METERS,
-                spindexerRadiusMeters = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
-        final double halfFuelSpacingRadius = fuelDiameterMeters / spindexerRadiusMeters / 2;
+        final double angularWidthRad = SimulatedGamePieceConstants.FUEL_DIAMETER_METERS /
+                SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
+
+        // We use a small epsilon to ensure balls aren't "frame-perfect" touching
+        final double EPSILON = 0.001;
+        final double clearanceRequired = angularWidthRad + EPSILON;
 
         if (occupiedRotations.isEmpty()) return targetRotation;
 
-        // 1. Define Forbidden Ranges [-PI, PI]
-        List<double[]> forbiddenRanges = new ArrayList<>();
-        for (Rotation2d pos : occupiedRotations) {
-            double center = pos.getRadians();
-            forbiddenRanges.add(new double[]{
-                    MathUtil.angleModulus(center - halfFuelSpacingRadius),
-                    MathUtil.angleModulus(center + halfFuelSpacingRadius)
-            });
-        }
-
-        // 2. Identify "Gaps" (Legal Zones)
-        // Sort by start angle
-        forbiddenRanges.sort(Comparator.comparingDouble(a -> a[0]));
-
-        List<double[]> legalGaps = new ArrayList<>();
-        // Simple check: if the entire circle is covered, return null
-        if (halfFuelSpacingRadius * 2 * occupiedRotations.size() >= 2 * Math.PI) {
-            return null;
-        }
-
-        // Find gaps between sorted forbidden ranges
-        for (int i = 0; i < forbiddenRanges.size(); i++) {
-            double endOfCurrent = forbiddenRanges.get(i)[1];
-            double startOfNext = forbiddenRanges.get((i + 1) % forbiddenRanges.size())[0];
-
-            // Handle wrap around PI to -PI
-            double gapSize = MathUtil.angleModulus(startOfNext - endOfCurrent);
-            if (gapSize > 0) {
-                legalGaps.add(new double[]{endOfCurrent, startOfNext});
+        // 1. Check if the target is already valid
+        boolean targetBlocked = false;
+        for (Rotation2d occupied : occupiedRotations) {
+            if (Math.abs(targetRotation.minus(occupied).getRadians()) < clearanceRequired) {
+                targetBlocked = true;
+                break;
             }
         }
+        if (!targetBlocked) return targetRotation;
 
-        // 3. Find closest point in any legal gap to target
-        double target = targetRotation.getRadians();
-        double bestPoint = Double.NaN;
-        double minDiff = Double.MAX_VALUE;
+        // 2. Collect all potential "Exit Points" (Edges of every ball)
+        ArrayList<Rotation2d> potentialExitPoints = new ArrayList<>();
+        for (Rotation2d occupied : occupiedRotations) {
+            potentialExitPoints.add(occupied.plus(Rotation2d.fromRadians(clearanceRequired)));
+            potentialExitPoints.add(occupied.minus(Rotation2d.fromRadians(clearanceRequired)));
+        }
 
-        for (double[] gap : legalGaps) {
-            // Check if target is inside the gap
-            if (isAngleInGap(target, gap[0], gap[1])) {
-                return targetRotation; // Target is already legal!
-            }
-
-            // Otherwise, the closest points are the boundaries of the gap
-            double[] boundaries = {gap[0], gap[1]};
-            for (double b : boundaries) {
-                double diff = Math.abs(MathUtil.angleModulus(b - target));
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    bestPoint = b;
+        // 3. Filter the exit points. An exit point is only valid if it doesn't
+        // collide with ANY of the existing balls.
+        ArrayList<Rotation2d> validExitPoints = new ArrayList<>();
+        for (Rotation2d exitPoint : potentialExitPoints) {
+            boolean isPointBlocked = false;
+            for (Rotation2d occupied : occupiedRotations) {
+                // We use a slightly smaller check here (minus epsilon) to allow
+                // the point to exist exactly on the edge of the ball that created it
+                if (Math.abs(exitPoint.minus(occupied).getRadians()) < clearanceRequired - (EPSILON * 2)) {
+                    isPointBlocked = true;
+                    break;
                 }
             }
+            if (!isPointBlocked) {
+                validExitPoints.add(exitPoint);
+            }
         }
 
-        return Double.isNaN(bestPoint) ? null : Rotation2d.fromRadians(bestPoint);
-    }
+        // 4. From the valid exit points, find the one closest to the targetRotation
+        Rotation2d bestRotation = null;
+        double minDistance = Double.MAX_VALUE;
 
-    private static boolean isAngleInGap(double angle, double start, double end) {
-        double totalGap = MathUtil.angleModulus(end - start);
-        double angleToStart = MathUtil.angleModulus(angle - start);
-        return angleToStart >= 0 && angleToStart <= totalGap;
+        for (Rotation2d validPoint : validExitPoints) {
+            double dist = Math.abs(targetRotation.minus(validPoint).getRadians());
+            if (dist < minDistance) {
+                minDistance = dist;
+                bestRotation = validPoint;
+            }
+        }
+
+        // 5. If no valid points are found, the spindexer is likely full.
+        // Otherwise, return the closest point that gets us out of the "stack."
+        return bestRotation;
     }
 }
