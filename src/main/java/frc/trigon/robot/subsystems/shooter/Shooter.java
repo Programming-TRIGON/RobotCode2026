@@ -36,6 +36,7 @@ public class Shooter extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
+        ShooterConstants.FOLLOWER_MOTOR.update();
     }
 
     @Override
@@ -46,11 +47,6 @@ public class Shooter extends MotorSubsystem {
     @Override
     public SysIdRoutine.Config getSysIDConfig() {
         return ShooterConstants.SYS_ID_CONFIG;
-    }
-
-    @Override
-    public void setBrake(boolean brake) {
-        motor.setBrake(brake);
     }
 
     @Override
@@ -79,7 +75,7 @@ public class Shooter extends MotorSubsystem {
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
-        motor.setControl(velocityRequest.withVelocity(this.targetVelocityMetersPerSecond));
+        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
     private double getCurrentVelocityMetersPerSecond() {

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Spindexer extends MotorSubsystem {
     private final TalonFXMotor motor = SpindexerConstants.MOTOR;
@@ -36,7 +35,7 @@ public class Spindexer extends MotorSubsystem {
                 motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
 
-        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
+//        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
     }
 
     @Override
