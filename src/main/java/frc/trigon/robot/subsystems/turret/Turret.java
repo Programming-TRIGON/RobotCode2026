@@ -2,6 +2,7 @@ package frc.trigon.robot.subsystems.turret;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -88,12 +89,12 @@ public class Turret extends MotorSubsystem {
     }
 
     public boolean atTargetSelfRelativeAngle() {
-        return Math.abs(getCurrentSelfRelativeAngle().getRotations() - getTargetSelfRelativeAngle().getRotations())
+        return MathUtil.angleModulus(getCurrentSelfRelativeAngle().getRotations() - getTargetSelfRelativeAngle().getRotations())
                 <= TurretConstants.ANGLE_TOLERANCE_ROTATION;
     }
 
     public boolean atTargetFieldRelativeAngle() {
-        return Math.abs(getCurrentFieldRelativeAngle().getRotations() - getTargetFieldRelativeAngle().getRotations())
+        return MathUtil.angleModulus(getCurrentFieldRelativeAngle().getRotations() - getTargetFieldRelativeAngle().getRotations())
                 <= TurretConstants.ANGLE_TOLERANCE_ROTATION;
     }
 
