@@ -42,8 +42,8 @@ public class SimulationFieldHandler {
     private static void updateGamePieces() {
         updateFuelPeriodically();
         updateCollection();
-        updateEjection();
         updateHeldFuelPoses();
+        updateEjection();
     }
 
     /**
@@ -96,7 +96,7 @@ public class SimulationFieldHandler {
     }
 
     private static void updateEjection() {
-        if (hasFuel() && isEjectingFuel()) {
+        if (hasFuel()) {
             final SimulatedGamePiece ejectableFuel = getEjectableFuel();
             if (ejectableFuel != null)
                 ejectGamePiece(ejectableFuel);

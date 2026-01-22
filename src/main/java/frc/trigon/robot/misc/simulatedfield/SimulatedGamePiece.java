@@ -44,7 +44,10 @@ public class SimulatedGamePiece {
         velocityAtRelease = fieldRelativeReleaseVelocity;
         poseAtRelease = fieldRelativePose;
         timestampAtRelease = Timer.getTimestamp();
+
         CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.remove(spindexerRelativeRotation);
+        spindexerRelativeRotation = null;
+        unindexedRobotRelativeStorePose = null;
 
         updateIsTouchingGround();
     }
@@ -67,11 +70,13 @@ public class SimulatedGamePiece {
 
     public void resetIndexing() {
         spindexerRelativeRotation = calculateClosestSpindexerRotationFromCurrentPose();
-        if (spindexerRelativeRotation == null) {
+        if (spindexerRelativeRotation == null && unindexedRobotRelativeStorePose == null) {
             unindexedRobotRelativeStorePose = calculateRobotRelativeStorePose();
             isIndexed = false;
             return;
-        }
+        } else if (spindexerRelativeRotation == null)
+            return;
+
         isIndexed = true;
         CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS.add(spindexerRelativeRotation);
     }
@@ -136,75 +141,144 @@ public class SimulatedGamePiece {
 
         final double closestSpindexerRotationRadians = Math.asin(MathUtil.clamp(yOffset / fuelTargetOffsetFromSpindexer, -1, 1));
         final Rotation2d closestSpindexerRotation = Rotation2d.fromRadians(closestSpindexerRotationRadians);
-
-        return findClosestOpenRotationInSpindexer(closestSpindexerRotation);
-    }
-
-    private Pose3d calculateRobotRelativeStorePose() {
-        return new Pose3d();
+        return findClosestOpenRotationInSpindexer(closestSpindexerRotation, spindexerRobotRelativePose.toPose2d().getRotation());
     }
 
     //WARNING: 100% vibe coded from this point
-    private Rotation2d findClosestOpenRotationInSpindexer(Rotation2d targetRotation) {
+    private Pose3d calculateRobotRelativeStorePose() {
+        final Pose3d cornerA = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START;
+        final Pose3d cornerB = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END;
+
+        // Calculate radius to ensure the center is far enough from walls
+        final double fuelRadius = SimulatedGamePieceConstants.FUEL_DIAMETER_METERS / 2.0;
+
+        // 1. Normalize the bounds (finding the true min and max for X, Y, Z)
+        double minX = Math.min(cornerA.getX(), cornerB.getX());
+        double maxX = Math.max(cornerA.getX(), cornerB.getX());
+
+        double minY = Math.min(cornerA.getY(), cornerB.getY());
+        double maxY = Math.max(cornerA.getY(), cornerB.getY());
+
+        double minZ = Math.min(cornerA.getZ(), cornerB.getZ());
+        double maxZ = Math.max(cornerA.getZ(), cornerB.getZ());
+
+        // 2. Inset the boundaries by the fuel radius
+        // This prevents the fuel from poking out of the box
+        minX += fuelRadius;
+        maxX -= fuelRadius;
+
+        minY += fuelRadius;
+        maxY -= fuelRadius;
+
+        minZ += fuelRadius;
+        maxZ -= fuelRadius;
+
+        // 3. Safety Check: If the box is smaller than the fuel diameter, it can't fit
+        if (minX >= maxX || minY >= maxY || minZ >= maxZ) {
+            return null;
+        }
+
+        // 4. Generate the random position within the safe (shrunk) bounds
+        double randomX = minX + (Math.random() * (maxX - minX));
+        double randomY = minY + (Math.random() * (maxY - minY));
+        double randomZ = minZ + (Math.random() * (maxZ - minZ));
+
+        return new Pose3d(randomX, randomY, randomZ, new Rotation3d());
+    }
+
+    private Rotation2d findClosestOpenRotationInSpindexer(Rotation2d targetRotation, Rotation2d currentSpindexerRotation) {
         final ArrayList<Rotation2d> occupiedRotations = CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS;
         final double angularWidthRad = SimulatedGamePieceConstants.FUEL_DIAMETER_METERS /
                 SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
 
-        // We use a small epsilon to ensure balls aren't "frame-perfect" touching
         final double EPSILON = 0.001;
         final double clearanceRequired = angularWidthRad + EPSILON;
 
-        if (occupiedRotations.isEmpty()) return targetRotation;
+        // 1. Define the Robot-Relative Deadzone (80° to 180°)
+        final double ROBOT_FORBIDDEN_MIN = Math.toRadians(80);
+        final double ROBOT_FORBIDDEN_MAX = Math.PI; // 180 degrees
 
-        // 1. Check if the target is already valid
+        // 2. Convert Robot-Relative bounds to Spindexer-Relative bounds
+        // Formula: SpindexerRelative = RobotRelative - SpindexerRotation
+        double spindexerForbiddenMin = MathUtil.angleModulus(ROBOT_FORBIDDEN_MIN - currentSpindexerRotation.getRadians());
+        double spindexerForbiddenMax = MathUtil.angleModulus(ROBOT_FORBIDDEN_MAX - currentSpindexerRotation.getRadians());
+
+        // 3. Normalize target and check if it's in the dynamic forbidden zone
+        double targetRad = MathUtil.angleModulus(targetRotation.getRadians());
+
+        if (isAngleInSector(targetRad, spindexerForbiddenMin, spindexerForbiddenMax)) {
+            // Snap to the closer boundary of the deadzone
+            double distToMin = Math.abs(MathUtil.angleModulus(targetRad - spindexerForbiddenMin));
+            double distToMax = Math.abs(MathUtil.angleModulus(targetRad - spindexerForbiddenMax));
+            targetRad = (distToMin < distToMax) ? spindexerForbiddenMin : spindexerForbiddenMax;
+        }
+        Rotation2d clampedTarget = Rotation2d.fromRadians(targetRad);
+
+        // 4. Check if the clamped target is clear of other fuel
         boolean targetBlocked = false;
         for (Rotation2d occupied : occupiedRotations) {
-            if (Math.abs(targetRotation.minus(occupied).getRadians()) < clearanceRequired) {
+            if (Math.abs(clampedTarget.minus(occupied).getRadians()) < clearanceRequired) {
                 targetBlocked = true;
                 break;
             }
         }
-        if (!targetBlocked) return targetRotation;
+        if (!targetBlocked) return clampedTarget;
 
-        // 2. Collect all potential "Exit Points" (Edges of every ball)
-        ArrayList<Rotation2d> potentialExitPoints = new ArrayList<>();
+        // 5. Generate candidate "Exit Points"
+        ArrayList<Rotation2d> candidates = new ArrayList<>();
+        candidates.add(Rotation2d.fromRadians(spindexerForbiddenMin));
+        candidates.add(Rotation2d.fromRadians(spindexerForbiddenMax));
+
         for (Rotation2d occupied : occupiedRotations) {
-            potentialExitPoints.add(occupied.plus(Rotation2d.fromRadians(clearanceRequired)));
-            potentialExitPoints.add(occupied.minus(Rotation2d.fromRadians(clearanceRequired)));
+            candidates.add(occupied.plus(Rotation2d.fromRadians(clearanceRequired)));
+            candidates.add(occupied.minus(Rotation2d.fromRadians(clearanceRequired)));
         }
 
-        // 3. Filter the exit points. An exit point is only valid if it doesn't
-        // collide with ANY of the existing balls.
-        ArrayList<Rotation2d> validExitPoints = new ArrayList<>();
-        for (Rotation2d exitPoint : potentialExitPoints) {
-            boolean isPointBlocked = false;
-            for (Rotation2d occupied : occupiedRotations) {
-                // We use a slightly smaller check here (minus epsilon) to allow
-                // the point to exist exactly on the edge of the ball that created it
-                if (Math.abs(exitPoint.minus(occupied).getRadians()) < clearanceRequired - (EPSILON * 2)) {
-                    isPointBlocked = true;
-                    break;
-                }
-            }
-            if (!isPointBlocked) {
-                validExitPoints.add(exitPoint);
-            }
-        }
-
-        // 4. From the valid exit points, find the one closest to the targetRotation
         Rotation2d bestRotation = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (Rotation2d validPoint : validExitPoints) {
-            double dist = Math.abs(targetRotation.minus(validPoint).getRadians());
-            if (dist < minDistance) {
-                minDistance = dist;
-                bestRotation = validPoint;
+        for (Rotation2d candidate : candidates) {
+            double candRad = MathUtil.angleModulus(candidate.getRadians());
+
+            // FILTER: Discard if the point falls inside the Robot-Relative Deadzone
+            if (isAngleInSector(candRad, spindexerForbiddenMin, spindexerForbiddenMax)) {
+                continue;
+            }
+
+            // Check for collisions with other fuel
+            boolean isBlocked = false;
+            for (Rotation2d occupied : occupiedRotations) {
+                if (Math.abs(candidate.minus(occupied).getRadians()) < clearanceRequired - (EPSILON * 2)) {
+                    isBlocked = true;
+                    break;
+                }
+            }
+
+            if (!isBlocked) {
+                double dist = Math.abs(clampedTarget.minus(candidate).getRadians());
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    bestRotation = candidate;
+                }
             }
         }
 
-        // 5. If no valid points are found, the spindexer is likely full.
-        // Otherwise, return the closest point that gets us out of the "stack."
         return bestRotation;
+    }
+
+    /**
+     * Helper to check if an angle is within a sector, handling wrap-around cases.
+     */
+    private boolean isAngleInSector(double angle, double start, double end) {
+        double normalizedStart = MathUtil.angleModulus(start);
+        double normalizedEnd = MathUtil.angleModulus(end);
+        double normalizedAngle = MathUtil.angleModulus(angle);
+
+        if (normalizedStart < normalizedEnd) {
+            return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+        } else {
+            // Sector crosses the PI/-PI boundary
+            return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
+        }
     }
 }

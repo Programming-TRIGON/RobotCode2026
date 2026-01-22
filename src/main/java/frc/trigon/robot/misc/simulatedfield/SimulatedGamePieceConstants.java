@@ -11,13 +11,13 @@ public class SimulatedGamePieceConstants {
     static final double G_FORCE = 9.806;
 
     static final double
-            INTAKE_TOLERANCE_METERS = 0.3,
-            LOADER_TOLERANCE_METERS = 0.1;
+            INTAKE_TOLERANCE_METERS = 0.2,
+            LOADER_TOLERANCE_METERS = 0.05;
     static final Pose3d
-            COLLECTION_CHECK_POSE = new Pose3d(0.7, 0, 0, new Rotation3d()),//TODO: Calibrate
+            COLLECTION_CHECK_POSE = new Pose3d(0.4, 0, 0, new Rotation3d()),//TODO: Calibrate
             LOADER_CHECK_POSE = new Pose3d(0, 0.13455, 0.2, new Rotation3d());
 
-    static final int MAXIMUM_HELD_FUEL = 6;//TODO: Increase when capability for holding more fuel is implemented
+    static final int MAXIMUM_HELD_FUEL = 40;
     static final Translation3d ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS = new Translation3d(
             0.165,
             0,
@@ -26,15 +26,15 @@ public class SimulatedGamePieceConstants {
 
     static final Pose3d
             ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START = new Pose3d(
-            0,
-            0,
-            0,
+            0.35,
+            0.35,
+            0.13,
             new Rotation3d()
     ),
             ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END = new Pose3d(
-                    0,
-                    0,
-                    0,
+                    -0.35,
+                    -0.35,
+                    0.4,
                     new Rotation3d()
 
             );
