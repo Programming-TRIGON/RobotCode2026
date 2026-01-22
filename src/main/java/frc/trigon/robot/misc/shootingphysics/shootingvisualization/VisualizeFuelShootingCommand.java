@@ -13,8 +13,6 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
 
-import java.util.function.Supplier;
-
 /**
  * A command to visualize note shooting.
  * This command will get the physical information from subsystems when we begin the shot, and calculate the note's position at each timestamp using physics.
@@ -29,13 +27,13 @@ public class VisualizeFuelShootingCommand extends Command {
         this.shotFuel = shotFuel;
     }
 
-    public static InstantCommand getScheduleShotCommand(Supplier<SimulatedGamePiece> shotFuelSupplier) {
-        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(shotFuelSupplier.get())));
+    public static InstantCommand getScheduleShotCommand(SimulatedGamePiece shotFuelSupplier) {
+        return new InstantCommand(() -> CommandScheduler.getInstance().schedule(new VisualizeFuelShootingCommand(shotFuelSupplier)));
     }
 
     @Override
     public void initialize() {
-        shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateCurrentFuelExitPose());
+        shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateTargetFuelExitPosition());
         currentFuelVelocity = calculateFuelExitVelocityVector();
         initializeSpin(currentFuelVelocity.getNorm());
     }
