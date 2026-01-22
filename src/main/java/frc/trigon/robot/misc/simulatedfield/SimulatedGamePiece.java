@@ -19,6 +19,7 @@ public class SimulatedGamePiece {
             isIndexed = true,
             isTouchingGround = true;
     private Rotation2d spindexerRelativeRotation;
+    private Pose3d unindexedRobotRelativeStorePose;
 
     public SimulatedGamePiece(double startingPoseXMeters, double startingPoseYMeters) {
         this.gamePieceType = SimulatedGamePieceConstants.GamePieceType.FUEL;
@@ -67,6 +68,7 @@ public class SimulatedGamePiece {
     public void resetIndexing() {
         spindexerRelativeRotation = calculateClosestSpindexerRotationFromCurrentPose();
         if (spindexerRelativeRotation == null) {
+            unindexedRobotRelativeStorePose = calculateRobotRelativeStorePose();
             isIndexed = false;
             return;
         }
@@ -76,6 +78,10 @@ public class SimulatedGamePiece {
 
     public Rotation2d getSpindexerRelativeRotation() {
         return spindexerRelativeRotation;
+    }
+
+    public Pose3d getUnindexedRobotRelativeStorePose() {
+        return unindexedRobotRelativeStorePose;
     }
 
     private void applyGravity() {
@@ -132,6 +138,10 @@ public class SimulatedGamePiece {
         final Rotation2d closestSpindexerRotation = Rotation2d.fromRadians(closestSpindexerRotationRadians);
 
         return findClosestOpenRotationInSpindexer(closestSpindexerRotation);
+    }
+
+    private Pose3d calculateRobotRelativeStorePose() {
+        return new Pose3d();
     }
 
     //WARNING: 100% vibe coded from this point

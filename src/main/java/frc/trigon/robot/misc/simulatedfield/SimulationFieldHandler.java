@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.constants.OperatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
@@ -60,9 +61,8 @@ public class SimulationFieldHandler {
     }
 
     private static void updateCollection() {
-        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
         final Pose3d robotRelativeCollectionPose = SimulatedGamePieceConstants.COLLECTION_CHECK_POSE;
-        final Pose3d collectionPose = robotPose.plus(toTransform(robotRelativeCollectionPose));
+        final Pose3d collectionPose = robotRelativeToFieldRelative(robotRelativeCollectionPose);
 
         if (isCollectingFuel() && HELD_FUEL.size() < SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL) {
             final ArrayList<SimulatedGamePiece> collectedFuel = getCollectedFuel(collectionPose);
@@ -116,10 +116,8 @@ public class SimulationFieldHandler {
     }
 
     private static Pose3d getFuelLoaderFieldRelativePose() {
-        final Pose3d
-                robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()),
-                loaderPose = SimulatedGamePieceConstants.LOADER_CHECK_POSE;
-        return robotPose.plus(toTransform(loaderPose));
+        final Pose3d loaderPose = SimulatedGamePieceConstants.LOADER_CHECK_POSE;
+        return robotRelativeToFieldRelative(loaderPose);
     }
 
     private static void ejectGamePiece(SimulatedGamePiece ejectedGamePiece) {
@@ -141,7 +139,8 @@ public class SimulationFieldHandler {
     private static void updateHeldFuelPoses() {
         for (SimulatedGamePiece heldFuel : HELD_FUEL) {
             if (!heldFuel.isIndexed()) {
-                heldFuel.updatePose(calculateUnindexedHeldFuelPose());
+                final Pose3d unindexedRobotRelativeStorePose = heldFuel.getUnindexedRobotRelativeStorePose();
+                heldFuel.updatePose(robotRelativeToFieldRelative(unindexedRobotRelativeStorePose));
                 continue;
             }
 
@@ -150,17 +149,12 @@ public class SimulationFieldHandler {
         }
     }
 
-    private static Pose3d calculateUnindexedHeldFuelPose() {
-        return new Pose3d();//TODO: Random legitamate poses in range (?)
-    }
-
     /**
      * Calculate the position of the held fuel relative to the field.
      *
      * @return the position of the held fuel relative to the field
      */
     private static Pose3d calculateHeldFuelFieldRelativePose(Rotation2d heldFuelSpindexerRelativeRotation) {
-        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
         final Pose3d robotRelativeSpindexerPose = RobotContainer.SPINDEXER.calculateComponentPose();
 
         final Rotation3d spindexerRotationOffset = new Rotation3d(heldFuelSpindexerRelativeRotation);
@@ -171,7 +165,18 @@ public class SimulationFieldHandler {
                 new Rotation3d()
         );
 
-        return robotPose.plus(toTransform(robotRelativeSpindexerPose.plus(fuelOffsetFromSpindexerPose)));
+        return robotRelativeToFieldRelative(robotRelativeSpindexerPose.plus(fuelOffsetFromSpindexerPose));
+    }
+
+    /**
+     * Converts a robot relative pose into a field relative pose.
+     *
+     * @param robotRelativePose the robot relative pose to convert
+     * @return the field relative pose
+     */
+    private static Pose3d robotRelativeToFieldRelative(Pose3d robotRelativePose) {
+        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
+        return robotPose.plus(toTransform(robotRelativePose));
     }
 
     /**

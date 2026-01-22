@@ -8,13 +8,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulatedGamePieceConstants {
-    public static final double G_FORCE = 9.806;
+    static final double G_FORCE = 9.806;
 
-    public static final double
+    static final double
             INTAKE_TOLERANCE_METERS = 0.3,
             LOADER_TOLERANCE_METERS = 0.1;
+    static final Pose3d
+            COLLECTION_CHECK_POSE = new Pose3d(0.7, 0, 0, new Rotation3d()),//TODO: Calibrate
+            LOADER_CHECK_POSE = new Pose3d(0, 0.13455, 0.2, new Rotation3d());
 
     static final int MAXIMUM_HELD_FUEL = 6;//TODO: Increase when capability for holding more fuel is implemented
+    static final Translation3d ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS = new Translation3d(
+            0.165,
+            0,
+            0.2
+    );
+
+    static final Pose3d
+            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_START = new Pose3d(
+            0,
+            0,
+            0,
+            new Rotation3d()
+    ),
+            ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END = new Pose3d(
+                    0,
+                    0,
+                    0,
+                    new Rotation3d()
+
+            );
 
     static final double FUEL_DIAMETER_METERS = 0.15;
     private static final int
@@ -24,15 +47,6 @@ public class SimulatedGamePieceConstants {
             STARTING_FUEL_X_POSITION_METERS = 7.357364,
             STARTING_FUEL_Y_POSITION_METERS = 1.724406,
             STARTING_FUEL_SPACING_METERS = 0.16;
-    static final Translation3d ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS = new Translation3d(
-            0.165,
-            0,
-            0.2
-    );
-
-    static final Pose3d
-            COLLECTION_CHECK_POSE = new Pose3d(0.7, 0, 0, new Rotation3d()),//TODO: Calibrate
-            LOADER_CHECK_POSE = new Pose3d(0, 0.13455, 0.2, new Rotation3d());
 
     /**
      * Stores the game pieces that start on the field.
