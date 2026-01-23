@@ -39,7 +39,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     public static Translation2d calculateDistanceFromTrackedGamePiece() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose();
         final Translation2d trackedObjectPositionOnField = OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot();
         if (trackedObjectPositionOnField == null)
             return null;
@@ -68,7 +68,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     public static FlippableRotation2d calculateTargetAngle() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose();
         final Translation2d trackedObjectFieldRelativePosition = OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot();
         if (trackedObjectFieldRelativePosition == null)
             return null;

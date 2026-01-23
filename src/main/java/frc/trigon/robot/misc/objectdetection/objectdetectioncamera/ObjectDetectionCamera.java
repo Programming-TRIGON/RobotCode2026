@@ -40,7 +40,7 @@ public class ObjectDetectionCamera extends SubsystemBase {
      */
     public Translation2d calculateClosestObjectPositionOnField(SimulatedGamePieceConstants.GamePieceType targetGamePiece) {
         final Translation2d[] targetObjectsTranslation = getObjectPositionsOnField(targetGamePiece);
-        final Translation2d currentRobotTranslation = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d().getTranslation();
+        final Translation2d currentRobotTranslation = RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getTranslation();
         if (targetObjectsTranslation.length == 0)
             return null;
         Translation2d closestObjectTranslation = targetObjectsTranslation[0];

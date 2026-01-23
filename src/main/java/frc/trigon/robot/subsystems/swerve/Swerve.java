@@ -122,12 +122,12 @@ public class Swerve extends MotorSubsystem {
 
     public boolean atXAxisPosition(double xAxisPosition) {
         final double currentXAxisVelocity = getFieldRelativeChassisSpeeds().vxMetersPerSecond;
-        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getX(), xAxisPosition, currentXAxisVelocity);
+        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getX(), xAxisPosition, currentXAxisVelocity);
     }
 
     public boolean atYAxisPosition(double yAxisPosition) {
         final double currentYAxisVelocity = getFieldRelativeChassisSpeeds().vyMetersPerSecond;
-        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getY(), yAxisPosition, currentYAxisVelocity);
+        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getY(), yAxisPosition, currentYAxisVelocity);
     }
 
     public boolean atAngle(FlippableRotation2d angle) {
@@ -252,7 +252,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     private Rotation2d getPoseEstimatorHeading() {
-        return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().toPose2d().getRotation();
+        return RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getRotation();
     }
 
     private void setTargetModuleStates(SwerveModuleState[] swerveModuleStates) {
