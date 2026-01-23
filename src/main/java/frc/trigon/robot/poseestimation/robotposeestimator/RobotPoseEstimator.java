@@ -76,7 +76,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         else
             updateFromAprilTagCameras();
 
-        field.setRobotPose(getEstimatedRobotPose().toPose2d());
+        field.setRobotPose(get2DRobotPose());
     }
 
     public void resetHeading() {
@@ -109,6 +109,10 @@ public class RobotPoseEstimator implements AutoCloseable {
     @AutoLogOutput(key = "Poses/Robot/PoseEstimator/EstimatedRobotPose")
     public Pose3d getEstimatedRobotPose() {
         return swerveDrivePoseEstimator.getEstimatedPosition();
+    }
+
+    public Pose2d get2DRobotPose() {
+        return getEstimatedRobotPose().toPose2d();
     }
 
     /**

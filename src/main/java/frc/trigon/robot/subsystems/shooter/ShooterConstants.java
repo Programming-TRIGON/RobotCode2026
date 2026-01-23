@@ -28,23 +28,28 @@ public class ShooterConstants {
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 6.22853402;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
+    private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
-    private static final double MOMENT_OF_INERTIA = 0.003;
+    private static final double MOMENT_OF_INERTIA = 0.002;
     static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, GEAR_RATIO, MOMENT_OF_INERTIA);
 
     static final SysIdRoutine.Config SYS_ID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(1).per(Units.Second),
+            Units.Volts.of(2.5).per(Units.Second),
             Units.Volts.of(7),
             null
     );
 
+    private static final String MECHANISM_NAME = "ShooterMechanism";
     private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 15;
-    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d("ShooterMechanism", MAXIMUM_DISPLAYABLE_VELOCITY);
+    static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d(
+            MECHANISM_NAME,
+            MAXIMUM_DISPLAYABLE_VELOCITY
+    );
 
     static final double TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND = 10;
-    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 3;
+    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
     static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.05;
 
     static {
@@ -61,17 +66,20 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.019553 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.2 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.019114 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.76102 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.012523 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0215 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.76477 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.019077 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 80 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 0;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;
 
         MASTER_MOTOR.applyConfiguration(config);
         MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
@@ -79,8 +87,9 @@ public class ShooterConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.TORQUE_CURRENT, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
     }
 
     private static void configureFollowerMotor() {
@@ -92,7 +101,14 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;
+
         FOLLOWER_MOTOR.applyConfiguration(config);
+
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
 
         final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_MOTOR.setControl(followRequest);
