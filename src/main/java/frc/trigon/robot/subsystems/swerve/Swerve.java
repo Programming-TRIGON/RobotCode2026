@@ -312,13 +312,7 @@ public class Swerve extends MotorSubsystem {
                 gyro.getThreadedSignal(Pigeon2Signal.PITCH),
                 gyro.getThreadedSignal(Pigeon2Signal.YAW)
         };
-        final int totalOdometryUpdates = Math.min(
-                Math.min(
-                        odometryUpdatesDegrees[0].length,
-                        odometryUpdatesDegrees[1].length
-                ),
-                odometryUpdatesDegrees[2].length
-        );
+        final int totalOdometryUpdates = odometryUpdatesDegrees[0].length;
 
         final SwerveModulePosition[][] swerveWheelPositions = new SwerveModulePosition[totalOdometryUpdates][];
         final Rotation3d[] gyroRotations = new Rotation3d[totalOdometryUpdates];
