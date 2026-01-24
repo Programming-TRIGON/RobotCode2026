@@ -139,17 +139,7 @@ public class SimulationFieldHandler {
      * @return the field relative pose
      */
     private static Translation3d robotRelativeToFieldRelative(Translation3d robotRelativePose) {
-        final Translation3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()).getTranslation();
-        return robotPose.plus(robotRelativePose);
-    }
-
-    /**
-     * Converts a Pose3d into a Transform3d.
-     *
-     * @param pose the target Pose3d
-     * @return the Transform3d
-     */
-    private static Transform3d toTransform(Pose3d pose) {
-        return new Transform3d(pose.getTranslation(), pose.getRotation());
+        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
+        return robotPose.plus(new Transform3d(robotRelativePose, new Rotation3d())).getTranslation();
     }
 }
