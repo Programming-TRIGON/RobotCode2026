@@ -114,7 +114,7 @@ public class SimulatedGamePiece {
         final Translation3d cornerB = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_UNINDEXED_FUEL_BOUNDING_BOX_END;
 
         // Calculate radius to ensure the center is far enough from walls
-        final double fuelRadius = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters / 2.0;
+        final double fuelRadius = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters;
 
         // 1. Normalize the bounds (finding the true min and max for X, Y, Z)
         double minX = Math.min(cornerA.getX(), cornerB.getX());
@@ -152,7 +152,7 @@ public class SimulatedGamePiece {
 
     private Rotation2d findClosestOpenRotationInSpindexer(Rotation2d targetRotation, Rotation2d currentSpindexerRotation) {
         final ArrayList<Rotation2d> occupiedRotations = CURRENT_SPINDEXER_RELATIVE_OCCUPIED_ROTATIONS;
-        final double angularWidthRad = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters /
+        final double angularWidthRad = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters * 2 /
                 SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
 
         final double EPSILON = 0.001;
