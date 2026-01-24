@@ -26,9 +26,7 @@ public class AprilTagCamera {
      * @param aprilTagCameraType  the type of camera
      * @param name                the camera's name
      * @param robotCenterToCamera the transform of the robot's origin point to the camera.
-     *                            only the x, y and yaw values will be used for transforming the camera pose to the robot's center,
-     *                            to avoid more inaccuracies like pitch and roll.
-     *                            The reset will be used for creating a camera in simulation
+     *                            The values will be used for creating a camera in simulation
      * @param standardDeviations  the initial calibrated standard deviations for the camera's estimated pose,
      *                            will be changed as the distance from the tag(s) changes and the number of tags changes
      */
@@ -118,7 +116,7 @@ public class AprilTagCamera {
             return bestPose;
 
         final Pose3d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose);
-        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(inputs.latestResultTimestampSeconds).toPose2d().getRotation();
+        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.sample2DPoseAtTimestamp(inputs.latestResultTimestampSeconds).getRotation();
 
         final double bestAngleDifference = Math.abs(bestPose.toPose2d().getRotation().minus(robotAngleAtResultTime).getRadians());
         final double alternateAngleDifference = Math.abs(alternatePose.toPose2d().getRotation().minus(robotAngleAtResultTime).getRadians());

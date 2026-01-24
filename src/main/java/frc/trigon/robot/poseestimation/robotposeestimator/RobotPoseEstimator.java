@@ -76,7 +76,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         else
             updateFromAprilTagCameras();
 
-        field.setRobotPose(get2DRobotPose());
+        field.setRobotPose(getEstimated2DRobotPose());
     }
 
     public void resetHeading() {
@@ -111,7 +111,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         return swerveDrivePoseEstimator.getEstimatedPosition();
     }
 
-    public Pose2d get2DRobotPose() {
+    public Pose2d getEstimated2DRobotPose() {
         return getEstimatedRobotPose().toPose2d();
     }
 
@@ -150,6 +150,17 @@ public class RobotPoseEstimator implements AutoCloseable {
     }
 
     /**
+     * Gets the estimated two-dimensional pose of the robot at the target timestamp.
+     * Unlike {@link #getPredictedRobotPose(double)} which predicts a future pose, this gets a stored pose from the estimator's buffer.
+     *
+     * @param timestamp the Rio's FPGA timestamp
+     * @return the robot's estimated pose at the timestamp
+     */
+    public Pose2d sample2DPoseAtTimestamp(double timestamp) {
+        return swerveDrivePoseEstimator.sampleAt(timestamp).map((Pose3d::toPose2d)).orElse(null);
+    }
+
+    /**
      * Predicts the robot's pose after the specified time.
      * Unlike {@link #samplePoseAtTimestamp(double)} which gets a previous pose from the buffer, this predicts the future pose of the robot.
      *
@@ -162,6 +173,21 @@ public class RobotPoseEstimator implements AutoCloseable {
         final double predictedY = robotVelocity.vyMetersPerSecond * seconds;
         final Rotation2d predictedRotation = Rotation2d.fromRadians(robotVelocity.omegaRadiansPerSecond * seconds);
         return getEstimatedRobotPose().transformBy(new Transform3d(predictedX, predictedY, 0, new Rotation3d(predictedRotation)));
+    }
+
+    /**
+     * Predicts the robot's two-dimensional pose after the specified time.
+     * Unlike {@link #sample2DPoseAtTimestamp(double)} which gets a previous pose from the buffer, this predicts the future pose of the robot.
+     *
+     * @param seconds the number of seconds into the future to predict the robot's pose for
+     * @return the predicted pose
+     */
+    public Pose2d getPredicted2DRobotPose(double seconds) {
+        final ChassisSpeeds robotVelocity = RobotContainer.SWERVE.getSelfRelativeChassisSpeeds();
+        final double predictedX = robotVelocity.vxMetersPerSecond * seconds;
+        final double predictedY = robotVelocity.vyMetersPerSecond * seconds;
+        final Rotation2d predictedRotation = Rotation2d.fromRadians(robotVelocity.omegaRadiansPerSecond * seconds);
+        return getEstimated2DRobotPose().transformBy(new Transform2d(predictedX, predictedY, predictedRotation));
     }
 
     private void initialize() {

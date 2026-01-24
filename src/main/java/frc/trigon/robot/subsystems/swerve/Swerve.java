@@ -122,12 +122,12 @@ public class Swerve extends MotorSubsystem {
 
     public boolean atXAxisPosition(double xAxisPosition) {
         final double currentXAxisVelocity = getFieldRelativeChassisSpeeds().vxMetersPerSecond;
-        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getX(), xAxisPosition, currentXAxisVelocity);
+        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getX(), xAxisPosition, currentXAxisVelocity);
     }
 
     public boolean atYAxisPosition(double yAxisPosition) {
         final double currentYAxisVelocity = getFieldRelativeChassisSpeeds().vyMetersPerSecond;
-        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getY(), yAxisPosition, currentYAxisVelocity);
+        return atTranslationPosition(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getY(), yAxisPosition, currentYAxisVelocity);
     }
 
     public boolean atAngle(FlippableRotation2d angle) {
@@ -252,7 +252,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     private Rotation2d getPoseEstimatorHeading() {
-        return RobotContainer.ROBOT_POSE_ESTIMATOR.get2DRobotPose().getRotation();
+        return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation();
     }
 
     private void setTargetModuleStates(SwerveModuleState[] swerveModuleStates) {
@@ -286,7 +286,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     private ChassisSpeeds calculateSelfRelativePIDSpeedsToPose(FlippablePose2d targetPose) {
-        final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(SwerveConstants.PID_TO_POSE_PREDICTION_TIME_SECONDS).toPose2d();
+        final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredicted2DRobotPose(SwerveConstants.PID_TO_POSE_PREDICTION_TIME_SECONDS);
         final Pose2d flippedTargetPose = targetPose.get();
 
         final double xSpeed = SwerveConstants.X_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
@@ -312,7 +312,13 @@ public class Swerve extends MotorSubsystem {
                 gyro.getThreadedSignal(Pigeon2Signal.PITCH),
                 gyro.getThreadedSignal(Pigeon2Signal.YAW)
         };
-        final int totalOdometryUpdates = odometryUpdatesDegrees[0].length;
+        final int totalOdometryUpdates = Math.min(
+                Math.min(
+                        odometryUpdatesDegrees[0].length,
+                        odometryUpdatesDegrees[1].length
+                ),
+                odometryUpdatesDegrees[2].length
+        );
 
         final SwerveModulePosition[][] swerveWheelPositions = new SwerveModulePosition[totalOdometryUpdates][];
         final Rotation3d[] gyroRotations = new Rotation3d[totalOdometryUpdates];

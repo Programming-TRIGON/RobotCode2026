@@ -64,7 +64,7 @@ public class AutonomousConstants {
 
     private static void configureAutoBuilder() {
         AutoBuilder.configure(
-                RobotContainer.ROBOT_POSE_ESTIMATOR::get2DRobotPose,
+                RobotContainer.ROBOT_POSE_ESTIMATOR::getEstimated2DRobotPose,
                 (resetPose2d) -> RobotContainer.ROBOT_POSE_ESTIMATOR.resetPose(new Pose3d(resetPose2d)),
                 RobotContainer.SWERVE::getSelfRelativeChassisSpeeds,
                 RobotContainer.SWERVE::drivePathPlanner,
