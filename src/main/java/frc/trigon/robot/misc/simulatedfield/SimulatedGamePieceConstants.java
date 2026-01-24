@@ -1,16 +1,16 @@
 package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.geometry.Translation3d;
-
-import java.util.ArrayList;
-import java.util.List;
+import frc.trigon.robot.constants.FieldConstants;
 
 public class SimulatedGamePieceConstants {
-    static final double G_FORCE = 9.806;
-
+    public static final double SCORE_TOLERANCE_METERS = 0.3;
     static final double
             INTAKE_TOLERANCE_METERS = 0.2,
             LOADER_TOLERANCE_METERS = 0.05;
+    public static final Translation3d
+            SCORE_CHECK_POSITION = new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.778),
+            EJECT_FUEL_FROM_HUB_POSITION = new Translation3d(5.189474, FieldConstants.FIELD_WIDTH_METERS / 2, 0.762);
     static final Translation3d
             COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),//TODO: Calibrate
             LOADER_CHECK_POSITION = new Translation3d(0, 0.13455, 0.2);
@@ -43,25 +43,19 @@ public class SimulatedGamePieceConstants {
             STARTING_FUEL_Y_POSITION_METERS = 1.724406,
             STARTING_FUEL_SPACING_METERS = 0.16;
 
-    /**
-     * Stores the game pieces that start on the field.
-     * Replenishes as the game pieces are picked up.
-     */
-    public static final ArrayList<SimulatedGamePiece> STARTING_FUEL = getStartingFuel();
+    static {
+        initializeFuel();
+    }
 
-    private static ArrayList<SimulatedGamePiece> getStartingFuel() {
-        final ArrayList<SimulatedGamePiece> startingFuel = new ArrayList<>(List.of());
-
+    private static void initializeFuel() {
         for (int i = 0; i < STARTING_FUEL_ROWS; i++) {
             for (int j = 0; j < STARTING_FUEL_COLUMNS; j++) {
-                startingFuel.add(new SimulatedGamePiece(
+                new SimulatedGamePiece(
                         STARTING_FUEL_X_POSITION_METERS + (i * STARTING_FUEL_SPACING_METERS),
                         STARTING_FUEL_Y_POSITION_METERS + (j * STARTING_FUEL_SPACING_METERS)
-                ));
+                );
             }
         }
-
-        return startingFuel;
     }
 
     public enum GamePieceType {

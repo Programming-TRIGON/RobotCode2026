@@ -245,9 +245,4 @@ public class SimulatedGamePiece {
             return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
         }
     }
-
-    private void updatePeriodically() {
-        if (!isIndexed)
-            resetIndexing();
-    }
 }
