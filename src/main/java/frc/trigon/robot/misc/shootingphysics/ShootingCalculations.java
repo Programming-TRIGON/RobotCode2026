@@ -99,11 +99,6 @@ public class ShootingCalculations {
         );
     }
 
-    private Translation3d calculateTangentialRobotVelocityVector(double tangentialVelocityTowardsHub, Rotation2d fuelAngleToHub) {
-        final Rotation2d anglePerpendicularToHub = fuelAngleToHub.rotateBy(new Rotation2d(Math.PI / 2));
-        return new Translation3d(tangentialVelocityTowardsHub, new Rotation3d(anglePerpendicularToHub));
-    }
-
     private Translation2d calculateVelocityRelativeToPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
         final Rotation2d angleToPoint = calculateAngleToPoint(fieldPoint, currentPosition);
         return robotFieldRelativeVelocity.rotateBy(angleToPoint.unaryMinus());
@@ -111,25 +106,5 @@ public class ShootingCalculations {
 
     private Rotation2d calculateAngleToPoint(Translation2d fieldPoint, Translation2d currentPosition) {
         return fieldPoint.minus(currentPosition).getAngle();
-    }
-
-    /**
-     * Extracts the yaw of a 3d vector.
-     *
-     * @param vector the vector to extract the yaw from
-     * @return the yaw of the vector
-     */
-    public Rotation2d getYaw(Translation3d vector) {
-        return new Rotation2d(vector.getX(), vector.getY());
-    }
-
-    /**
-     * Extracts the pitch of a 3d vector.
-     *
-     * @param vector the vector to extract the pitch from
-     * @return the pitch of the vector
-     */
-    public Rotation2d getPitch(Translation3d vector) {
-        return new Rotation2d(Math.atan2(vector.getZ(), Math.hypot(vector.getX(), vector.getY())));
     }
 }
