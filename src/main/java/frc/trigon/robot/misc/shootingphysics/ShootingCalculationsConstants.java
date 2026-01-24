@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.lib.utilities.FilesHandler;
 
 public class ShootingCalculationsConstants {
     static final Pose3d
@@ -25,4 +26,6 @@ public class ShootingCalculationsConstants {
             );
 
     static final double POSE_PREDICTION_TIME_SECONDS = 0.00;
+
+    static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "shooting_lut.bin";
 }
