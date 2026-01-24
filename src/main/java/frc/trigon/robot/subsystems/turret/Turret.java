@@ -124,7 +124,7 @@ public class Turret extends MotorSubsystem {
     }
 
     void setTargetFieldRelativeAngle(Rotation2d targetAngle) {
-        final Rotation2d targetRobotRelativeAngle = Rotation2d.fromDegrees(targetAngle.getDegrees() - RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation().getDegrees());
+        final Rotation2d targetRobotRelativeAngle = targetAngle.minus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation());
         setTargetSelfRelativeAngle(targetRobotRelativeAngle);
     }
 
