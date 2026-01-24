@@ -24,6 +24,7 @@ import java.util.Random;
  */
 public class VisualizeFuelShootingCommand extends Command {
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
+    private static final Random RANDOM = new Random();
     private final SimulatedGamePiece shotFuel;
     private Translation3d currentFuelVelocity;
     private double currentSpinRadiansPerSecond;
@@ -161,7 +162,6 @@ public class VisualizeFuelShootingCommand extends Command {
     }
 
     private double getRandomNumber(int min, int max) {
-        final Random random = new Random();
-        return min + (max - min) * random.nextDouble();
+        return min + (max - min) * RANDOM.nextDouble();
     }
 }

@@ -35,11 +35,11 @@ public class SimulatedGamePieceConstants {
                     0.4
             );
 
-    static final double FUEL_DIAMETER_METERS = 0.15;
     private static final int
             STARTING_FUEL_ROWS = 12,
             STARTING_FUEL_COLUMNS = 30;
     private static final double
+            FUEL_DIAMETER_METERS = 0.15,
             STARTING_FUEL_X_POSITION_METERS = 7.357364,
             STARTING_FUEL_Y_POSITION_METERS = 1.724406,
             STARTING_FUEL_SPACING_METERS = 0.16;
