@@ -1,16 +1,17 @@
 package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.lib.utilities.flippable.FlippableTranslation3d;
 import frc.trigon.robot.constants.FieldConstants;
 
 public class SimulatedGamePieceConstants {
     public static final double SCORE_TOLERANCE_METERS = 0.3;
     static final double
-            INTAKE_TOLERANCE_METERS = 0.2,
+            INTAKE_TOLERANCE_METERS = 0.3,
             LOADER_TOLERANCE_METERS = 0.05;
-    public static final Translation3d
-            SCORE_CHECK_POSITION = new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.778),
-            EJECT_FUEL_FROM_HUB_POSITION = new Translation3d(5.189474, FieldConstants.FIELD_WIDTH_METERS / 2, 0.762);
+    public static final FlippableTranslation3d
+            SCORE_CHECK_POSITION = new FlippableTranslation3d(new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.778), true),
+            EJECT_FUEL_FROM_HUB_POSITION = new FlippableTranslation3d(new Translation3d(5.189474, FieldConstants.FIELD_WIDTH_METERS / 2, 0.762), true);
     static final Translation3d
             COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),//TODO: Calibrate
             LOADER_CHECK_POSITION = new Translation3d(0, 0.13455, 0.2);

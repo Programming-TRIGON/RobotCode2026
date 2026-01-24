@@ -157,28 +157,28 @@ public class SimulatedGamePiece {
 
         final double EPSILON = 0.001;
         final double clearanceRequired = angularWidthRad + EPSILON;
+        final double fuelRadiusRad = angularWidthRad / 2.0;
 
-        // 1. Define the Robot-Relative Deadzone (80° to 180°)
-        final double ROBOT_FORBIDDEN_MIN = Math.toRadians(80);
-        final double ROBOT_FORBIDDEN_MAX = Math.PI; // 180 degrees
+        // 1. Define Robot-Relative Deadzone (80° to 180°)
+        // We ADD the fuel radius to the bounds so the edge of the ball never enters the zone
+        final double ROBOT_FORBIDDEN_MIN = Math.toRadians(80) - fuelRadiusRad;
+        final double ROBOT_FORBIDDEN_MAX = Math.PI + fuelRadiusRad;
 
-        // 2. Convert Robot-Relative bounds to Spindexer-Relative bounds
-        // Formula: SpindexerRelative = RobotRelative - SpindexerRotation
+        // 2. Convert to Spindexer-Relative bounds
         double spindexerForbiddenMin = MathUtil.angleModulus(ROBOT_FORBIDDEN_MIN - currentSpindexerRotation.getRadians());
         double spindexerForbiddenMax = MathUtil.angleModulus(ROBOT_FORBIDDEN_MAX - currentSpindexerRotation.getRadians());
 
-        // 3. Normalize target and check if it's in the dynamic forbidden zone
+        // 3. Normalize target and check if it's in the inflated forbidden zone
         double targetRad = MathUtil.angleModulus(targetRotation.getRadians());
 
         if (isAngleInSector(targetRad, spindexerForbiddenMin, spindexerForbiddenMax)) {
-            // Snap to the closer boundary of the deadzone
             double distToMin = Math.abs(MathUtil.angleModulus(targetRad - spindexerForbiddenMin));
             double distToMax = Math.abs(MathUtil.angleModulus(targetRad - spindexerForbiddenMax));
             targetRad = (distToMin < distToMax) ? spindexerForbiddenMin : spindexerForbiddenMax;
         }
         Rotation2d clampedTarget = Rotation2d.fromRadians(targetRad);
 
-        // 4. Check if the clamped target is clear of other fuel
+        // 4. Standard collision check against other fuel
         boolean targetBlocked = false;
         for (Rotation2d occupied : occupiedRotations) {
             if (Math.abs(clampedTarget.minus(occupied).getRadians()) < clearanceRequired) {
@@ -188,7 +188,7 @@ public class SimulatedGamePiece {
         }
         if (!targetBlocked) return clampedTarget;
 
-        // 5. Generate candidate "Exit Points"
+        // 5. Generate candidate points (Edges of deadzone + Edges of existing balls)
         ArrayList<Rotation2d> candidates = new ArrayList<>();
         candidates.add(Rotation2d.fromRadians(spindexerForbiddenMin));
         candidates.add(Rotation2d.fromRadians(spindexerForbiddenMax));
@@ -204,12 +204,12 @@ public class SimulatedGamePiece {
         for (Rotation2d candidate : candidates) {
             double candRad = MathUtil.angleModulus(candidate.getRadians());
 
-            // FILTER: Discard if the point falls inside the Robot-Relative Deadzone
+            // REJECT if center is within the inflated deadzone
             if (isAngleInSector(candRad, spindexerForbiddenMin, spindexerForbiddenMax)) {
                 continue;
             }
 
-            // Check for collisions with other fuel
+            // REJECT if colliding with other balls
             boolean isBlocked = false;
             for (Rotation2d occupied : occupiedRotations) {
                 if (Math.abs(candidate.minus(occupied).getRadians()) < clearanceRequired - (EPSILON * 2)) {
@@ -230,18 +230,14 @@ public class SimulatedGamePiece {
         return bestRotation;
     }
 
-    /**
-     * Helper to check if an angle is within a sector, handling wrap-around cases.
-     */
     private boolean isAngleInSector(double angle, double start, double end) {
         double normalizedStart = MathUtil.angleModulus(start);
         double normalizedEnd = MathUtil.angleModulus(end);
         double normalizedAngle = MathUtil.angleModulus(angle);
 
-        if (normalizedStart < normalizedEnd) {
+        if (normalizedStart <= normalizedEnd) {
             return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
         } else {
-            // Sector crosses the PI/-PI boundary
             return normalizedAngle >= normalizedStart || normalizedAngle <= normalizedEnd;
         }
     }

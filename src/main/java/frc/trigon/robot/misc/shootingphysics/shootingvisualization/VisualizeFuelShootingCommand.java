@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.trigon.lib.hardware.RobotHardwareStats;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
@@ -148,15 +149,15 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private void ejectFromHub() {
         final Translation3d ejectionPower = new Translation3d(getRandomNumber(4, 15), 0, 0);
-        final Rotation3d ejectionRotation = new Rotation3d(0, 0, Units.degreesToRadians(getRandomNumber(-35, 35)));
+        final Rotation3d ejectionRotation = new Rotation3d(0, 0, Units.degreesToRadians(getRandomNumber(-35, 35)) + (Flippable.isRedAlliance() ? Math.PI : 0));
         final Translation3d ejectionVector = ejectionPower.rotateBy(ejectionRotation);
 
-        shotFuel.updatePosition(SimulatedGamePieceConstants.EJECT_FUEL_FROM_HUB_POSITION);
+        shotFuel.updatePosition(SimulatedGamePieceConstants.EJECT_FUEL_FROM_HUB_POSITION.get());
         currentFuelVelocity = ejectionVector;
     }
 
     private boolean isScoredInHub() {
-        return shotFuel.getPosition().getDistance(SimulatedGamePieceConstants.SCORE_CHECK_POSITION) < SimulatedGamePieceConstants.SCORE_TOLERANCE_METERS;
+        return shotFuel.getPosition().getDistance(SimulatedGamePieceConstants.SCORE_CHECK_POSITION.get()) < SimulatedGamePieceConstants.SCORE_TOLERANCE_METERS;
     }
 
     private double getRandomNumber(int min, int max) {
