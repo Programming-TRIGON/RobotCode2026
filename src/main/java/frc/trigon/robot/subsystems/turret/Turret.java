@@ -82,6 +82,7 @@ public class Turret extends MotorSubsystem {
     @Override
     public void stop() {
         masterMotor.stopMotor();
+        targetSelfRelativeAngle = new Rotation2d();
     }
 
     public Pose3d calculateVisualizationPose() {
