@@ -11,11 +11,11 @@ import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 
 public class FuelIntakeCommand {
-    private static boolean IS_PREPARE_TO_INTAKE = false;
+    private static boolean IS_INTAKE_PREPARED = false;
 
     public static Command getToggleIntakeDefaultStateCommand() {
         return new InstantCommand(() ->
-                IS_PREPARE_TO_INTAKE = !IS_PREPARE_TO_INTAKE
+                IS_INTAKE_PREPARED = !IS_INTAKE_PREPARED
         ).andThen(
                 new ConditionalCommand(
                         new InstantCommand(() ->
@@ -30,7 +30,7 @@ public class FuelIntakeCommand {
                                 )
                         ),
 
-                        () -> IS_PREPARE_TO_INTAKE
+                        () -> IS_INTAKE_PREPARED
                 )
         );
     }
@@ -43,6 +43,6 @@ public class FuelIntakeCommand {
                         OperatorConstants.Y_ASSIST_POWER,
                         OperatorConstants.THETA_ASSIST_POWER
                 ).onlyWhile(OperatorConstants.INTAKE_ASSIST_ENABLED).repeatedly()
-        ).onlyWhile(() -> IS_PREPARE_TO_INTAKE).repeatedly();
+        ).onlyWhile(() -> IS_INTAKE_PREPARED).repeatedly();
     }
 }

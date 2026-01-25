@@ -53,6 +53,6 @@ public class OperatorConstants {
             BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
 
     public static final Trigger
-            INTAKE_PREPARE_TRIGGER = OPERATOR_CONTROLLER.m(), //change to DRIVER_CONTROLER.a()
+            TOGGLE_INTAKE_PREPARATION_TRIGGER = OPERATOR_CONTROLLER.m(), //change to DRIVER_CONTROLER.a()
             INTAKE_TRIGGER = OPERATOR_CONTROLLER.n();  //DRIVER_CONTROLLER.leftTrigger()
 }

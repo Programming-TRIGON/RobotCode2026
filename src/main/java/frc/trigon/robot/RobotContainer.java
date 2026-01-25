@@ -89,7 +89,7 @@ public class RobotContainer {
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
 
-        OperatorConstants.INTAKE_PREPARE_TRIGGER.onTrue(FuelIntakeCommand.getToggleIntakeDefaultStateCommand());
+        OperatorConstants.TOGGLE_INTAKE_PREPARATION_TRIGGER.onTrue(FuelIntakeCommand.getToggleIntakeDefaultStateCommand());
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommand.getIntakeCommand());
     }
 
