@@ -1,6 +1,9 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
@@ -15,23 +18,23 @@ public class ShootingCommands {
     public static Command getShootFuelCommand() {
         return new SequentialCommandGroup(
                 getAimAtHubCommand(),
-                new WaitUntilCommand(() ->
-                        RobotContainer.SHOOTER.atTargetVelocity()
-                                && RobotContainer.HOOD.atTargetAngle()
-                                && RobotContainer.TURRET.atTargetSelfRelativeAngle()
-                ),
                 getFeedToShooterCommand()
         );
     }
 
-    public static Command getFeedToShooterCommand() {
-        return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET),
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
-        );
+    private static Command getFeedToShooterCommand() {
+        return new RunCommand(() -> {
+            if (RobotContainer.TURRET.atTargetSelfRelativeAngle()
+                    && RobotContainer.HOOD.atTargetAngle()
+                    && RobotContainer.SHOOTER.atTargetVelocity()) {
+                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD);
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET);
+            }
+        });
     }
 
-    public static Command getAimAtHubCommand() {
+
+    private static Command getAimAtHubCommand() {
         return new ParallelCommandGroup(
                 getUpdateShootingCalculations(),
                 TurretCommands.getAlignToHubCommand(),
@@ -40,7 +43,7 @@ public class ShootingCommands {
         );
     }
 
-    public static Command getUpdateShootingCalculations() {
+    private static Command getUpdateShootingCalculations() {
         return new RunCommand(
                 ShootingCalculations.getInstance()::updateCalculations
         );
