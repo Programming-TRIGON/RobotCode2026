@@ -1,9 +1,6 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
@@ -23,14 +20,16 @@ public class ShootingCommands {
     }
 
     private static Command getFeedToShooterCommand() {
-        return new RunCommand(() -> {
-            if (RobotContainer.TURRET.atTargetSelfRelativeAngle()
-                    && RobotContainer.HOOD.atTargetAngle()
-                    && RobotContainer.SHOOTER.atTargetVelocity()) {
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD);
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET);
-            }
-        });
+        return new ConditionalCommand(
+                new ParallelCommandGroup(
+                        LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD),
+                        SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET)
+                ),
+                new InstantCommand(),
+                () -> RobotContainer.TURRET.atTargetSelfRelativeAngle()
+                        && RobotContainer.HOOD.atTargetAngle()
+                        && RobotContainer.SHOOTER.atTargetVelocity()
+        );
     }
 
 
