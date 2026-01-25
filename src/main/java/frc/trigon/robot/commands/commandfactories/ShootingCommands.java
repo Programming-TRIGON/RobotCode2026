@@ -1,6 +1,9 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
