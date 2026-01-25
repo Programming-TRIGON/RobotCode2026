@@ -20,17 +20,13 @@ public class FuelIntakeCommand {
                 new ConditionalCommand(
                         new InstantCommand(() ->
                                 RobotContainer.INTAKE.changeDefaultCommand(
-                                        IntakeCommands.getSetTargetStateCommand(
-                                                IntakeConstants.IntakeState.PREPARE_TO_INTAKE
-                                        )
+                                        IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.PREPARE_TO_INTAKE)
                                 )
                         ),
 
                         new InstantCommand(() ->
                                 RobotContainer.INTAKE.changeDefaultCommand(
-                                        IntakeCommands.getSetTargetStateCommand(
-                                                IntakeConstants.IntakeState.REST
-                                        )
+                                        IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.REST)
                                 )
                         ),
 
@@ -38,24 +34,6 @@ public class FuelIntakeCommand {
                 )
         );
     }
-
-/*    public static Command getToggleIntakeDefaultStateCommand() {
-        return new InstantCommand(() -> {
-            IS_PREPARE_TO_INTAKE = !IS_PREPARE_TO_INTAKE;
-            if (IS_PREPARE_TO_INTAKE)
-                RobotContainer.INTAKE.changeDefaultCommand(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.PREPARE_TO_INTAKE));
-            else
-                RobotContainer.INTAKE.changeDefaultCommand(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.REST));
-        });
-    }*/
-
-//    public static Command getIntakeCommand() {
-//        return new ParallelCommandGroup(
-//                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-//                new IntakeAssistCommand(OperatorConstants.X_ASSIST_POWER, OperatorConstants.Y_ASSIST_POWER, OperatorConstants.THETA_ASSIST_POWER).onlyIf(OperatorConstants.INTAKE_ASSIST_ENABLED)
-//        );
-//    }
-
 
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
