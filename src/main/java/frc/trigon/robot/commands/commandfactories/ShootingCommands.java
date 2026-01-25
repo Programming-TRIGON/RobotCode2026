@@ -13,23 +13,23 @@ import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class ShootingCommands {
     public static Command getShootFuelCommand() {
-        return new SequentialCommandGroup(
+        return new ParallelCommandGroup(
                 getAimAtHubCommand(),
                 getFeedToShooterCommand()
         );
     }
 
     private static Command getFeedToShooterCommand() {
-        return new ConditionalCommand(
-                new ParallelCommandGroup(
+        return new RunCommand(() -> {
+            if (RobotContainer.TURRET.atTargetSelfRelativeAngle()
+                    && RobotContainer.HOOD.atTargetAngle()
+                    && RobotContainer.SHOOTER.atTargetVelocity()) {
+                CommandScheduler.getInstance().schedule(
                         LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD),
                         SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET)
-                ),
-                new InstantCommand(),
-                () -> RobotContainer.TURRET.atTargetSelfRelativeAngle()
-                        && RobotContainer.HOOD.atTargetAngle()
-                        && RobotContainer.SHOOTER.atTargetVelocity()
-        );
+                );
+            }
+        });
     }
 
 
