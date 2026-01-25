@@ -5,11 +5,18 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import java.util.function.DoubleUnaryOperator;
 
 public class OperatorConstants {
+    public static final LoggedNetworkBoolean INTAKE_ASSIST_ENABLED =
+            new LoggedNetworkBoolean("Debug/intakeAssistEnabled", true);
     public static final double DRIVER_CONTROLLER_DEADBAND = 0.07;
+    public static final double
+            X_ASSIST_POWER = 0.0,
+            Y_ASSIST_POWER = 0.0,
+            THETA_ASSIST_POWER = 0.0;
     private static final int DRIVER_CONTROLLER_PORT = 0;
     private static final int
             DRIVER_CONTROLLER_RIGHT_STICK_EXPONENT = 1,
@@ -43,7 +50,9 @@ public class OperatorConstants {
             FORWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.right(),
             BACKWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.left(),
             FORWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.up(),
-            BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down(),
-            INTAKE_PREPARE_TRIGGER = DRIVER_CONTROLLER.a(),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+            BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
+
+    public static final Trigger
+            INTAKE_PREPARE_TRIGGER = OPERATOR_CONTROLLER.m(), //change to DRIVER_CONTROLER.a()
+            INTAKE_TRIGGER = OPERATOR_CONTROLLER.n();  //DRIVER_CONTROLLER.leftTrigger()
 }
