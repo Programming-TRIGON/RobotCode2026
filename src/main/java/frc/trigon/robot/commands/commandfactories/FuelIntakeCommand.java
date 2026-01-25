@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import static frc.trigon.robot.subsystems.intake.IntakeCommands.getSetTargetStateCommand;
 
-public class IntakeCommand {
+public class FuelIntakeCommand {
     private static boolean IS_PREPARE_TO_INTAKE = false;
     private static final double
             X_ASSIST_POWER = 0.0,
