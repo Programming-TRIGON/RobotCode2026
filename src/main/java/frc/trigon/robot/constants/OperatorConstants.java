@@ -10,8 +10,9 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 import java.util.function.DoubleUnaryOperator;
 
 public class OperatorConstants {
-    public static final LoggedNetworkBoolean INTAKE_ASSIST_ENABLED =
-            new LoggedNetworkBoolean("Debug/intakeAssistEnabled", true);
+    public static LoggedNetworkBoolean
+            SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("Debug/intakeAssistEnabled", false),
+            IS_INTAKE_ASSIST_ENABLED = new LoggedNetworkBoolean("Assists/intakeAssistEnabled", false);
     public static final double DRIVER_CONTROLLER_DEADBAND = 0.07;
     public static final double
             X_ASSIST_POWER = 0.0,
@@ -53,6 +54,6 @@ public class OperatorConstants {
             BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
 
     public static final Trigger
-            TOGGLE_INTAKE_PREPARATION_TRIGGER = DRIVER_CONTROLLER.a(),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.m(),
+            INTAKE_TRIGGER = OPERATOR_CONTROLLER.n();
 }
