@@ -26,7 +26,7 @@ public class ShootingCommands {
         return new RunCommand(() -> {
             if (RobotContainer.TURRET.atTargetSelfRelativeAngle()
                     && RobotContainer.HOOD.atTargetAngle()
-                    && RobotContainer.SHOOTER.atTargetVelocity()) {
+                    && RobotContainer.SHOOTER.atTargetVelocity() && !getFeedToShooterCommand().isScheduled()) {
                 CommandScheduler.getInstance().schedule(
                         LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD),
                         SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET)
