@@ -87,13 +87,17 @@ public class TurretConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 180 : 0;
+        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
+        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.01;
+
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 240 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 16 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.002 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 6.2 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.001 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+        config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.UseSlot1;
 
         config.Slot1.kP = config.Slot0.kP;
         config.Slot1.kI = config.Slot0.kI;

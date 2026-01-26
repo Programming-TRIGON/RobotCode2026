@@ -39,7 +39,7 @@ public class VisualizeFuelShootingCommand extends Command {
 
     @Override
     public void initialize() {
-        shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateTargetFuelExitPosition());
+        shotFuel.updatePosition(SHOOTING_CALCULATIONS.calculateCurrentFuelExitPose());
         currentFuelVelocity = calculateFuelExitVelocityVector();
         initializeSpin(currentFuelVelocity.getNorm());
     }
