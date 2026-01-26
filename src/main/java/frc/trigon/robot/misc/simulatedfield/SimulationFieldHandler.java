@@ -56,7 +56,7 @@ public class SimulationFieldHandler {
      * @return the fuel object that is being collected
      */
     private static ArrayList<SimulatedGamePiece> getCollectedFuel(Translation3d collectionPosition) {
-        final ArrayList<SimulatedGamePiece> collectedFuel = new ArrayList<>(List.of());
+        final ArrayList<SimulatedGamePiece> collectedFuel = new ArrayList<>();
         for (SimulatedGamePiece gamePiece : SimulatedGamePiece.getUnheldGamePieces())
             if (gamePiece.getDistanceFromPositionMeters(collectionPosition) <= SimulatedGamePieceConstants.INTAKE_TOLERANCE_METERS)
                 collectedFuel.add(gamePiece);
@@ -77,11 +77,12 @@ public class SimulationFieldHandler {
     }
 
     private static SimulatedGamePiece getEjectableFuel() {
+        final Translation3d fuelLoaderFieldRelativePose = getFuelLoaderFieldRelativePose();
         for (SimulatedGamePiece heldFuel : HELD_FUEL) {
             if (!heldFuel.isIndexed())
                 continue;
 
-            final double distanceFromLoaderPose = heldFuel.getDistanceFromPositionMeters(getFuelLoaderFieldRelativePose());
+            final double distanceFromLoaderPose = heldFuel.getDistanceFromPositionMeters(fuelLoaderFieldRelativePose);
             if (distanceFromLoaderPose < SimulatedGamePieceConstants.LOADER_TOLERANCE_METERS)
                 return heldFuel;
         }
