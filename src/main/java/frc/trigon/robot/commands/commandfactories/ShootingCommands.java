@@ -14,7 +14,7 @@ import frc.trigon.robot.subsystems.turret.TurretCommands;
 public class ShootingCommands {
     public static Command getShootFuelCommand() {
         return new ParallelCommandGroup(
-                getAimAtHubCommand(),
+                getCalculatedAimAtHubCommand(),
                 getLoadWhenReadyCommand()
         );
     }
@@ -33,9 +33,15 @@ public class ShootingCommands {
         );
     }
 
+    private static Command getCalculatedAimAtHubCommand() {
+        return new SequentialCommandGroup(
+                getUpdateShootingCalculationsCommand(),
+                getAimAtHubCommand()
+        );
+    }
+
     private static Command getAimAtHubCommand() {
         return new ParallelCommandGroup(
-                getUpdateShootingCalculations(),
                 TurretCommands.getAlignToHubCommand(),
                 HoodCommands.getAimAtHubCommand(),
                 ShooterCommands.getAimAtHubCommand()
@@ -50,7 +56,7 @@ public class ShootingCommands {
         );
     }
 
-    private static Command getUpdateShootingCalculations() {
+    private static Command getUpdateShootingCalculationsCommand() {
         return new RunCommand(
                 ShootingCalculations.getInstance()::updateCalculations
         );
