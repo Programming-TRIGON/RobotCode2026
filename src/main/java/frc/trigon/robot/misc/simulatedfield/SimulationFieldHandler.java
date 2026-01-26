@@ -3,8 +3,8 @@ package frc.trigon.robot.misc.simulatedfield;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.shootingphysics.shootingvisualization.VisualizeFuelShootingCommand;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class SimulationFieldHandler {
     }
 
     private static boolean isCollectingFuel() {
-        return false;//TODO: INTAKE at state
+        return RobotContainer.INTAKE.atState(IntakeConstants.IntakeState.INTAKE);
     }
 
     private static void updateEjection() {
