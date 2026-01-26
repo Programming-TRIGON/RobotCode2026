@@ -159,7 +159,7 @@ public class VisualizeFuelShootingCommand extends Command {
                 0,
                 Units.degreesToRadians(
                         getRandomNumber(
-                                SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_ANGLE.getDegrees(),
+                                -SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_ANGLE.getDegrees(),
                                 SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_ANGLE.getDegrees()
                         )
                 ) + (Flippable.isRedAlliance() ? Math.PI : 0)
