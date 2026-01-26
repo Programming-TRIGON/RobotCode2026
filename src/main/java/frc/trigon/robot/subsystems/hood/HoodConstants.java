@@ -3,10 +3,7 @@ package frc.trigon.robot.subsystems.hood;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.*;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -18,6 +15,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
 import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
+import frc.trigon.robot.subsystems.turret.TurretConstants;
 
 public class HoodConstants {
     private static final int
@@ -31,8 +29,6 @@ public class HoodConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 50;
-    private static final double ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS = 0;
-    static final double POSITION_OFFSET_FROM_GRAVITY_OFFSET_ROTATION = RobotHardwareStats.isSimulation() ? 0 : 0 - ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
@@ -41,7 +37,7 @@ public class HoodConstants {
             HOOD_LENGTH_METERS = 0.17;
     private static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(50),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(90);
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(87);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
             GEARBOX,
@@ -60,22 +56,22 @@ public class HoodConstants {
             HOOD_LENGTH_METERS,
             MECHANISM_COLOR
     );
-
     static final Pose3d HOOD_VISUALIZATION_ORIGIN_POINT = new Pose3d(
-            new Translation3d(0, 0, 0),
-            new Rotation3d(0, 0, 0)
+            new Translation3d(-0.06144, 0.14542, 0.46867),
+            new Rotation3d(0, Math.toRadians(87), 0)
     );
+    static final Transform3d TURRET_TO_HOOD_OFFSET = HOOD_VISUALIZATION_ORIGIN_POINT.minus(TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT);
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(0.5).per(Units.Seconds),
-            Units.Volts.of(1),
+            Units.Volts.of(0.3).per(Units.Seconds),
+            Units.Volts.of(0.7),
             null
     );
 
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
     static final Rotation2d
-            REST_ANGLE = Rotation2d.fromDegrees(50),
-            DELIVERY_ANGLE = Rotation2d.fromDegrees(90);
+            REST_ANGLE = Rotation2d.fromDegrees(87),
+            DELIVERY_ANGLE = Rotation2d.fromDegrees(50);
 
     static {
         configureMotor();
@@ -95,15 +91,16 @@ public class HoodConstants {
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 1 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.039753 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.45 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        config.Slot0.GravityArmPositionOffset = 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 0;
@@ -127,7 +124,7 @@ public class HoodConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = ANGLE_ENCODER_GRAVITY_OFFSET_ROTATIONS;
+        config.MagnetSensor.MagnetOffset = 0;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

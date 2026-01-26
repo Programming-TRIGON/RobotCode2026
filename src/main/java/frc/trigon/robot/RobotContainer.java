@@ -17,11 +17,15 @@ import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.LEDConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
+import frc.trigon.robot.misc.shootingphysics.ShootingLookupTable3D;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.hood.Hood;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
+import frc.trigon.robot.subsystems.intake.Intake;
+import frc.trigon.robot.subsystems.intake.IntakeCommands;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.loader.Loader;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
@@ -31,6 +35,8 @@ import frc.trigon.robot.subsystems.spindexer.Spindexer;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
+import frc.trigon.robot.subsystems.turret.Turret;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -42,9 +48,11 @@ public class RobotContainer {
     );
     public static final Swerve SWERVE = new Swerve();
     public static final Hood HOOD = new Hood();
+    public static final Intake INTAKE = new Intake();
     public static final Loader LOADER = new Loader();
     public static final Shooter SHOOTER = new Shooter();
     public static final Spindexer SPINDEXER = new Spindexer();
+    public static final Turret TURRET = new Turret();
     private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
@@ -63,15 +71,17 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        //configureSysIDBindings(LOADER);
+//        configureSysIDBindings(TURRET);
     }
 
     private void bindDefaultCommands() {
         SWERVE.setDefaultCommand(GeneralCommands.getFieldRelativeDriveCommand());
         HOOD.setDefaultCommand(HoodCommands.getRestCommand());
+        INTAKE.setDefaultCommand(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.REST));
         LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
+        TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
     }
 
     private void bindControllerCommands() {
@@ -97,6 +107,7 @@ public class RobotContainer {
         Flippable.init();
         LEDConstants.init();
         AutonomousConstants.init();
+        ShootingLookupTable3D.init();
     }
 
     private void buildAutoChooser() {
