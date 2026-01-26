@@ -149,8 +149,21 @@ public class VisualizeFuelShootingCommand extends Command {
     }
 
     private void ejectFromHub() {
-        final Translation3d ejectionPower = new Translation3d(getRandomNumber(4, 15), 0, 0);
-        final Rotation3d ejectionRotation = new Rotation3d(0, 0, Units.degreesToRadians(getRandomNumber(-35, 35)) + (Flippable.isRedAlliance() ? Math.PI : 0));
+        final Translation3d ejectionPower = new Translation3d(
+                getRandomNumber(SimulatedGamePieceConstants.EJECTION_FROM_HUB_MINIMUM_VELOCITY_METERS_PER_SECOND, SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_VELOCITY_METERS_PER_SECOND),
+                0,
+                0
+        );
+        final Rotation3d ejectionRotation = new Rotation3d(
+                0,
+                0,
+                Units.degreesToRadians(
+                        getRandomNumber(
+                                SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_ANGLE.getDegrees(),
+                                SimulatedGamePieceConstants.EJECTION_FROM_HUB_MAXIMUM_ANGLE.getDegrees()
+                        )
+                ) + (Flippable.isRedAlliance() ? Math.PI : 0)
+        );
         final Translation3d ejectionVector = ejectionPower.rotateBy(ejectionRotation);
 
         shotFuel.updatePosition(SimulatedGamePieceConstants.EJECT_FUEL_FROM_HUB_POSITION.get());
@@ -161,7 +174,7 @@ public class VisualizeFuelShootingCommand extends Command {
         return shotFuel.getPosition().getDistance(SimulatedGamePieceConstants.SCORE_CHECK_POSITION.get()) < SimulatedGamePieceConstants.SCORE_TOLERANCE_METERS;
     }
 
-    private double getRandomNumber(int min, int max) {
+    private double getRandomNumber(double min, double max) {
         return min + (max - min) * RANDOM.nextDouble();
     }
 }

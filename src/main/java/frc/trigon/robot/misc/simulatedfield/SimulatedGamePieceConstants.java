@@ -1,5 +1,6 @@
 package frc.trigon.robot.misc.simulatedfield;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation3d;
 import frc.trigon.robot.constants.FieldConstants;
@@ -13,7 +14,7 @@ public class SimulatedGamePieceConstants {
             SCORE_CHECK_POSITION = new FlippableTranslation3d(new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.778), true),
             EJECT_FUEL_FROM_HUB_POSITION = new FlippableTranslation3d(new Translation3d(5.189474, FieldConstants.FIELD_WIDTH_METERS / 2, 0.762), true);
     static final Translation3d
-            COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),//TODO: Calibrate
+            COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),
             LOADER_CHECK_POSITION = new Translation3d(0, 0.13455, 0.2);
 
     static final int MAXIMUM_HELD_FUEL = 40;
@@ -43,6 +44,11 @@ public class SimulatedGamePieceConstants {
             STARTING_FUEL_X_POSITION_METERS = 7.357364,
             STARTING_FUEL_Y_POSITION_METERS = 1.724406,
             STARTING_FUEL_SPACING_METERS = 0.16;
+
+    public static final double
+            EJECTION_FROM_HUB_MINIMUM_VELOCITY_METERS_PER_SECOND = 4,
+            EJECTION_FROM_HUB_MAXIMUM_VELOCITY_METERS_PER_SECOND = 15;
+    public static final Rotation2d EJECTION_FROM_HUB_MAXIMUM_ANGLE = Rotation2d.fromDegrees(35);
 
     static {
         initializeFuel();
