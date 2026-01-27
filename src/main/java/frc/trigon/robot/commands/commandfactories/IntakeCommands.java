@@ -7,25 +7,24 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandclasses.IntakeAssistCommand;
 import frc.trigon.robot.constants.OperatorConstants;
-import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 
-public class FuelIntakeCommand {
-    public static Command getToggleShouldKeepIntakeOpenCommand(){
+public class IntakeCommands {
+    public static Command getToggleShouldKeepIntakeOpenCommand() {
         return new ConditionalCommand(
                 new InstantCommand(
-                        () -> RobotContainer.INTAKE.changeDefaultCommand(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.PREPARE_TO_INTAKE))
+                        () -> RobotContainer.INTAKE.changeDefaultCommand(frc.trigon.robot.subsystems.intake.IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.PREPARE_TO_INTAKE))
                 ),
                 new InstantCommand(
-                        () -> RobotContainer.INTAKE.changeDefaultCommand(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.REST))
+                        () -> RobotContainer.INTAKE.changeDefaultCommand(frc.trigon.robot.subsystems.intake.IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.REST))
                 ),
                 OperatorConstants.SHOULD_KEEP_INTAKE_OPEN
         );
     }
-    
+
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
-                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
+                frc.trigon.robot.subsystems.intake.IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 new IntakeAssistCommand(
                         OperatorConstants.X_ASSIST_POWER,
                         OperatorConstants.Y_ASSIST_POWER,
