@@ -10,10 +10,6 @@ import java.util.function.DoubleUnaryOperator;
 
 public class OperatorConstants {
     public static final double DRIVER_CONTROLLER_DEADBAND = 0.07;
-    public static final double
-            X_ASSIST_POWER = 0.0,
-            Y_ASSIST_POWER = 0.0,
-            THETA_ASSIST_POWER = 0.0;
     private static final int DRIVER_CONTROLLER_PORT = 0;
     private static final int
             DRIVER_CONTROLLER_RIGHT_STICK_EXPONENT = 1,
