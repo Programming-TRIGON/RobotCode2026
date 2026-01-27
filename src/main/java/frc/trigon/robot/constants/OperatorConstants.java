@@ -5,14 +5,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import java.util.function.DoubleUnaryOperator;
 
 public class OperatorConstants {
-    public static LoggedNetworkBoolean
-            SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("Debug/intakeAssistEnabled", false),
-            IS_INTAKE_ASSIST_ENABLED = new LoggedNetworkBoolean("Assists/intakeAssistEnabled", false);
     public static final double DRIVER_CONTROLLER_DEADBAND = 0.07;
     public static final double
             X_ASSIST_POWER = 0.0,
