@@ -111,7 +111,7 @@ public class ShootingCommands {
         SHOOTING_CALCULATIONS.updateCalculations();
     }
 
-    public enum FixedShootingPosition {
+    public enum FixedShootingPosition {//TODO: Get all values from shooting calculations
         CLOSE_TO_HUB(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         LEFT_CORNER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         CLOSE_TO_TOWER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
