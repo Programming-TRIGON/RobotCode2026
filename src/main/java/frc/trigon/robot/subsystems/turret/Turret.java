@@ -129,7 +129,17 @@ public class Turret extends MotorSubsystem {
 
     void setTargetSelfRelativeAngle(Rotation2d targetAngle) {
         targetSelfRelativeAngle = limitAngle(targetAngle);
-        masterMotor.setControl(positionRequest.withPosition(targetSelfRelativeAngle.getRotations()).withFeedForward((-RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond() / (Math.PI * 2)) * 6.2249));
+        final double resistSwerveRotationFeedforward = calculateResistSwerveRotationFeedforward();
+        masterMotor.setControl(positionRequest
+                .withPosition(targetSelfRelativeAngle.getRotations())
+                .withFeedForward(resistSwerveRotationFeedforward)
+        );
+    }
+
+    private double calculateResistSwerveRotationFeedforward() {
+        final double robotRotationalVelocityRadiansPerSecond = RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond();
+        final double robotRotationalVelocityRotationsPerSecond = robotRotationalVelocityRadiansPerSecond / (2 * Math.PI);
+        return -robotRotationalVelocityRotationsPerSecond * TurretConstants.RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN;
     }
 
     private Rotation2d calculateTargetAngleForDelivery() {

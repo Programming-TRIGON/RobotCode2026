@@ -38,6 +38,7 @@ public class TurretConstants {
     private static final double GEAR_RATIO = 52;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
+    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = 6.2;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
