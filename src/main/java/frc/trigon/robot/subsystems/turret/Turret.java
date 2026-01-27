@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.phoenix6.Phoenix6SignalThread;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
@@ -61,6 +62,12 @@ public class Turret extends MotorSubsystem {
         masterMotor.update();
         followerMotor.update();
         encoder.update();
+
+        TurretCameraTransformCalculator.getInstance().update(
+                masterMotor.getThreadedSignal(TalonFXSignal.POSITION),
+                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
+                masterMotor.getSignal(TalonFXSignal.VELOCITY)
+        );
     }
 
     @Override

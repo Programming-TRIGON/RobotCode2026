@@ -4,10 +4,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.signals.*;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -72,6 +69,21 @@ public class TurretConstants {
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
 
+    static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
+    static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
+            new Translation3d(-0.14542, 0.14542, 0.34578),
+            new Rotation3d(0, 0, 0)
+    );
+    static final Transform3d
+            TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
+            new Translation3d(0.03, -0.05, 0.0),
+            new Rotation3d(0, 0, 0)
+    ),
+            TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
+                    new Translation3d(0.03, 0.05, 0.0),
+                    new Rotation3d(0, 0, 0)
+            );
+
     static {
         configureMasterMotor();
         configureFollowerMotor();
@@ -120,9 +132,9 @@ public class TurretConstants {
 
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 250);
+        MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
     private static void configureFollowerMotor() {
@@ -157,6 +169,6 @@ public class TurretConstants {
         ENCODER.setSimulationInputsFromTalonFX(MASTER_MOTOR);
 
         ENCODER.registerSignal(CANcoderSignal.POSITION, 250);
-        ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
+        ENCODER.registerSignal(CANcoderSignal.VELOCITY, 250);
     }
 }
