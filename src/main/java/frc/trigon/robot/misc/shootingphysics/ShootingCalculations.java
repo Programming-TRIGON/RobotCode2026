@@ -38,7 +38,6 @@ public class ShootingCalculations {
         return calculateFieldRelativeFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
-    @AutoLogOutput(key = "Shooting/TargetFuelExitPosition")
     public Translation3d calculateTargetFuelExitPosition(double posePredictionTimeSeconds) {
         final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(posePredictionTimeSeconds);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
