@@ -53,9 +53,9 @@ public class OperatorConstants {
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.i().or(DRIVER_CONTROLLER.b()),
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
     public static final Trigger
-            OVERRIDE_ALWAYS_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
+            OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick(),
-            SHOULD_SHOOT_TRIGGER = OVERRIDE_ALWAYS_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldShoot).or(OperatorConstants::canShootFromSetPosition),
+            SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldShoot).or(OperatorConstants::canShootFromSetPosition),
             TOGGLE_SHOULD_SHOOT_FROM_SET_POSITION_TRIGGER = DRIVER_CONTROLLER.back(),
             SET_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = OPERATOR_CONTROLLER.u(),
             SET_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = OPERATOR_CONTROLLER.h(),
@@ -68,6 +68,6 @@ public class OperatorConstants {
     }
 
     private static boolean canShootFromSetPosition() {
-        return ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION && OVERRIDE_ALWAYS_SHOOT_TRIGGER.getAsBoolean();
+        return ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION && OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 }

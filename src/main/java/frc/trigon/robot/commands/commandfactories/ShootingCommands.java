@@ -78,9 +78,11 @@ public class ShootingCommands {
     }
 
     private static Command getLoadFuelWhenReadyCommand() {
-        return getLoadFuelCommand()
-                .onlyWhile(ShootingCommands::canShoot)
-                .repeatedly();
+        return new SequentialCommandGroup(
+                new WaitUntilCommand(ShootingCommands::canShoot),
+                getLoadFuelCommand()
+                        .until(() -> !canShoot())
+        ).repeatedly();
     }
 
     private static Command getLoadFuelCommand() {
