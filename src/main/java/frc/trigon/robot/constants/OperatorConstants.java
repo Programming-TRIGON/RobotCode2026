@@ -73,6 +73,6 @@ public class OperatorConstants {
 
     private static boolean isInAllianceZone() {
         final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 }

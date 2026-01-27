@@ -31,7 +31,7 @@ public class FieldConstants {
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(1.7175, 1.76, true),
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(1.7175, 7.065, true),
             HUB_POSITION = new FlippableTranslation2d(4.625594, FIELD_WIDTH_METERS / 2, true);
-    public static final double ALLIANCE_ZONE_X_LENGTH = 4.625594;
+    public static final double ALLIANCE_ZONE_LENGTH = 4.625594;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
