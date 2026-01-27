@@ -25,7 +25,10 @@ public class ShootingCalculationsConstants {
                     new Rotation3d(0, 0, 0)
             );
 
-    static final double POSE_PREDICTION_TIME_SECONDS = 0.00;
+    static final double
+            PITCHER_POSE_PREDICTION_TIME_SECONDS = 0.00,
+            SHOOTER_POSE_PREDICTION_TIME_SECONDS = 0.00,
+            TURRET_POSE_PREDICTION_TIME_SECONDS = 0.06;
 
     static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "shooting_lut.bin";
 }
