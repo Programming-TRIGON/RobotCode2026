@@ -11,7 +11,7 @@ public class SimulatedGamePieceConstants {
             INTAKE_TOLERANCE_METERS = 0.3,
             LOADER_TOLERANCE_METERS = 0.05;
     public static final FlippableTranslation3d
-            SCORE_CHECK_POSITION = new FlippableTranslation3d(new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.778), true),
+            SCORE_CHECK_POSITION = new FlippableTranslation3d(new Translation3d(4.625594, FieldConstants.FIELD_WIDTH_METERS / 2, 1.4), true),
             EJECT_FUEL_FROM_HUB_POSITION = new FlippableTranslation3d(new Translation3d(5.189474, FieldConstants.FIELD_WIDTH_METERS / 2, 0.762), true);
     static final Translation3d
             COLLECTION_CHECK_POSITION = new Translation3d(0.4, 0, 0),

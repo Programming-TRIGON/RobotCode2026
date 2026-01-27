@@ -46,6 +46,9 @@ public class VisualizeFuelShootingCommand extends Command {
 
     @Override
     public void execute() {
+        if (isScoredInHub())
+            ejectFromHub();
+
         for (int i = 0; i < (int) (RobotHardwareStats.getPeriodicTimeSeconds() / FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS); i++)
             stepSimulation();
     }
@@ -95,9 +98,6 @@ public class VisualizeFuelShootingCommand extends Command {
 
         final Translation3d currentGamePiecePosition = shotFuel.getPosition();
         shotFuel.updatePosition(currentGamePiecePosition.plus(currentFuelVelocity.times(FuelShootingVisualizationConstants.SIMULATION_TIME_STEP_SECONDS)));
-
-        if (isScoredInHub())
-            ejectFromHub();
     }
 
     private Translation3d calculateCurrentGravitySpeedVector() {
