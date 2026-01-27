@@ -70,7 +70,9 @@ public class TurretConstants {
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
-    static final Rotation2d TOLERANCE = Rotation2d.fromDegrees(0.5);
+    static final Rotation2d
+            NORMAL_TOLERANCE = Rotation2d.fromDegrees(0.5),
+            WIDE_TOLERANCE = Rotation2d.fromDegrees(2);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
 
     static {

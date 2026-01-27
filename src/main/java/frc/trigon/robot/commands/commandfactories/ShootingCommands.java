@@ -81,7 +81,7 @@ public class ShootingCommands {
         return new SequentialCommandGroup(
                 new WaitUntilCommand(ShootingCommands::canShoot),
                 getLoadFuelCommand()
-                        .until(() -> !canShoot())
+                        .until(ShootingCommands::shouldStopShooting)
         ).repeatedly();
     }
 
@@ -96,10 +96,14 @@ public class ShootingCommands {
         return isRobotReadyToShoot() || OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
     }
 
+    private static boolean shouldStopShooting() {
+        return RobotContainer.TURRET.atTargetAngle(true) && !OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
+    }
+
     private static boolean isRobotReadyToShoot() {
         return RobotContainer.SHOOTER.atTargetVelocity()
                 && RobotContainer.HOOD.atTargetAngle()
-                && RobotContainer.TURRET.atTargetAngle();
+                && RobotContainer.TURRET.atTargetAngle(false);
     }
 
     private static void updateShootingCalculations() {
