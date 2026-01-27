@@ -104,6 +104,10 @@ public class Turret extends MotorSubsystem {
         return getCurrentSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
     }
 
+    public boolean atTargetAngle() {
+        return Math.abs(targetSelfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians()) < TurretConstants.TOLERANCE.getRadians();
+    }
+
     public Rotation2d getCurrentSelfRelativeAngle() {
         return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
     }

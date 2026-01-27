@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -47,5 +49,13 @@ public class OperatorConstants {
 
     public static final Trigger
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.i().or(DRIVER_CONTROLLER.b()),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
+            OVERRIDE_ALWAYS_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
+            SHOULD_SHOOT_TRIGGER = OVERRIDE_ALWAYS_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldDefaultToShooting),
+            OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick();
+
+    private static boolean shouldDefaultToShooting() {
+        return MatchTracker.isHubActive() &&
+                RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
+    }
 }

@@ -2,6 +2,7 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
@@ -12,31 +13,25 @@ import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class ShootingCommands {
-    public static Command getShootFuelCommand() {
-        return new ParallelCommandGroup(
-                getCalculatedAimAtHubCommand(),
-                getLoadWhenReadyCommand()
-        );
-    }
-
-    private static Command getLoadWhenReadyCommand() {
+    public static Command getShootFuelAtHubCommand() {
         return new SequentialCommandGroup(
-                getWaitUntilAtTargetCommand(),
-                getLoadToShooterCommand()
+                new InstantCommand(ShootingCommands::updateShootingCalculations),
+                getShootAtHubCommand()
         );
     }
 
-    private static Command getLoadToShooterCommand() {
+    public static Command getDeliverFuelCommand() {
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.FEED_TO_TURRET),
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
+                getAimForDeliveryCommand(),
+                getLoadFuelWhenReadyCommand()
         );
     }
 
-    private static Command getCalculatedAimAtHubCommand() {
-        return new SequentialCommandGroup(
-                getUpdateShootingCalculationsCommand(),
-                getAimAtHubCommand()
+    private static Command getShootAtHubCommand() {
+        return new ParallelCommandGroup(
+                new RunCommand(ShootingCommands::updateShootingCalculations),
+                getAimAtHubCommand(),
+                getLoadFuelWhenReadyCommand()
         );
     }
 
@@ -48,17 +43,38 @@ public class ShootingCommands {
         );
     }
 
-    private static Command getWaitUntilAtTargetCommand() {
-        return new WaitUntilCommand(() ->
-                RobotContainer.SHOOTER.atTargetVelocity()
-                        && RobotContainer.HOOD.atTargetAngle()
-                        && RobotContainer.TURRET.atTargetSelfRelativeAngle()
+    private static Command getAimForDeliveryCommand() {
+        return new ParallelCommandGroup(
+                TurretCommands.getAlignForDeliveryCommand(),
+                HoodCommands.getAimForDeliveryCommand(),
+                ShooterCommands.getAimForDeliveryCommand()
         );
     }
 
-    private static Command getUpdateShootingCalculationsCommand() {
-        return new RunCommand(
-                ShootingCalculations.getInstance()::updateCalculations
+    private static Command getLoadFuelWhenReadyCommand() {
+        return getLoadFuelCommand()
+                .onlyWhile(ShootingCommands::canShoot)
+                .repeatedly();
+    }
+
+    private static Command getLoadFuelCommand() {
+        return new ParallelCommandGroup(
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TURRET),
+                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
         );
+    }
+
+    private static boolean canShoot() {
+        return isRobotReadyToShoot() || OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    private static boolean isRobotReadyToShoot() {
+        return RobotContainer.SHOOTER.atTargetVelocity()
+                && RobotContainer.HOOD.atTargetAngle()
+                && RobotContainer.TURRET.atTargetAngle();
+    }
+
+    private static void updateShootingCalculations() {
+        ShootingCalculations.getInstance().updateCalculations();
     }
 }
