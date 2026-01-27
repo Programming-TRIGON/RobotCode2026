@@ -1,6 +1,7 @@
 package frc.trigon.robot.misc.shootingphysics.shootingvisualization;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 
 public class FuelShootingVisualizationConstants {
     static final double G_FORCE = 9.81;
@@ -20,5 +21,5 @@ public class FuelShootingVisualizationConstants {
     static final Translation3d MAGNUS_SPIN_AXIS = new Translation3d(0, 1, 0);
 
     static final double SIMULATION_TIME_STEP_SECONDS = 0.001;
-    static final double END_SIMULATION_HEIGHT_METERS = 0.6;
+    static final double END_SIMULATION_HEIGHT_METERS = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters;
 }

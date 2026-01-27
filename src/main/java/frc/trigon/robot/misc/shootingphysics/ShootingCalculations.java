@@ -38,9 +38,8 @@ public class ShootingCalculations {
         return calculateFieldRelativeFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
-    @AutoLogOutput(key = "Shooting/TargetFuelExitPosition")
-    public Translation3d calculateTargetFuelExitPosition() {
-        final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(ShootingCalculationsConstants.POSE_PREDICTION_TIME_SECONDS);
+    public Translation3d calculateTargetFuelExitPosition(double posePredictionTimeSeconds) {
+        final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(posePredictionTimeSeconds);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
         final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getTargetSelfRelativeAngle();
         return calculateFieldRelativeFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
@@ -77,26 +76,60 @@ public class ShootingCalculations {
     }
 
     private ShootingState calculateTargetShootingState() {
-        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition().toTranslation2d();
-        final Translation2d velocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
-        final Translation2d hub = FieldConstants.HUB_POSITION.get();
+        final Translation2d robotFieldRelativeVelocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
+        final Translation2d hubPosition = FieldConstants.HUB_POSITION.get();
 
-        final double distance = hub.minus(fuelExitPosition).getNorm();
-        final Translation2d relativeVelocity = calculateVelocityRelativeToPoint(hub, fuelExitPosition, velocity);
-        Logger.recordOutput("Shooting/DistanceToHub", distance);
-        Logger.recordOutput("Shooting/RelativeVelocityToHubX", relativeVelocity.getX());
-        Logger.recordOutput("Shooting/RelativeVelocityToHubY", relativeVelocity.getY());
-
-        final double targetPitchRadians = ShootingLookupTable3D.calculatePitch(distance, relativeVelocity.getX(), relativeVelocity.getY());
-        final double targetShootingVelocityMetersPerSecond = ShootingLookupTable3D.calculateVelocity(distance, relativeVelocity.getX(), relativeVelocity.getY());
-        final double yawRadians = ShootingLookupTable3D.calculateYaw(distance, relativeVelocity.getX(), relativeVelocity.getY());
-        final Rotation2d targetRobotAngle = calculateAngleToPoint(hub, fuelExitPosition).plus(new Rotation2d(yawRadians));
+        final double targetShootingVelocityMetersPerSecond = calculateTargetShootingVelocityMetersPerSecond(robotFieldRelativeVelocity, hubPosition);
+        final Rotation2d targetPitch = calculateTargetPitch(robotFieldRelativeVelocity, hubPosition);
+        final Rotation2d targetRobotAngle = calculateTargetRobotAngle(robotFieldRelativeVelocity, hubPosition);
 
         return new ShootingState(
                 targetRobotAngle,
-                new Rotation2d(targetPitchRadians),
+                targetPitch,
                 targetShootingVelocityMetersPerSecond
         );
+    }
+
+    private double calculateTargetShootingVelocityMetersPerSecond(Translation2d robotFieldRelativeVelocity, Translation2d hubPosition) {
+        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition(ShootingCalculationsConstants.SHOOTER_POSE_PREDICTION_TIME_SECONDS).toTranslation2d();
+        final Translation2d robotHubRelativeVelocity = calculateVelocityRelativeToPoint(hubPosition, fuelExitPosition, robotFieldRelativeVelocity);
+        final double distanceFromHub = hubPosition.minus(fuelExitPosition).getNorm();
+
+        return ShootingLookupTable3D.calculateVelocity(
+                distanceFromHub,
+                robotHubRelativeVelocity.getX(),
+                robotHubRelativeVelocity.getY()
+        );
+    }
+
+    private Rotation2d calculateTargetPitch(Translation2d robotFieldRelativeVelocity, Translation2d hubPosition) {
+        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition(ShootingCalculationsConstants.PITCHER_POSE_PREDICTION_TIME_SECONDS).toTranslation2d();
+        final Translation2d robotHubRelativeVelocity = calculateVelocityRelativeToPoint(hubPosition, fuelExitPosition, robotFieldRelativeVelocity);
+        final double distanceFromHub = hubPosition.minus(fuelExitPosition).getNorm();
+
+        Logger.recordOutput("Shooting/DistanceToHub", distanceFromHub);
+        Logger.recordOutput("Shooting/HubRelativeVelocityX", robotHubRelativeVelocity.getX());
+        Logger.recordOutput("Shooting/HubRelativeVelocityY", robotHubRelativeVelocity.getY());
+
+        return new Rotation2d(ShootingLookupTable3D.calculatePitch(
+                distanceFromHub,
+                robotHubRelativeVelocity.getX(),
+                robotHubRelativeVelocity.getY()
+        ));
+    }
+
+    private Rotation2d calculateTargetRobotAngle(Translation2d robotFieldRelativeVelocity, Translation2d hubPosition) {
+        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition(ShootingCalculationsConstants.TURRET_POSE_PREDICTION_TIME_SECONDS).toTranslation2d();
+        final Translation2d robotHubRelativeVelocity = calculateVelocityRelativeToPoint(hubPosition, fuelExitPosition, robotFieldRelativeVelocity);
+        final double distanceFromHub = hubPosition.minus(fuelExitPosition).getNorm();
+        final Rotation2d targetSelfRelativeYaw = new Rotation2d(ShootingLookupTable3D.calculateYaw(
+                distanceFromHub,
+                robotHubRelativeVelocity.getX(),
+                robotHubRelativeVelocity.getY()
+        ));
+
+        final Rotation2d robotAngleToHub = calculateAngleToPoint(hubPosition, fuelExitPosition);
+        return robotAngleToHub.plus(targetSelfRelativeYaw);
     }
 
     private Translation2d calculateVelocityRelativeToPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
