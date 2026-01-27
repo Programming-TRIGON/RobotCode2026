@@ -17,7 +17,8 @@ import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class ShootingCommands {
     public static boolean SHOULD_SHOOT_FROM_FIXED_POSITION = false;
-    public static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
+    private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
+    private static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
 
     public static Command getShootAtHubCommand() {
         return new SequentialCommandGroup(
@@ -107,7 +108,7 @@ public class ShootingCommands {
     }
 
     private static void updateShootingCalculations() {
-        ShootingCalculations.getInstance().updateCalculations();
+        SHOOTING_CALCULATIONS.updateCalculations();
     }
 
     public enum FixedShootingPosition {
