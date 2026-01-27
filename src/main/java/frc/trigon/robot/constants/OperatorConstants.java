@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.ShootingCommands;
 import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
@@ -49,13 +51,23 @@ public class OperatorConstants {
 
     public static final Trigger
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.i().or(DRIVER_CONTROLLER.b()),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
+            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+    public static final Trigger
             OVERRIDE_ALWAYS_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
-            SHOULD_SHOOT_TRIGGER = OVERRIDE_ALWAYS_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldDefaultToShooting),
-            OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick();
+            OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick(),
+            SHOULD_SHOOT_TRIGGER = OVERRIDE_ALWAYS_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldShoot).or(OperatorConstants::canShootFromSetPosition),
+            TOGGLE_SHOULD_SHOOT_FROM_SET_POSITION_TRIGGER = DRIVER_CONTROLLER.back(),
+            SET_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = OPERATOR_CONTROLLER.u(),
+            SET_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = OPERATOR_CONTROLLER.h(),
+            SET_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = OPERATOR_CONTROLLER.j(),
+            SET_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = OPERATOR_CONTROLLER.k();
 
-    private static boolean shouldDefaultToShooting() {
+    private static boolean shouldShoot() {
         return MatchTracker.isHubActive() &&
-                RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
+                new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get().getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
+    }
+
+    private static boolean canShootFromSetPosition() {
+        return ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION && OVERRIDE_ALWAYS_SHOOT_TRIGGER.getAsBoolean();
     }
 }

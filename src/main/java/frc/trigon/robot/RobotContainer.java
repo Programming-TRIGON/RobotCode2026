@@ -93,7 +93,13 @@ public class RobotContainer {
         OperatorConstants.TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER.onTrue(FuelIntakeCommands.getToggleDefaultIntakeStateCommand());
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommands.getIntakeCommand());
 
-        OperatorConstants.SHOULD_SHOOT_TRIGGER.whileTrue(ShootingCommands.getShootFuelAtHubCommand());
+        OperatorConstants.SHOULD_SHOOT_TRIGGER.whileTrue(ShootingCommands.getShootAtHubCommand());
+
+        OperatorConstants.TOGGLE_SHOULD_SHOOT_FROM_SET_POSITION_TRIGGER.onTrue(ShootingCommands.getToggleShouldShootFromSetPositionCommand());
+        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_HUB));
+        OperatorConstants.SET_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.LEFT_CORNER));
+        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_TOWER));
+        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_OUTPOST));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
