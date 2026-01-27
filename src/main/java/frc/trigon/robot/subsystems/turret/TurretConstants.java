@@ -3,10 +3,7 @@ package frc.trigon.robot.subsystems.turret;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ctre.phoenix6.signals.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -38,13 +35,14 @@ public class TurretConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 65;
-    private static final double CURRENT_LIMIT_AMPS = 40;
+    private static final double GEAR_RATIO = 52;
+    private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
+    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = 6.2;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
-    private static final double MOMENT_OF_INERTIA = 0.5;
+    private static final double MOMENT_OF_INERTIA = 0.1;
     private static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
             GEAR_RATIO,
@@ -90,16 +88,29 @@ public class TurretConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
+        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
+        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;
+
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 400 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00083758 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.6478 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.14659 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.02 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+        config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.UseSlot1;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 7 : 5;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 2 : 5;
-        config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
+        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 400 : 0;
+        config.Slot1.kI = config.Slot0.kI;
+        config.Slot1.kD = 0;
+        config.Slot1.kS = config.Slot0.kS;
+        config.Slot1.kV = 0;
+        config.Slot1.kA = 0;
+        config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.5 : 5;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 90 : 5;
+        config.MotionMagic.MotionMagicJerk = 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT_AMPS;

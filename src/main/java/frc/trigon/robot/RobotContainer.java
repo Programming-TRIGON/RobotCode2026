@@ -18,6 +18,7 @@ import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.LEDConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
+import frc.trigon.robot.misc.shootingphysics.ShootingLookupTable3D;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
@@ -42,7 +43,7 @@ public class RobotContainer {
     public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator();
     public static final ObjectPoseEstimator OBJECT_POSE_ESTIMATOR = new ObjectPoseEstimator(
             CameraConstants.OBJECT_POSE_ESTIMATOR_DELETION_THRESHOLD_SECONDS,
-            SimulatedGamePieceConstants.GamePieceType.GAME_PIECE_TYPE,
+            SimulatedGamePieceConstants.GamePieceType.FUEL,
             CameraConstants.OBJECT_DETECTION_CAMERA
     );
     public static final Swerve SWERVE = new Swerve();
@@ -70,7 +71,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-        //configureSysIDBindings(LOADER);
+//        configureSysIDBindings(TURRET);
     }
 
     private void bindDefaultCommands() {
@@ -109,6 +110,7 @@ public class RobotContainer {
         Flippable.init();
         LEDConstants.init();
         AutonomousConstants.init();
+        ShootingLookupTable3D.init();
     }
 
     private void buildAutoChooser() {
