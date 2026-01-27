@@ -100,7 +100,7 @@ public class TurretConstants {
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.UseSlot1;
 
-        config.Slot1.kP = 400;
+        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 400 : 0;
         config.Slot1.kI = config.Slot0.kI;
         config.Slot1.kD = 0;
         config.Slot1.kS = config.Slot0.kS;
