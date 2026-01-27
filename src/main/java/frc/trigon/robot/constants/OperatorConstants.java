@@ -1,6 +1,7 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
@@ -66,7 +67,12 @@ public class OperatorConstants {
         if (ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION)
             return OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
         return MatchTracker.isHubActive() &&
-                !OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean() &&
-                new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get().getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
+                isInAllianceZone() &&
+                !OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    private static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
     }
 }
