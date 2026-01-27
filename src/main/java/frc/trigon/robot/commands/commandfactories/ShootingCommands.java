@@ -16,8 +16,8 @@ import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class ShootingCommands {
-    public static boolean SHOULD_SHOOT_FROM_SET_POSITION = false;
-    public static ShootingState SET_SHOOTING_STATE = SetShootingPosition.CLOSE_TO_HUB.targetState;
+    public static boolean SHOULD_SHOOT_FROM_FIXED_POSITION = false;
+    public static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
 
     public static Command getShootAtHubCommand() {
         return new SequentialCommandGroup(
@@ -29,10 +29,10 @@ public class ShootingCommands {
         );
     }
 
-    public static Command getShootFromSetPositionCommand() {
+    public static Command getShootFromFixedPositionCommand() {
         return new ParallelCommandGroup(
-                getAimForSetStateCommand()
-                        .raceWith(new WaitUntilChangeCommand<>(() -> SET_SHOOTING_STATE)).repeatedly(),
+                getAimForFixedStateCommand()
+                        .raceWith(new WaitUntilChangeCommand<>(() -> FIXED_SHOOTING_STATE)).repeatedly(),
                 getLoadFuelWhenReadyCommand()
         );
     }
@@ -44,12 +44,12 @@ public class ShootingCommands {
         );
     }
 
-    public static Command getToggleShouldShootFromSetPositionCommand() {
-        return new InstantCommand(() -> ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION = !ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION);
+    public static Command getToggleShouldShootFromFixedPositionCommand() {
+        return new InstantCommand(() -> ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION = !ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION);
     }
 
-    public static Command getChangeSetShootingPositionCommand(SetShootingPosition setPosition) {
-        return new InstantCommand(() -> SET_SHOOTING_STATE = setPosition.targetState);
+    public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
+        return new InstantCommand(() -> FIXED_SHOOTING_STATE = fixedPosition.targetState);
     }
 
     private static Command getAimAtHubCommand() {
@@ -69,11 +69,11 @@ public class ShootingCommands {
         );
     }
 
-    private static Command getAimForSetStateCommand() {
+    private static Command getAimForFixedStateCommand() {
         return new ParallelCommandGroup(
-                TurretCommands.getSetTargetFieldRelativeAngleCommand(SET_SHOOTING_STATE::targetFieldRelativeYaw),
-                HoodCommands.getSetTargetAngleCommand(SET_SHOOTING_STATE.targetPitch()),
-                ShooterCommands.getSetTargetVelocityCommand(SET_SHOOTING_STATE.targetShootingVelocityMetersPerSecond())
+                TurretCommands.getSetTargetFieldRelativeAngleCommand(FIXED_SHOOTING_STATE::targetFieldRelativeYaw),
+                HoodCommands.getSetTargetAngleCommand(FIXED_SHOOTING_STATE.targetPitch()),
+                ShooterCommands.getSetTargetVelocityCommand(FIXED_SHOOTING_STATE.targetShootingVelocityMetersPerSecond())
         );
     }
 
@@ -110,7 +110,7 @@ public class ShootingCommands {
         ShootingCalculations.getInstance().updateCalculations();
     }
 
-    public enum SetShootingPosition {
+    public enum FixedShootingPosition {
         CLOSE_TO_HUB(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         LEFT_CORNER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         CLOSE_TO_TOWER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
@@ -118,8 +118,8 @@ public class ShootingCommands {
 
         private final ShootingState targetState;
 
-        SetShootingPosition(Rotation2d targetFieldRelativeYaw, Rotation2d targetPitch,
-                            double targetShootingVelocityMetersPerSecond) {
+        FixedShootingPosition(Rotation2d targetFieldRelativeYaw, Rotation2d targetPitch,
+                              double targetShootingVelocityMetersPerSecond) {
             this.targetState = new ShootingState(targetFieldRelativeYaw, targetPitch, targetShootingVelocityMetersPerSecond);
         }
     }

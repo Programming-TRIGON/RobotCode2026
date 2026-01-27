@@ -95,11 +95,11 @@ public class RobotContainer {
 
         OperatorConstants.SHOULD_SHOOT_TRIGGER.whileTrue(ShootingCommands.getShootAtHubCommand());
 
-        OperatorConstants.TOGGLE_SHOULD_SHOOT_FROM_SET_POSITION_TRIGGER.onTrue(ShootingCommands.getToggleShouldShootFromSetPositionCommand());
-        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_HUB));
-        OperatorConstants.SET_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.LEFT_CORNER));
-        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_TOWER));
-        OperatorConstants.SET_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeSetShootingPositionCommand(ShootingCommands.SetShootingPosition.CLOSE_TO_OUTPOST));
+        OperatorConstants.TOGGLE_SHOULD_SHOOT_FROM_FIXED_POSITION_TRIGGER.onTrue(ShootingCommands.getToggleShouldShootFromFixedPositionCommand());
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_HUB));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
