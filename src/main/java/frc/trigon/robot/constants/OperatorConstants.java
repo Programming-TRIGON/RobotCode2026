@@ -55,7 +55,7 @@ public class OperatorConstants {
     public static final Trigger
             OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick(),
-            SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate().and(OperatorConstants::shouldShoot).or(OperatorConstants::canShootFromSetPosition),
+            SHOULD_SHOOT_TRIGGER = new Trigger(OperatorConstants::shouldShoot),
             TOGGLE_SHOULD_SHOOT_FROM_SET_POSITION_TRIGGER = DRIVER_CONTROLLER.back(),
             SET_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = OPERATOR_CONTROLLER.u(),
             SET_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = OPERATOR_CONTROLLER.h(),
@@ -63,11 +63,10 @@ public class OperatorConstants {
             SET_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = OPERATOR_CONTROLLER.k();
 
     private static boolean shouldShoot() {
+        if (ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION)
+            return OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
         return MatchTracker.isHubActive() &&
+                !OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean() &&
                 new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get().getX() < FieldConstants.ALLIANCE_ZONE_X_LENGTH;
-    }
-
-    private static boolean canShootFromSetPosition() {
-        return ShootingCommands.SHOULD_SHOOT_FROM_SET_POSITION && OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 }
