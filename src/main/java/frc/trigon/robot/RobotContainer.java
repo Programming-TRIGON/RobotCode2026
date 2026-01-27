@@ -40,7 +40,10 @@ import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-    public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator();
+    public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator(
+            CameraConstants.RIGHT_TURRET_CAMERA,
+            CameraConstants.LEFT_TURRET_CAMERA
+    );
     public static final ObjectPoseEstimator OBJECT_POSE_ESTIMATOR = new ObjectPoseEstimator(
             CameraConstants.OBJECT_POSE_ESTIMATOR_DELETION_THRESHOLD_SECONDS,
             SimulatedGamePieceConstants.GamePieceType.FUEL,
