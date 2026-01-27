@@ -23,7 +23,6 @@ public class ShootingCommands {
         return new SequentialCommandGroup(
                 new InstantCommand(ShootingCommands::updateShootingCalculations),
                 new ParallelCommandGroup(
-                        new RunCommand(ShootingCommands::updateShootingCalculations),
                         getAimAtHubCommand(),
                         getLoadFuelWhenReadyCommand()
                 )
@@ -55,6 +54,7 @@ public class ShootingCommands {
 
     private static Command getAimAtHubCommand() {
         return new ParallelCommandGroup(
+                new RunCommand(ShootingCommands::updateShootingCalculations),
                 TurretCommands.getAlignToHubCommand(),
                 HoodCommands.getAimAtHubCommand(),
                 ShooterCommands.getAimAtHubCommand()
@@ -87,7 +87,7 @@ public class ShootingCommands {
 
     private static Command getLoadFuelCommand() {
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TURRET),
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
                 LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
         );
     }
