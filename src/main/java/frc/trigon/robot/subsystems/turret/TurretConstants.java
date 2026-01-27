@@ -108,7 +108,7 @@ public class TurretConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
+        MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
     }
 
@@ -143,7 +143,7 @@ public class TurretConstants {
         ENCODER.applyConfiguration(config);
         ENCODER.setSimulationInputsFromTalonFX(MASTER_MOTOR);
 
-        ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
+        ENCODER.registerSignal(CANcoderSignal.POSITION, 250);
         ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
     }
 }
