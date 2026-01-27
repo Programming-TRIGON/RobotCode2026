@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.GearRatioCalculationCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.FuelIntakeCommands;
+import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 
 import java.util.Set;
 
@@ -26,6 +28,14 @@ public class IntakeCommands {
                 IntakeConstants.ANGLE_ENCODER,
                 0.5,
                 RobotContainer.INTAKE
+        );
+    }
+
+    public static Command getDefaultCommand() {
+        return GeneralCommands.getContinuousConditionalCommand(
+                getSetTargetStateCommand(IntakeConstants.IntakeState.PREPARE_TO_INTAKE),
+                getSetTargetStateCommand(IntakeConstants.IntakeState.REST),
+                FuelIntakeCommands.SHOULD_DEFAULT_TO_OPEN_INTAKE
         );
     }
 
