@@ -103,7 +103,7 @@ public class ShootingCalculations {
     }
 
     private Rotation2d calculateTargetPitch(Translation2d robotFieldRelativeVelocity, Translation2d hubPosition) {
-        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition(ShootingCalculationsConstants.PITCHER_POSE_PREDICTION_TIME_SECONDS).toTranslation2d();
+        final Translation2d fuelExitPosition = calculateTargetFuelExitPosition(ShootingCalculationsConstants.HOOD_POSE_PREDICTION_TIME_SECONDS).toTranslation2d();
         final Translation2d robotHubRelativeVelocity = calculateVelocityRelativeToPoint(hubPosition, fuelExitPosition, robotFieldRelativeVelocity);
         final double distanceFromHub = hubPosition.minus(fuelExitPosition).getNorm();
 
