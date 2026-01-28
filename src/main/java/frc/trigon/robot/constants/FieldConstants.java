@@ -28,8 +28,8 @@ public class FieldConstants {
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
     public static final FlippableTranslation2d
-            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(1.7175, 1.76, true),
-            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(1.7175, 7.065, true),
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(3, 1.76, true),
+            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(3, 7.065, true),
             HUB_POSITION = new FlippableTranslation2d(4.625594, FIELD_WIDTH_METERS / 2, true);
     public static final double ALLIANCE_ZONE_LENGTH = 4.625594;
 

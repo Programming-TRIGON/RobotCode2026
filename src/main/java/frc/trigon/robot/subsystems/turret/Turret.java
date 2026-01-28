@@ -1,5 +1,6 @@
 package frc.trigon.robot.subsystems.turret;
 
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.math.geometry.*;
@@ -10,6 +11,9 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.utilities.flippable.Flippable;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
+import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
@@ -25,7 +29,7 @@ public class Turret extends MotorSubsystem {
             followerMotor = TurretConstants.FOLLOWER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
-    private final PositionVoltage positionRequest = new PositionVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private Rotation2d targetSelfRelativeAngle = Rotation2d.fromDegrees(0);
 
     public Turret() {
@@ -113,6 +117,13 @@ public class Turret extends MotorSubsystem {
         return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
     }
 
+    public Translation2d calculateClosestDeliveryPosition() {
+        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
+            return FieldConstants.LEFT_DELIVERY_POSITION.get();
+        return FieldConstants.RIGHT_DELIVERY_POSITION.get();
+    }
+
     void alignToHub() {
         final Rotation2d targetFieldRelativeYaw = shootingCalculations.getTargetShootingState().targetFieldRelativeYaw();
         setTargetFieldRelativeAngle(targetFieldRelativeYaw);
@@ -149,9 +160,11 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d calculateTargetAngleForDelivery() {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
-            return calculateTargetAngleToPose(FieldConstants.LEFT_DELIVERY_POSITION.get(), currentPosition);
-        return calculateTargetAngleToPose(FieldConstants.RIGHT_DELIVERY_POSITION.get(), currentPosition);
+        final Rotation2d angleToDeliveryPoint = calculateTargetAngleToPose(calculateClosestDeliveryPosition(), currentPosition);
+        final double currentYVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vyMetersPerSecond;
+        final double currentAllianceYVelocity = Flippable.isRedAlliance() ? -currentYVelocity : currentYVelocity;
+        final Rotation2d yVelocityResistanceAngle = Rotation2d.fromDegrees(currentAllianceYVelocity * TurretConstants.RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT);
+        return angleToDeliveryPoint.plus(yVelocityResistanceAngle);
     }
 
     private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation, Pose2d currentPosition) {

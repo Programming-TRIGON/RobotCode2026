@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.FilesHandler;
 
 public class ShootingCalculationsConstants {
@@ -26,9 +27,9 @@ public class ShootingCalculationsConstants {
             );
 
     static final double
-            PITCHER_POSE_PREDICTION_TIME_SECONDS = 0.00,
-            SHOOTER_POSE_PREDICTION_TIME_SECONDS = 0.00,
-            TURRET_POSE_PREDICTION_TIME_SECONDS = 0.06;
+            PITCHER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0,
+            SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0,
+            TURRET_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.06 : 0;
 
     static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "shooting_lut.bin";
 }

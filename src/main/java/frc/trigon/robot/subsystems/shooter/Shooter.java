@@ -2,11 +2,14 @@ package frc.trigon.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.lib.utilities.flippable.Flippable;
+import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -86,12 +89,19 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimForDelivery() {
-        final double targetDeliveryVelocity = ShooterConstants.TARGET_DELIVERY_VELOCITY_METERS_PER_SECOND;
-        setTargetVelocity(targetDeliveryVelocity);
+        setTargetVelocity(calculateDeliveryShootingVelocity());
     }
 
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
+    }
+
+    private double calculateDeliveryShootingVelocity() {
+        final double currentXVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vxMetersPerSecond;
+        final double distanceToDeliveryPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getDistance(RobotContainer.TURRET.calculateClosestDeliveryPosition());
+        final double distanceAimingVelocity = (distanceToDeliveryPosition * ShooterConstants.DELIVERY_VELOCITY_SLOPE) + ShooterConstants.DELIVERY_VELOCITY_INTERCEPT_POINT;
+        final double currentXVelocityTowardsAlliance = Flippable.isRedAlliance() ? -currentXVelocity : currentXVelocity;
+        return distanceAimingVelocity + currentXVelocityTowardsAlliance;
     }
 }
