@@ -70,6 +70,10 @@ public class Shooter extends MotorSubsystem {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
+    public boolean isAimingAtHub() {
+        return targetVelocityMetersPerSecond == shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+    }
+
     public double getCurrentVelocityMetersPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
     }

@@ -21,12 +21,9 @@ public class ShootingCommands {
     private static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
 
     public static Command getShootAtHubCommand() {
-        return new SequentialCommandGroup(
-                new InstantCommand(ShootingCommands::updateShootingCalculations),
-                new ParallelCommandGroup(
-                        getAimAtHubCommand(),
-                        getLoadFuelWhenReadyCommand()
-                )
+        return new ParallelCommandGroup(
+                getAimAtHubCommand(),
+                getLoadFuelWhenReadyCommand(true)
         );
     }
 
@@ -34,14 +31,14 @@ public class ShootingCommands {
         return new ParallelCommandGroup(
                 getAimForFixedStateCommand()
                         .raceWith(new WaitUntilChangeCommand<>(() -> FIXED_SHOOTING_STATE)).repeatedly(),
-                getLoadFuelWhenReadyCommand()
+                getLoadFuelWhenReadyCommand(false)
         );
     }
 
     public static Command getDeliveryCommand() {
         return new ParallelCommandGroup(
                 getAimForDeliveryCommand(),
-                getLoadFuelWhenReadyCommand()
+                getLoadFuelWhenReadyCommand(false)
         );
     }
 
@@ -54,11 +51,13 @@ public class ShootingCommands {
     }
 
     private static Command getAimAtHubCommand() {
-        return new ParallelCommandGroup(
-                new RunCommand(ShootingCommands::updateShootingCalculations),
-                TurretCommands.getAlignToHubCommand(),
-                HoodCommands.getAimAtHubCommand(),
-                ShooterCommands.getAimAtHubCommand()
+        return new InstantCommand(ShootingCommands::updateShootingCalculations).andThen(
+                new ParallelCommandGroup(
+                        new RunCommand(ShootingCommands::updateShootingCalculations),
+                        TurretCommands.getAlignToHubCommand(),
+                        HoodCommands.getAimAtHubCommand(),
+                        ShooterCommands.getAimAtHubCommand()
+                )
         );
     }
 
@@ -78,9 +77,9 @@ public class ShootingCommands {
         );
     }
 
-    private static Command getLoadFuelWhenReadyCommand() {
+    private static Command getLoadFuelWhenReadyCommand(boolean isShootingAtHub) {
         return new SequentialCommandGroup(
-                new WaitUntilCommand(ShootingCommands::canShoot),
+                new WaitUntilCommand(() -> canShoot(isShootingAtHub)),
                 getLoadFuelCommand()
                         .until(ShootingCommands::shouldStopShooting)
         ).repeatedly();
@@ -93,18 +92,20 @@ public class ShootingCommands {
         );
     }
 
-    private static boolean canShoot() {
-        return isRobotReadyToShoot() || OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
+    private static boolean canShoot(boolean isShootingAtHub) {
+        return isRobotAtShootingState(isShootingAtHub) || OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
     }
 
     private static boolean shouldStopShooting() {
         return !RobotContainer.TURRET.atTargetAngle(true) && !OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
     }
 
-    private static boolean isRobotReadyToShoot() {
-        return RobotContainer.SHOOTER.atTargetVelocity()
-                && RobotContainer.HOOD.atTargetAngle()
-                && RobotContainer.TURRET.atTargetAngle(false);
+    private static boolean isRobotAtShootingState(boolean isShootingAtHub) {
+        return
+                (!isShootingAtHub || RobotContainer.SHOOTER.isAimingAtHub()) &&
+                        RobotContainer.SHOOTER.atTargetVelocity()
+                        && RobotContainer.HOOD.atTargetAngle()
+                        && RobotContainer.TURRET.atTargetAngle(false);
     }
 
     private static void updateShootingCalculations() {
