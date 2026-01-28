@@ -11,6 +11,7 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends MotorSubsystem {
@@ -19,6 +20,7 @@ public class Shooter extends MotorSubsystem {
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
     private double targetVelocityMetersPerSecond = 0;
+    private boolean isAimingAtHub = true;
 
     public Shooter() {
         setName("Shooter");
@@ -36,6 +38,7 @@ public class Shooter extends MotorSubsystem {
     public void stop() {
         motor.stopMotor();
         targetVelocityMetersPerSecond = 0;
+        isAimingAtHub = false;
     }
 
     @Override
@@ -72,8 +75,9 @@ public class Shooter extends MotorSubsystem {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
+    @AutoLogOutput(key = "Shooter/IsAimingAtHub")
     public boolean isAimingAtHub() {
-        return targetVelocityMetersPerSecond == getTargetVelocityFromShootingCalculationsWithSlippageCompensation();
+        return isAimingAtHub;
     }
 
     public double getCurrentVelocityMetersPerSecond() {
@@ -81,6 +85,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimAtHub() {
+        isAimingAtHub = true;
         setTargetVelocity(getTargetVelocityFromShootingCalculationsWithSlippageCompensation());
     }
 
