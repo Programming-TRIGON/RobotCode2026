@@ -65,7 +65,7 @@ public class CommandConstants {
                     (omegaRadiansPerSecond) -> RobotContainer.SWERVE.selfRelativeDrive(new ChassisSpeeds(0, 0, omegaRadiansPerSecond)),
                     RobotContainer.SWERVE
             );
-    public static Command
+    public static final Command
             SHORT_EJECT_COMMAND = new ParallelCommandGroup(
             SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
             LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_EJECT),
