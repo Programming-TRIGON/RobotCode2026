@@ -76,7 +76,7 @@ public class Turret extends MotorSubsystem {
 
         Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", currentSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
-        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle == null ? 0 : targetSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngle", targetProfiledSelfRelativeAngle.getDegrees());
     }
 
