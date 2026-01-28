@@ -1,7 +1,6 @@
 package frc.trigon.robot.subsystems.turret;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
@@ -12,8 +11,6 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
-import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
@@ -30,7 +27,7 @@ public class Turret extends MotorSubsystem {
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
-    private Rotation2d targetSelfRelativeAngle = Rotation2d.fromDegrees(0);
+    private Rotation2d targetSelfRelativeAngle = null;
 
     public Turret() {
         setName("Turret");
@@ -86,6 +83,7 @@ public class Turret extends MotorSubsystem {
     @Override
     public void stop() {
         masterMotor.stopMotor();
+        targetSelfRelativeAngle = null;
     }
 
     public Pose3d calculateVisualizationPose() {
