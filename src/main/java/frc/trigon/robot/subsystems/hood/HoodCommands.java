@@ -42,6 +42,14 @@ public class HoodCommands {
         );
     }
 
+    public static Command getAimForEjectionCommand() {
+        return new StartEndCommand(
+                RobotContainer.HOOD::aimForEjection,
+                RobotContainer.HOOD::stop,
+                RobotContainer.HOOD
+        );
+    }
+
     public static Command getRestCommand() {
         return new StartEndCommand(
                 RobotContainer.HOOD::rest,

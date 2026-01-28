@@ -1,10 +1,13 @@
 package frc.trigon.robot.commands.commandfactories;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.commands.WaitUntilChangeCommand;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.constants.OperatorConstants;
+import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.misc.MatchTracker;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.shootingphysics.ShootingState;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
@@ -14,12 +17,18 @@ import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class ShootingCommands {
-    public static LoggedNetworkBoolean SHOULD_SHOOT_FROM_FIXED_POSITION = new LoggedNetworkBoolean("ShouldShootFromFixedPosition", false);
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
     private static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
+
+    public static Command getDefaultShootingCommand() {
+        return new ConditionalCommand(
+                getShootAtHubCommand(),
+                getDeliveryCommand(false),
+                MatchTracker::isHubActive
+        );
+    }
 
     public static Command getShootAtHubCommand() {
         return new ParallelCommandGroup(
@@ -36,15 +45,11 @@ public class ShootingCommands {
         );
     }
 
-    public static Command getDeliveryCommand() {
+    public static Command getDeliveryCommand(boolean isFixedDelivery) {
         return new ParallelCommandGroup(
-                getAimForDeliveryCommand(),
+                isFixedDelivery ? getAimForFixedDeliveryCommand() : getAimForDeliveryCommand(),
                 getLoadFuelWhenReadyCommand(false)
         );
-    }
-
-    public static Command getToggleShouldShootFromFixedPositionCommand() {
-        return new InstantCommand(() -> ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.set(!ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.get()));
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
@@ -78,6 +83,14 @@ public class ShootingCommands {
         );
     }
 
+    private static Command getAimForFixedDeliveryCommand() {
+        return new ParallelCommandGroup(
+                TurretCommands.getAlignForEjectionCommand(),
+                HoodCommands.getAimForEjectionCommand(),
+                ShooterCommands.getAimForFixedDeliveryCommand()
+        );
+    }
+
     private static Command getLoadFuelWhenReadyCommand(boolean isShootingAtHub) {
         return new SequentialCommandGroup(
                 new WaitUntilCommand(() -> canShoot(isShootingAtHub)),
@@ -94,19 +107,24 @@ public class ShootingCommands {
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {
-        return isRobotAtShootingState(isShootingAtHub) || OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
+        return (!isShootingAtHub || canShootAtHub()) &&
+                RobotContainer.SHOOTER.atTargetVelocity()
+                && RobotContainer.HOOD.atTargetAngle()
+                && RobotContainer.TURRET.atTargetAngle(false);
+    }
+
+    private static boolean canShootAtHub() {
+        return RobotContainer.SHOOTER.isAimingAtHub() &&
+                isInAllianceZone();
     }
 
     private static boolean shouldStopShooting() {
         return !RobotContainer.TURRET.atTargetAngle(true);
     }
 
-    private static boolean isRobotAtShootingState(boolean isShootingAtHub) {
-        return
-                (!isShootingAtHub || RobotContainer.SHOOTER.isAimingAtHub()) &&
-                        RobotContainer.SHOOTER.atTargetVelocity()
-                        && RobotContainer.HOOD.atTargetAngle()
-                        && RobotContainer.TURRET.atTargetAngle(false);
+    private static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 
     private static void updateShootingCalculations() {

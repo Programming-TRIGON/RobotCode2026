@@ -1,15 +1,10 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
-import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandfactories.ShootingCommands;
-import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -50,29 +45,18 @@ public class OperatorConstants {
             FORWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.up(),
             BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
 
-    public static final Trigger
-            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.i().or(DRIVER_CONTROLLER.b()),
+    public static final Trigger//Intake Triggers
+            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
-    public static final Trigger
+    public static final Trigger//Shooting Triggers
             OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
-            OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick(),
-            SHOULD_SHOOT_TRIGGER = new Trigger(OperatorConstants::shouldShoot),
-            TOGGLE_SHOULD_SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.i()),
-            RELEASE_FUEL_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.rightStick().and(ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION),
-            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = OPERATOR_CONTROLLER.u(),
-            SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = OPERATOR_CONTROLLER.h(),
-            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = OPERATOR_CONTROLLER.j(),
-            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = OPERATOR_CONTROLLER.k();
-
-    private static boolean shouldShoot() {
-        return !ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.get() &&
-                MatchTracker.isHubActive() &&
-                isInAllianceZone() &&
-                !OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
-    }
-
-    private static boolean isInAllianceZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
-    }
+            SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate(),
+            SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.rightBumper().and(OVERRIDE_AUTO_SHOOT_TRIGGER),
+            FIXED_DELIVERY_TRIGGER = DRIVER_CONTROLLER.leftBumper().and(OVERRIDE_AUTO_SHOOT_TRIGGER),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = DRIVER_CONTROLLER.povUp().and(OPERATOR_CONTROLLER.i()),
+            SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = DRIVER_CONTROLLER.povLeft().and(OPERATOR_CONTROLLER.j()),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().and(OPERATOR_CONTROLLER.k()),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().and(OPERATOR_CONTROLLER.l());
+    public static final Trigger//Debugging Triggers
+            SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x();
 }
