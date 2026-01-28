@@ -100,6 +100,10 @@ public class Hood extends MotorSubsystem {
         setTargetAngle(HoodConstants.DELIVERY_ANGLE);
     }
 
+    void aimForEjection() {
+        setTargetAngle(HoodConstants.EJECTION_ANGLE);
+    }
+
     void rest() {
         setTargetAngle(HoodConstants.REST_ANGLE);
     }

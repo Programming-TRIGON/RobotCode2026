@@ -31,6 +31,22 @@ public class ShooterCommands {
         );
     }
 
+    public static Command getAimForFixedDeliveryCommand() {
+        return new StartEndCommand(
+                RobotContainer.SHOOTER::aimForFixedDelivery,
+                RobotContainer.SHOOTER::stop,
+                RobotContainer.SHOOTER
+        );
+    }
+
+    public static Command getAimForEjectionCommand() {
+        return new StartEndCommand(
+                RobotContainer.SHOOTER::aimForEjection,
+                RobotContainer.SHOOTER::stop,
+                RobotContainer.SHOOTER
+        );
+    }
+
     public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
         return new StartEndCommand(
                 () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityMetersPerSecond),

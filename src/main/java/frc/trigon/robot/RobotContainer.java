@@ -13,6 +13,7 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
 import frc.trigon.robot.commands.commandfactories.FuelIntakeCommands;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
+import frc.trigon.robot.commands.commandfactories.ShootingCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.LEDConstants;
@@ -91,6 +92,16 @@ public class RobotContainer {
 
         OperatorConstants.TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER.onTrue(FuelIntakeCommands.getToggleDefaultIntakeStateCommand());
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommands.getIntakeCommand());
+
+        OperatorConstants.SHOULD_SHOOT_TRIGGER.whileTrue(ShootingCommands.getDefaultShootingCommand());
+        OperatorConstants.SHOOT_FROM_FIXED_POSITION_TRIGGER.whileTrue(ShootingCommands.getShootFromFixedPositionCommand());
+        OperatorConstants.FIXED_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand(true));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_HUB));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
+        OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
+
+        OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(CommandConstants.SHORT_EJECT_COMMAND);
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

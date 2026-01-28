@@ -54,6 +54,14 @@ public class TurretCommands {
         );
     }
 
+    public static Command getAlignForEjectionCommand() {
+        return new StartEndCommand(
+                RobotContainer.TURRET::alignForEjection,
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
+
     public static Command getStopCommand() {
         return new StartEndCommand(
                 RobotContainer.TURRET::stop,
