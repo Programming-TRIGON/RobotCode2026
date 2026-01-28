@@ -57,16 +57,16 @@ public class OperatorConstants {
             OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             OVERRIDE_CAN_SHOOT_TRIGGER = DRIVER_CONTROLLER.leftStick(),
             SHOULD_SHOOT_TRIGGER = new Trigger(OperatorConstants::shouldShoot),
-            TOGGLE_SHOULD_SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.back(),
+            TOGGLE_SHOULD_SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.i()),
+            RELEASE_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = OPERATOR_CONTROLLER.u(),
             SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = OPERATOR_CONTROLLER.h(),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = OPERATOR_CONTROLLER.j(),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = OPERATOR_CONTROLLER.k();
 
     private static boolean shouldShoot() {
-        if (ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION)
-            return OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
-        return MatchTracker.isHubActive() &&
+        return !ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.get() &&
+                MatchTracker.isHubActive() &&
                 isInAllianceZone() &&
                 !OVERRIDE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }

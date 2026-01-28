@@ -14,9 +14,10 @@ import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class ShootingCommands {
-    public static boolean SHOULD_SHOOT_FROM_FIXED_POSITION = false;
+    public static LoggedNetworkBoolean SHOULD_SHOOT_FROM_FIXED_POSITION = new LoggedNetworkBoolean("ShouldShootFromFixedPosition", false);
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
     private static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
 
@@ -43,7 +44,7 @@ public class ShootingCommands {
     }
 
     public static Command getToggleShouldShootFromFixedPositionCommand() {
-        return new InstantCommand(() -> ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION = !ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION);
+        return new InstantCommand(() -> ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.set(!ShootingCommands.SHOULD_SHOOT_FROM_FIXED_POSITION.get()));
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {

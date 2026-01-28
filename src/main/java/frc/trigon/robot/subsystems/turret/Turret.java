@@ -27,7 +27,7 @@ public class Turret extends MotorSubsystem {
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
-    private Rotation2d targetSelfRelativeAngle = null;
+    private Rotation2d targetSelfRelativeAngle = new Rotation2d();
 
     public Turret() {
         setName("Turret");
@@ -76,14 +76,14 @@ public class Turret extends MotorSubsystem {
 
         Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", currentSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
-        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle == null ? 0 : targetSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngle", targetProfiledSelfRelativeAngle.getDegrees());
     }
 
     @Override
     public void stop() {
         masterMotor.stopMotor();
-        targetSelfRelativeAngle = null;
+        targetSelfRelativeAngle = new Rotation2d();
     }
 
     public Pose3d calculateVisualizationPose() {
@@ -95,9 +95,6 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d getTargetFieldRelativeAngle() {
-        if (targetSelfRelativeAngle == null)
-            return null;
-
         return targetSelfRelativeAngle.plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
     }
 
@@ -110,9 +107,6 @@ public class Turret extends MotorSubsystem {
     }
 
     public boolean atTargetAngle(boolean useWideTolerance) {
-        if (targetSelfRelativeAngle == null)
-            return false;
-
         return Math.abs(targetSelfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians())
                 < (useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians());
     }
