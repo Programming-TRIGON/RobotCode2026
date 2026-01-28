@@ -1,10 +1,10 @@
 package frc.trigon.robot.poseestimation.relativerobotposesource;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.robot.poseestimation.relativerobotposesource.io.RelativeRobotPoseSourceSimulationIO;
 import frc.trigon.robot.poseestimation.relativerobotposesource.io.RelativeRobotPoseSourceT265IO;
 import org.littletonrobotics.junction.AutoLog;
-import frc.trigon.lib.hardware.RobotHardwareStats;
 
 public class RelativeRobotPoseSourceIO {
     static RelativeRobotPoseSourceIO generateIO(String hostname) {
@@ -22,7 +22,7 @@ public class RelativeRobotPoseSourceIO {
     public static class RelativeRobotPoseSourceInputs {
         public int framesPerSecond = 0;
         public double batteryPercentage = 0;
-        public Pose2d pose = new Pose2d();
+        public Pose3d pose = new Pose3d();
         public double resultTimestampSeconds = 0;
         public boolean hasResult = false;
     }

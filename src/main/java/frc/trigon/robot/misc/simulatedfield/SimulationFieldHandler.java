@@ -140,7 +140,7 @@ public class SimulationFieldHandler {
      * @return the field relative pose
      */
     private static Translation3d robotRelativeToFieldRelative(Translation3d robotRelativePose) {
-        final Pose3d robotPose = new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
+        final Pose3d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         return robotPose.plus(new Transform3d(robotRelativePose, new Rotation3d())).getTranslation();
     }
 }

@@ -93,14 +93,14 @@ public class SimulatedGamePiece {
     }
 
     private Rotation2d calculateClosestSpindexerRotationFromCurrentPose() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose3d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Pose3d spindexerRobotRelativePose = RobotContainer.SPINDEXER.calculateComponentPose();
         final Transform3d spindexerRobotRelativeTransform = new Transform3d(
                 new Pose3d(),
                 spindexerRobotRelativePose
         );
 
-        final double yOffset = new Pose3d(fieldRelativePosition, new Rotation3d()).relativeTo(new Pose3d(robotPose).plus(spindexerRobotRelativeTransform)).getY();
+        final double yOffset = new Pose3d(fieldRelativePosition, new Rotation3d()).relativeTo(robotPose.plus(spindexerRobotRelativeTransform)).getY();
         final double fuelTargetOffsetFromSpindexer = SimulatedGamePieceConstants.ROBOT_RELATIVE_HELD_FUEL_OFFSET_FROM_SPINDEXER_METERS.toTranslation2d().getNorm();
 
         final double closestSpindexerRotationRadians = Math.asin(MathUtil.clamp(yOffset / fuelTargetOffsetFromSpindexer, -1, 1));

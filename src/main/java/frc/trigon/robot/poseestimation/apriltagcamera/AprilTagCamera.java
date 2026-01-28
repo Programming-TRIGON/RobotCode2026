@@ -15,10 +15,10 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagCamera {
     protected final String name;
     private final AprilTagCameraInputsAutoLogged inputs = new AprilTagCameraInputsAutoLogged();
-    private final Transform2d cameraToRobotCenter;
+    private final Transform3d cameraToRobotCenter;
     private final StandardDeviations standardDeviations;
     private final AprilTagCameraIO aprilTagCameraIO;
-    private Pose2d estimatedRobotPose = new Pose2d();
+    private Pose3d estimatedRobotPose = new Pose3d();
 
     /**
      * Constructs a new AprilTagCamera.
@@ -26,9 +26,7 @@ public class AprilTagCamera {
      * @param aprilTagCameraType  the type of camera
      * @param name                the camera's name
      * @param robotCenterToCamera the transform of the robot's origin point to the camera.
-     *                            only the x, y and yaw values will be used for transforming the camera pose to the robot's center,
-     *                            to avoid more inaccuracies like pitch and roll.
-     *                            The reset will be used for creating a camera in simulation
+     *                            The values will be used for creating a camera in simulation
      * @param standardDeviations  the initial calibrated standard deviations for the camera's estimated pose,
      *                            will be changed as the distance from the tag(s) changes and the number of tags changes
      */
@@ -37,7 +35,7 @@ public class AprilTagCamera {
                           StandardDeviations standardDeviations) {
         this.name = name;
         this.standardDeviations = standardDeviations;
-        this.cameraToRobotCenter = toTransform2d(robotCenterToCamera).inverse();
+        this.cameraToRobotCenter = robotCenterToCamera.inverse();
 
         aprilTagCameraIO = AprilTagCameraIO.generateIO(aprilTagCameraType, name, robotCenterToCamera);
     }
@@ -50,7 +48,7 @@ public class AprilTagCamera {
         logCameraInfo();
     }
 
-    public Pose2d getEstimatedRobotPose() {
+    public Pose3d getEstimatedRobotPose() {
         return estimatedRobotPose;
     }
 
@@ -95,38 +93,38 @@ public class AprilTagCamera {
         return new StandardDeviations(translationStandardDeviation, thetaStandardDeviation);
     }
 
-    private Pose2d calculateRobotPose() {
+    private Pose3d calculateRobotPose() {
         if (!hasValidResult())
             return null;
 
         return chooseBestRobotPose();
     }
 
-    private Pose2d chooseBestRobotPose() {
+    private Pose3d chooseBestRobotPose() {
         if (!inputs.hasConstrainedResult || isWithinBestTagRangeForAccurateSolvePNPResult())
             return chooseBestNormalSolvePNPPose();
 
-        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose.toPose2d());
+        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose);
     }
 
-    private Pose2d chooseBestNormalSolvePNPPose() {
-        final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose.toPose2d());
+    private Pose3d chooseBestNormalSolvePNPPose() {
+        final Pose3d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose);
 
         if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose))
             return bestPose;
         if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1 || DriverStation.isDisabled())
             return bestPose;
 
-        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose.toPose2d());
-        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(inputs.latestResultTimestampSeconds).getRotation();
+        final Pose3d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose);
+        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.sample2DPoseAtTimestamp(inputs.latestResultTimestampSeconds).getRotation();
 
-        final double bestAngleDifference = Math.abs(bestPose.getRotation().minus(robotAngleAtResultTime).getRadians());
-        final double alternateAngleDifference = Math.abs(alternatePose.getRotation().minus(robotAngleAtResultTime).getRadians());
+        final double bestAngleDifference = Math.abs(bestPose.toPose2d().getRotation().minus(robotAngleAtResultTime).getRadians());
+        final double alternateAngleDifference = Math.abs(alternatePose.toPose2d().getRotation().minus(robotAngleAtResultTime).getRadians());
 
         return bestAngleDifference > alternateAngleDifference ? alternatePose : bestPose;
     }
 
-    private Pose2d cameraPoseToRobotPose(Pose2d cameraPose) {
+    private Pose3d cameraPoseToRobotPose(Pose3d cameraPose) {
         return cameraPose.transformBy(cameraToRobotCenter);
     }
 
@@ -148,7 +146,7 @@ public class AprilTagCamera {
             logUsedTags();
 
         if (hasValidResult()) {
-            Logger.recordOutput("Poses/Robot/Cameras/" + name + "Pose", new Pose2d[]{estimatedRobotPose});
+            Logger.recordOutput("Poses/Robot/Cameras/" + name + "Pose", new Pose3d[]{estimatedRobotPose});
             return;
         }
 

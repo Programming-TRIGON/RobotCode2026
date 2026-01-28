@@ -3,7 +3,7 @@ package frc.trigon.robot.poseestimation.robotposeestimator;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.numbers.N4;
 
 /**
  * Standard Deviations represent how ambiguous an estimated pose is using calibrated gains.
@@ -21,8 +21,9 @@ public record StandardDeviations(double translationStandardDeviation, double the
     public StandardDeviations {
     }
 
-    public Matrix<N3, N1> toMatrix() {
+    public Matrix<N4, N1> toMatrix() {
         return VecBuilder.fill(
+                translationStandardDeviation,
                 translationStandardDeviation,
                 translationStandardDeviation,
                 thetaStandardDeviation

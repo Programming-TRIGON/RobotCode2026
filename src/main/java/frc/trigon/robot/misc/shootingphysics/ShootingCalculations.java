@@ -32,22 +32,22 @@ public class ShootingCalculations {
 
     @AutoLogOutput(key = "Shooting/CurrentFuelExitPosition")
     public Translation3d calculateCurrentFuelExitPose() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose3d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Rotation2d hoodPitch = RobotContainer.HOOD.getCurrentAngle();
         final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getCurrentSelfRelativeAngle();
         return calculateFieldRelativeFuelExitPose(robotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
     public Translation3d calculateTargetFuelExitPosition(double posePredictionTimeSeconds) {
-        final Pose2d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(posePredictionTimeSeconds);
+        final Pose3d predictedRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(posePredictionTimeSeconds);
         final Rotation2d hoodPitch = RobotContainer.HOOD.getTargetAngle();
         final Rotation2d turretSelfRelativeYaw = RobotContainer.TURRET.getTargetSelfRelativeAngle();
         return calculateFieldRelativeFuelExitPose(predictedRobotPose, hoodPitch, turretSelfRelativeYaw);
     }
 
-    public Translation3d calculateFieldRelativeFuelExitPose(Pose2d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
+    public Translation3d calculateFieldRelativeFuelExitPose(Pose3d robotPose, Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {
         final Transform3d robotToFuelExitPosition = calculateRobotToFuelExitTransform(hoodPitch, turretSelfRelativeYaw);
-        return new Pose3d(robotPose).transformBy(robotToFuelExitPosition).getTranslation();
+        return robotPose.transformBy(robotToFuelExitPosition).getTranslation();
     }
 
     private Transform3d calculateRobotToFuelExitTransform(Rotation2d hoodPitch, Rotation2d turretSelfRelativeYaw) {

@@ -82,6 +82,7 @@ public class Turret extends MotorSubsystem {
     @Override
     public void stop() {
         masterMotor.stopMotor();
+        targetSelfRelativeAngle = new Rotation2d();
     }
 
     public Pose3d calculateVisualizationPose() {
@@ -93,7 +94,7 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d getTargetFieldRelativeAngle() {
-        return targetSelfRelativeAngle.plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
+        return targetSelfRelativeAngle.plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation());
     }
 
     public Rotation2d getTargetSelfRelativeAngle() {
@@ -101,7 +102,7 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d getCurrentFieldRelativeAngle() {
-        return getCurrentSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
+        return getCurrentSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation());
     }
 
     public Rotation2d getCurrentSelfRelativeAngle() {
@@ -123,7 +124,7 @@ public class Turret extends MotorSubsystem {
     }
 
     void setTargetFieldRelativeAngle(Rotation2d targetAngle) {
-        final Rotation2d targetRobotRelativeAngle = Rotation2d.fromDegrees(targetAngle.getDegrees() - RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees());
+        final Rotation2d targetRobotRelativeAngle = targetAngle.minus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose().getRotation());
         setTargetSelfRelativeAngle(targetRobotRelativeAngle);
     }
 
@@ -143,7 +144,7 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d calculateTargetAngleForDelivery() {
-        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimated2DRobotPose();
         if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
             return calculateTargetAngleToPose(FieldConstants.LEFT_DELIVERY_POSITION.get(), currentPosition);
         return calculateTargetAngleToPose(FieldConstants.RIGHT_DELIVERY_POSITION.get(), currentPosition);

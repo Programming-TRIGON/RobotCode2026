@@ -2,6 +2,7 @@ package frc.trigon.robot.commands.commandfactories;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
@@ -124,7 +125,7 @@ public class AutonomousCommands {
                 () -> {
                     if (DriverStation.isEnabled())
                         return;
-                    RobotContainer.ROBOT_POSE_ESTIMATOR.resetPose(getAutoStartPose(autoName.get()));
+                    RobotContainer.ROBOT_POSE_ESTIMATOR.resetPose(new Pose3d(getAutoStartPose(autoName.get())));
                 }
         ).ignoringDisable(true);
     }
