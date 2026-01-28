@@ -97,7 +97,7 @@ public class ShootingCommands {
     }
 
     private static boolean shouldStopShooting() {
-        return !RobotContainer.TURRET.atTargetAngle(true) && !OperatorConstants.OVERRIDE_CAN_SHOOT_TRIGGER.getAsBoolean();
+        return !RobotContainer.TURRET.atTargetAngle(true);
     }
 
     private static boolean isRobotAtShootingState(boolean isShootingAtHub) {
