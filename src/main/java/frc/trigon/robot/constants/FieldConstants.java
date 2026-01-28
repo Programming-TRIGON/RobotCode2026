@@ -27,10 +27,13 @@ public class FieldConstants {
     private static final Transform3d TAG_OFFSET = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
+    private static final double
+            BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
+            DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
     public static final FlippableTranslation2d
             HUB_POSITION = new FlippableTranslation2d(4.625594, FIELD_WIDTH_METERS / 2, true),
-            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(3, (FIELD_WIDTH_METERS / 2) - 2.2 , true),
-            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(3, (FIELD_WIDTH_METERS / 2) + 2.2, true);
+            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double ALLIANCE_ZONE_LENGTH = 4.625594;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {

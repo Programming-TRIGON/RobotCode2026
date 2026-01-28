@@ -95,6 +95,9 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d getTargetFieldRelativeAngle() {
+        if (targetSelfRelativeAngle == null)
+            return null;
+
         return targetSelfRelativeAngle.plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
     }
 
@@ -107,6 +110,9 @@ public class Turret extends MotorSubsystem {
     }
 
     public boolean atTargetAngle(boolean useWideTolerance) {
+        if (targetSelfRelativeAngle == null)
+            return false;
+
         return Math.abs(targetSelfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians())
                 < (useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians());
     }
@@ -117,9 +123,12 @@ public class Turret extends MotorSubsystem {
 
     public Translation2d calculateClosestDeliveryPosition() {
         final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        if (currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get()) < currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()))
-            return FieldConstants.LEFT_DELIVERY_POSITION.get();
-        return FieldConstants.RIGHT_DELIVERY_POSITION.get();
+        final double
+                distanceFromRightDeliveryPosition = currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()),
+                distanceFromLeftDeliveryPosition = currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get());
+        if (distanceFromRightDeliveryPosition < distanceFromLeftDeliveryPosition)
+            return FieldConstants.RIGHT_DELIVERY_POSITION.get();
+        return FieldConstants.LEFT_DELIVERY_POSITION.get();
     }
 
     void alignToHub() {
