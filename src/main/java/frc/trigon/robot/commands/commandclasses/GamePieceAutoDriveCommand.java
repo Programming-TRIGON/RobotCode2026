@@ -9,7 +9,6 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
-import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
 
@@ -17,11 +16,9 @@ import java.util.function.Supplier;
 
 public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     private static final ObjectPoseEstimator OBJECT_POSE_ESTIMATOR = RobotContainer.OBJECT_POSE_ESTIMATOR;
-    private final SimulatedGamePieceConstants.GamePieceType targetGamePieceType;
     private Translation2d distanceFromTrackedGamePiece;
 
-    public GamePieceAutoDriveCommand(SimulatedGamePieceConstants.GamePieceType targetGamePieceType) {
-        this.targetGamePieceType = targetGamePieceType;
+    public GamePieceAutoDriveCommand() {
         addCommands(
                 getTrackGamePieceCommand(),
                 GeneralCommands.getContinuousConditionalCommand(
