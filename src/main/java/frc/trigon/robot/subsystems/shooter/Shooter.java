@@ -2,7 +2,6 @@ package frc.trigon.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -74,7 +73,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     public boolean isAimingAtHub() {
-        return targetVelocityMetersPerSecond == shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        return targetVelocityMetersPerSecond == getTargetVelocityFromShootingCalculationsWithSlippageCompensation();
     }
 
     public double getCurrentVelocityMetersPerSecond() {
@@ -82,10 +81,7 @@ public class Shooter extends MotorSubsystem {
     }
 
     void aimAtHub() {
-        final double targetVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
-        final double targetVelocityWithSlippageCompensation = targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
-
-        setTargetVelocity(targetVelocityWithSlippageCompensation);
+        setTargetVelocity(getTargetVelocityFromShootingCalculationsWithSlippageCompensation());
     }
 
     void aimForDelivery() {
@@ -95,6 +91,11 @@ public class Shooter extends MotorSubsystem {
     void setTargetVelocity(double targetVelocityMetersPerSecond) {
         this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
         motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
+    }
+
+    private double getTargetVelocityFromShootingCalculationsWithSlippageCompensation() {
+        final double targetVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        return targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
     }
 
     private double calculateDeliveryShootingVelocity() {
