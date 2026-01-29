@@ -21,6 +21,11 @@ public class TurretCameraTransformCalculator {
     }
 
     public void update(double[] turretPositions, double[] timestamps, double velocityRotationsPerSecond) {
+        if (turretPositions.length > timestamps.length) {
+            System.out.println("Turret positions and timestamps arrays must have the same length.");
+            return;
+        }
+
         for (int i = 0; i < turretPositions.length; i++)
             addSample(turretPositions[i], timestamps[i]);
         this.latestVelocityRotationsPerSecond = velocityRotationsPerSecond;
