@@ -62,7 +62,7 @@ public class RobotContainer {
      * @return the command to run in autonomous mode
      */
     public Command getAutonomousCommand() {
-        AutonomousCommands.getAutonomousCommand();
+        return AutonomousCommands.getAutonomousCommand();
     }
 
     private void configureBindings() {
