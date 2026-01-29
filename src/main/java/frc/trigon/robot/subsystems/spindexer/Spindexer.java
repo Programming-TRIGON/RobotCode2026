@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.subsystems.MotorSubsystem;
-import org.littletonrobotics.junction.Logger;
 
 public class Spindexer extends MotorSubsystem {
     private final TalonFXMotor motor = SpindexerConstants.MOTOR;
@@ -36,7 +35,7 @@ public class Spindexer extends MotorSubsystem {
                 motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
 
-        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
+//        Logger.recordOutput("Poses/Components/SpindexerPose", calculateComponentPose());
     }
 
     @Override
@@ -69,6 +68,14 @@ public class Spindexer extends MotorSubsystem {
                 <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
     }
 
+    public Pose3d calculateComponentPose() {
+        final Transform3d yawTransform = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION)).getRadians())
+        );
+        return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
+    }
+
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
         setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
     }
@@ -80,13 +87,5 @@ public class Spindexer extends MotorSubsystem {
 
     private double getCurrentVelocityRotationsPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
-    }
-
-    private Pose3d calculateComponentPose() {
-        final Transform3d yawTransform = new Transform3d(
-                new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.POSITION)).getRadians())
-        );
-        return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }
 }
