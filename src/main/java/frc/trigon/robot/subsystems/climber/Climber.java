@@ -57,7 +57,7 @@ public class Climber extends MotorSubsystem {
     public void updateMechanism() {
         ClimberConstants.MECHANISM.update(
                 getPositionRotations(),
-                (motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
         );
 
         Logger.recordOutput("Poses/Components/ClimberPose", calculateComponentPose());
@@ -71,6 +71,11 @@ public class Climber extends MotorSubsystem {
     @Override
     public void sysIDDrive(double targetVoltage) {
         motor.setControl(voltageRequest.withOutput(targetVoltage));
+    }
+
+
+    public boolean atTargetExtendedState() {
+        return calculateTargetExtendedStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
     }
 
     void setTargetExtendedState(ClimberConstants.ClimberState targetState) {
@@ -93,10 +98,6 @@ public class Climber extends MotorSubsystem {
         positionRequest.Jerk = positionRequest.Acceleration * 10;
     }
 
-    private boolean atTargetExtendedState() {
-        return calculateTargetExtendedStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
-    }
-
     private double calculateTargetExtendedStateDistance() {
         return Math.abs(targetState.targetExtendedPositionMeters - getPositionMeters());
     }
@@ -114,12 +115,13 @@ public class Climber extends MotorSubsystem {
         return Conversions.distanceToRotations(positionMeters, ClimberConstants.DRUM_DIAMETER_METERS);
     }
 
-    private double getPositionRotations() {
-        return motor.getSignal(TalonFXSignal.POSITION);
-    }
-
     private double getPositionMeters() {
         return rotationsToMeters(getPositionRotations());
+    }
+
+
+    private double getPositionRotations() {
+        return motor.getSignal(TalonFXSignal.POSITION);
     }
 
     private double rotationsToMeters(double positionRotations) {
