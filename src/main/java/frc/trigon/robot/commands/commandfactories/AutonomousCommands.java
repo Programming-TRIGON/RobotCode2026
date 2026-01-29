@@ -35,9 +35,9 @@ public class AutonomousCommands {
                 SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
                 FuelIntakeCommands.getIntakeCommand(),
                 GeneralCommands.getContinuousConditionalCommand(
-                        null, //TODO: getShootingCommand()
-                        null, //TODO: getDeliveryCommand()
-                        () -> false //TODO: isInAllianceZone()
+                        ShootingCommands.getShootAtHubCommand(),
+                        ShootingCommands.getDeliveryCommand(),
+                        AutonomousCommands::isInAllianceZone
                 )
         ).withTimeout(AutonomousConstants.DELIVERY_TIMEOUT_SECONDS);
     }
@@ -45,23 +45,23 @@ public class AutonomousCommands {
     public static Command getCollectFromNeutralZoneCommand() {
         return new ParallelCommandGroup(
                 SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                FuelIntakeCommands.getIntakeCommand()
-                //TODO: getShootingCommand().onlyIf(isInAllianceZone())
+                FuelIntakeCommands.getIntakeCommand(),
+                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
         ).withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
     }
 
     public static Command getScoreCommand() {
         return new ParallelCommandGroup(
-                SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : () -> FieldConstants.LEFT_IDEAL_SHOOTING_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS)
-                //TODO: getShootingCommand().onlyIf(isInAllianceZone())
+                SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : () -> FieldConstants.LEFT_IDEAL_SHOOTING_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
+                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
         );
     }
 
     public static Command getCollectFromDepotCommand() {
         return new ParallelCommandGroup(
                 SwerveCommands.getDriveToPoseCommand(() -> FieldConstants.DEPOT_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                FuelIntakeCommands.getIntakeCommand()
-                //TODO: Add shooting command
+                FuelIntakeCommands.getIntakeCommand(),
+                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
         ).withTimeout(AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
     }
 
@@ -74,6 +74,11 @@ public class AutonomousCommands {
 
     private static boolean isRight() {
         return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getY() < FieldConstants.FIELD_WIDTH_METERS / 2;
+    }
+
+    private static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 
     /**
