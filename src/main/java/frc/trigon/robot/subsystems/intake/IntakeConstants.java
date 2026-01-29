@@ -111,11 +111,11 @@ public class IntakeConstants {
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 3.5 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 30 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.048463 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 4.5566 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 5 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.066678 : 0;
 
@@ -174,7 +174,7 @@ public class IntakeConstants {
     }
 
     public enum IntakeState {
-        REST(Rotation2d.fromDegrees(120), 0),
+        REST(Rotation2d.fromDegrees(90), 0),
         PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0),
         INTAKE(Rotation2d.fromDegrees(0), 6),
         EJECT(Rotation2d.fromDegrees(0), -6);

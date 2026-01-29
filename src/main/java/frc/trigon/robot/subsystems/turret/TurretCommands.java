@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 public class TurretCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetAngleDegrees) -> RobotContainer.TURRET.setTargetSelfRelativeAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
+                (targetFieldRelativeAngleDegrees) -> RobotContainer.TURRET.setTargetFieldRelativeAngle(Rotation2d.fromDegrees(targetFieldRelativeAngleDegrees)),
                 false,
                 Set.of(RobotContainer.TURRET),
-                "Debugging/TurretTargetAngleDegrees"
+                "Debugging/TurretTargetFieldRelativeAngleDegrees"
         );
     }
 
@@ -49,6 +49,14 @@ public class TurretCommands {
     public static Command getAlignForDeliveryCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.TURRET::alignForDelivery,
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
+
+    public static Command getAlignForEjectionCommand() {
+        return new StartEndCommand(
+                RobotContainer.TURRET::alignForEjection,
                 RobotContainer.TURRET::stop,
                 RobotContainer.TURRET
         );
