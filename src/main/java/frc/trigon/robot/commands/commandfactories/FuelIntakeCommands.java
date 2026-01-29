@@ -21,7 +21,7 @@ public class FuelIntakeCommands {
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                getIntakeAssistCommand().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
+                getIntakeAssistCommand().asProxy().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
         );
     }
 
