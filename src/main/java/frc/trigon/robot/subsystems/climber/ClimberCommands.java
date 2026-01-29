@@ -1,6 +1,7 @@
 package frc.trigon.robot.subsystems.climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
@@ -14,6 +15,14 @@ public class ClimberCommands {
                 false,
                 Set.of(RobotContainer.CLIMBER),
                 "Debugging/ClimberTargetPositionRotations"
+        );
+    }
+
+    public static Command getResetPositionCommand() {
+        return new StartEndCommand(
+                RobotContainer.CLIMBER::resetPosition,
+                RobotContainer.CLIMBER::stop,
+                RobotContainer.CLIMBER
         );
     }
 
@@ -40,4 +49,5 @@ public class ClimberCommands {
                 RobotContainer.CLIMBER
         );
     }
+
 }

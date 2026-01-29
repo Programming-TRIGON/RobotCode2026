@@ -92,6 +92,11 @@ public class Climber extends MotorSubsystem {
         motor.setControl(positionRequest.withPosition(targetPositionRotations));
     }
 
+    void resetPosition() {
+        targetState = ClimberConstants.ClimberState.REST;
+        motor.setControl(voltageRequest.withOutput(ClimberConstants.CLIMBER_RESET_VOLTAGE));
+    }
+
     private void scalePositionRequestSpeed(double speedScalar) {
         positionRequest.Velocity = ClimberConstants.DEFAULT_MAXIMUM_VELOCITY * speedScalar;
         positionRequest.Acceleration = ClimberConstants.DEFAULT_MAXIMUM_ACCELERATION * speedScalar;
