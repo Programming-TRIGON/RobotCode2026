@@ -1,7 +1,6 @@
 package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.trigon.robot.commands.commandclasses.IntakeAssistCommand;
@@ -11,36 +10,44 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class FuelIntakeCommands {
     public static final LoggedNetworkBoolean
-            SHOULD_DEFAULT_TO_OPEN_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldDefaultToOpenIntake", false),
-            IS_INTAKE_ASSIST_ENABLED = new LoggedNetworkBoolean("/SmartDashboard/IntakeAssistEnabled", false);
+            SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("/SmartDashboard/ShouldKeepIntakeOpen", true),
+            SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", true);
 
     public static final double
             X_ASSIST_POWER = 0.0,
-            Y_ASSIST_POWER = 0.0,
+            Y_ASSIST_POWER = 0.5,
             THETA_ASSIST_POWER = 0.0;
-
-    public static Command getToggleDefaultIntakeStateCommand() {
-        return new InstantCommand(
-                () -> SHOULD_DEFAULT_TO_OPEN_INTAKE.set(!SHOULD_DEFAULT_TO_OPEN_INTAKE.get())
-        );
-    }
 
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                getAssistIfEnabledCommand()
+                getIntakeAssistCommand().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
         );
     }
 
-    private static Command getAssistIfEnabledCommand() {
-        return GeneralCommands.getContinuousConditionalCommand(
-                new IntakeAssistCommand(
-                        X_ASSIST_POWER,
-                        Y_ASSIST_POWER,
-                        THETA_ASSIST_POWER
-                ).asProxy(),
-                Commands.idle(),
-                IS_INTAKE_ASSIST_ENABLED
+    public static Command getToggleDefaultIntakeStateCommand() {
+        return new InstantCommand(
+                () -> SHOULD_KEEP_INTAKE_OPEN.set(!SHOULD_KEEP_INTAKE_OPEN.get())
+        );
+    }
+
+    public static Command getEnableAssistIntakeCommand() {
+        return new InstantCommand(
+                () -> SHOULD_ASSIST_INTAKE.set(true)
+        );
+    }
+
+    public static Command getDisableIntakeAssistCommand() {
+        return new InstantCommand(
+                () -> SHOULD_ASSIST_INTAKE.set(false)
+        );
+    }
+
+    private static Command getIntakeAssistCommand() {
+        return new IntakeAssistCommand(
+                X_ASSIST_POWER,
+                Y_ASSIST_POWER,
+                THETA_ASSIST_POWER
         );
     }
 }

@@ -46,8 +46,8 @@ public class OperatorConstants {
             BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
 
     public static final Trigger//Intake Triggers
-            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
+            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
             ENABLE_INTAKE_ASSIST = OPERATOR_CONTROLLER.o(),
             DISABLE_INTAKE_ASSIST = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
     public static final Trigger//Shooting Triggers
