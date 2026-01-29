@@ -67,6 +67,8 @@ public class ClimberConstants {
     static final double DRUM_DIAMETER_METERS = DRUM_RADIUS_METERS * 2;
     static final double POSITION_TOLERANCE_METERS = 0.07;
     static final double CLIMBER_RESET_VOLTAGE = -0.5;
+    static final int CLIMBER_WEIGHT_SLOT = 0;
+    static final int FULL_ROBOT_WEIGHT_SLOT = 1;
 
     static {
         configureMotor();
@@ -94,6 +96,14 @@ public class ClimberConstants {
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
+        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
+
         config.HardwareLimitSwitch.ReverseLimitEnable = true;
         config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
         config.HardwareLimitSwitch.ReverseLimitSource = ReverseLimitSourceValue.LimitSwitchPin;
@@ -119,17 +129,19 @@ public class ClimberConstants {
     }
 
     public enum ClimberState {
-        REST(0, 0, 0.7),
-        CLIMB_L1(0.5, 0, 1);
+        REST(0, 0, 0.7, 0.7),
+        CLIMB_L1(0.5, 0, 1, 0.5);
 
         public final double targetExtendedPositionMeters;
         public final double targetRetractedPositionMeters;
-        final double speedScalar;
+        final double extendedSpeedScalar;
+        final double retractedSpeedScalar;
 
-        ClimberState(double targetExtendedPositionMeters, double targetRetractedPositionMeters, double speedScalar) {
+        ClimberState(double targetExtendedPositionMeters, double targetRetractedPositionMeters, double extendedSpeedScalar, double retractedSpeedScalar) {
             this.targetExtendedPositionMeters = targetExtendedPositionMeters;
             this.targetRetractedPositionMeters = targetRetractedPositionMeters;
-            this.speedScalar = speedScalar;
+            this.extendedSpeedScalar = extendedSpeedScalar;
+            this.retractedSpeedScalar = retractedSpeedScalar;
         }
     }
 }

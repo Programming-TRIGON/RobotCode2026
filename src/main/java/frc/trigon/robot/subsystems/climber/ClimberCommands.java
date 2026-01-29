@@ -1,7 +1,6 @@
 package frc.trigon.robot.subsystems.climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
@@ -11,7 +10,7 @@ import java.util.Set;
 public class ClimberCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                RobotContainer.CLIMBER::setTargetPositionRotations,
+                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotations(targetPosition, ClimberConstants.CLIMBER_WEIGHT_SLOT),
                 false,
                 Set.of(RobotContainer.CLIMBER),
                 "Debugging/ClimberTargetPositionRotations"
