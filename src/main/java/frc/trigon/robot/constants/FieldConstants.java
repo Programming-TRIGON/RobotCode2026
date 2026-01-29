@@ -34,7 +34,9 @@ public class FieldConstants {
             HUB_POSITION = new FlippableTranslation2d(4.625594, FIELD_WIDTH_METERS / 2, true),
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
-    public static final double ALLIANCE_ZONE_LENGTH = 4.625594;
+    public static final double
+            ALLIANCE_ZONE_LENGTH = 4.625594,
+            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.5;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {

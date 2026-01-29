@@ -1,10 +1,15 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -50,10 +55,11 @@ public class OperatorConstants {
             ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o(),
             DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
     public static final Trigger //Shooting Triggers
-            OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
-            SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate(),
-            SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.rightBumper().and(OVERRIDE_AUTO_SHOOT_TRIGGER),
-            FIXED_DELIVERY_TRIGGER = DRIVER_CONTROLLER.leftBumper().and(OVERRIDE_AUTO_SHOOT_TRIGGER),
+            DISABLE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
+            AUTO_SHOOT_AT_HUB_TRIGGER = new Trigger(OperatorConstants::shouldAutoShootAtHub),
+            AUTO_DELIVERY_TRIGGER = new Trigger(OperatorConstants::shouldAutoDeliver),
+            SHOOT_FROM_FIXED_POSITION_TRIGGER = DRIVER_CONTROLLER.rightBumper().and(DISABLE_AUTO_SHOOT_TRIGGER),
+            FIXED_DELIVERY_TRIGGER = DRIVER_CONTROLLER.leftBumper().and(DISABLE_AUTO_SHOOT_TRIGGER),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = DRIVER_CONTROLLER.povUp().and(OPERATOR_CONTROLLER.i()),
             SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = DRIVER_CONTROLLER.povLeft().and(OPERATOR_CONTROLLER.j()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().and(OPERATOR_CONTROLLER.k()),
@@ -65,4 +71,28 @@ public class OperatorConstants {
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start(),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x();
+
+    public static boolean shouldAutoShootAtHub() {
+        return !DriverStation.isAutonomous()
+                && isInAllianceZone()
+                && MatchTracker.isHubActive()
+                && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    public static boolean shouldAutoDeliver() {
+        return !DriverStation.isAutonomous()
+                && isInDeliveryZone()
+                && MatchTracker.isHubActive()
+                && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    public static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
+    }
+
+    public static boolean isInDeliveryZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+    }
 }

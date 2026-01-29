@@ -5,7 +5,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.trigon.lib.commands.CameraPositionCalculationCommand;
 import frc.trigon.lib.commands.WheelRadiusCharacterizationCommand;
 import frc.trigon.lib.hardware.misc.XboxController;
@@ -14,14 +13,7 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.OperatorConstants;
-import frc.trigon.robot.subsystems.hood.HoodCommands;
-import frc.trigon.robot.subsystems.loader.LoaderCommands;
-import frc.trigon.robot.subsystems.loader.LoaderConstants;
-import frc.trigon.robot.subsystems.shooter.ShooterCommands;
-import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
-import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
-import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 /**
  * A class that contains commands that only use parameters and don't require logic.
@@ -65,14 +57,6 @@ public class CommandConstants {
                     (omegaRadiansPerSecond) -> RobotContainer.SWERVE.selfRelativeDrive(new ChassisSpeeds(0, 0, omegaRadiansPerSecond)),
                     RobotContainer.SWERVE
             );
-    public static final Command
-            SHORT_EJECT_COMMAND = new ParallelCommandGroup(
-            SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
-            LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_EJECT),
-            TurretCommands.getAlignForEjectionCommand(),
-            HoodCommands.getAimForEjectionCommand(),
-            ShooterCommands.getAimForEjectionCommand()
-    );
 
     /**
      * Calculates the target drive power from an axis value by dividing it by the shift mode value.
