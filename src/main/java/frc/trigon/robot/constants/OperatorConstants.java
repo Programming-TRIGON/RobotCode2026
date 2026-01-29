@@ -35,7 +35,7 @@ public class OperatorConstants {
                     INTAKE_ASSIST_MAXIMUM_ASSISTABLE_ANGLE_FORMULA_INTERCEPT
             );
 
-    public static final Trigger
+    public static final Trigger//General Triggers
             RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
@@ -47,7 +47,9 @@ public class OperatorConstants {
 
     public static final Trigger//Intake Triggers
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
+            ENABLE_INTAKE_ASSIST = OPERATOR_CONTROLLER.o(),
+            DISABLE_INTAKE_ASSIST = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
     public static final Trigger//Shooting Triggers
             OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate(),
@@ -57,6 +59,11 @@ public class OperatorConstants {
             SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = DRIVER_CONTROLLER.povLeft().and(OPERATOR_CONTROLLER.j()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().and(OPERATOR_CONTROLLER.k()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().and(OPERATOR_CONTROLLER.l());
+    public static final Trigger//Climb Triggers
+            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back();
+    //          CANCEL_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()),
+    //          CONTINUE_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper());
     public static final Trigger//Debugging Triggers
+            UNJAM_TRIGGER = DRIVER_CONTROLLER.start(),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x();
 }
