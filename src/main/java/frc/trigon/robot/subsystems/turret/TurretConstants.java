@@ -66,7 +66,6 @@ public class TurretConstants {
             null
     );
 
-    static final Rotation2d EJECTION_ANGLE = Rotation2d.fromDegrees(0);
     static final Rotation2d
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
@@ -76,6 +75,7 @@ public class TurretConstants {
             WIDE_TOLERANCE = Rotation2d.fromDegrees(15);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
+    static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
 
     static {
         configureMasterMotor();

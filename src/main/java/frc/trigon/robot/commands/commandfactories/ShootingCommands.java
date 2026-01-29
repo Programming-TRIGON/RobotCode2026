@@ -3,6 +3,7 @@ package frc.trigon.robot.commands.commandfactories;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.commands.WaitUntilChangeCommand;
+import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.shootingphysics.ShootingState;
@@ -14,9 +15,11 @@ import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 
+import java.util.function.Supplier;
+
 public class ShootingCommands {
     private static final ShootingCalculations SHOOTING_CALCULATIONS = ShootingCalculations.getInstance();
-    private static ShootingState FIXED_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
+    private static ShootingState FIXED_HUB_SHOOTING_STATE = FixedShootingPosition.CLOSE_TO_HUB.targetState;
 
     public static Command getShortEjectFuelCommand() {
         return new ParallelCommandGroup(
@@ -35,23 +38,23 @@ public class ShootingCommands {
         );
     }
 
-    public static Command getShootFromFixedPositionCommand() {
+    public static Command getDeliveryCommand() {
         return new ParallelCommandGroup(
-                getAimForFixedStateCommand()
-                        .raceWith(new WaitUntilChangeCommand<>(() -> FIXED_SHOOTING_STATE)).repeatedly(),
+                getAimForDeliveryCommand(),
                 getLoadFuelWhenReadyCommand(false)
         );
     }
 
-    public static Command getDeliveryCommand(boolean isFixedDelivery) {
-        return new ParallelCommandGroup(
-                isFixedDelivery ? getAimForFixedDeliveryCommand() : getAimForDeliveryCommand(),
-                getLoadFuelWhenReadyCommand(false)
-        );
+    public static Command getFixedHubShootingCommand() {
+        return getShootFromFixedPositionCommand(() -> FIXED_HUB_SHOOTING_STATE);
+    }
+
+    public static Command getFixedDeliveryCommand() {
+        return getShootFromFixedPositionCommand(() -> FixedShootingPosition.FIXED_DELIVERY.targetState);
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
-        return new InstantCommand(() -> FIXED_SHOOTING_STATE = fixedPosition.targetState);
+        return new InstantCommand(() -> FIXED_HUB_SHOOTING_STATE = fixedPosition.targetState);
     }
 
     private static Command getAimAtHubCommand() {
@@ -73,25 +76,25 @@ public class ShootingCommands {
         );
     }
 
-    private static Command getAimForFixedStateCommand() {
+    private static Command getShootFromFixedPositionCommand(Supplier<ShootingState> fixedShootingStateSupplier) {
         return new ParallelCommandGroup(
-                TurretCommands.getSetTargetFieldRelativeAngleCommand(FIXED_SHOOTING_STATE::targetFieldRelativeYaw),
-                HoodCommands.getSetTargetAngleCommand(FIXED_SHOOTING_STATE.targetPitch()),
-                ShooterCommands.getSetTargetVelocityCommand(FIXED_SHOOTING_STATE.targetShootingVelocityMetersPerSecond())
+                getAimForFixedStateCommand(fixedShootingStateSupplier)
+                        .raceWith(new WaitUntilChangeCommand<>(fixedShootingStateSupplier)).repeatedly(),
+                getLoadFuelWhenReadyCommand(false)
         );
     }
 
-    private static Command getAimForFixedDeliveryCommand() {
+    private static Command getAimForFixedStateCommand(Supplier<ShootingState> fixedShootingStateSupplier) {
         return new ParallelCommandGroup(
-                TurretCommands.getAlignForEjectionCommand(),
-                HoodCommands.getAimForEjectionCommand(),
-                ShooterCommands.getAimForFixedDeliveryCommand()
+                TurretCommands.getSetTargetFieldRelativeAngleCommand(() -> new FlippableRotation2d(fixedShootingStateSupplier.get().targetFieldRelativeYaw(), true).get()),
+                HoodCommands.getSetTargetAngleCommand(() -> fixedShootingStateSupplier.get().targetPitch()),
+                ShooterCommands.getSetTargetVelocityCommand(() -> fixedShootingStateSupplier.get().targetShootingVelocityMetersPerSecond())
         );
     }
 
-    private static Command getLoadFuelWhenReadyCommand(boolean isShootingAtHub) {
+    private static Command getLoadFuelWhenReadyCommand(boolean isAutoShootingAtHub) {
         return new SequentialCommandGroup(
-                new WaitUntilCommand(() -> canShoot(isShootingAtHub)),
+                new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub)),
                 getLoadFuelCommand()
                         .until(ShootingCommands::shouldStopShooting)
         ).repeatedly();
@@ -127,7 +130,8 @@ public class ShootingCommands {
         CLOSE_TO_HUB(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         LEFT_CORNER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
         CLOSE_TO_TOWER(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
-        CLOSE_TO_OUTPOST(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0);
+        CLOSE_TO_OUTPOST(Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0), 0),
+        FIXED_DELIVERY(Rotation2d.fromDegrees(180), Rotation2d.fromDegrees(50), 6);
 
         private final ShootingState targetState;
 

@@ -93,10 +93,6 @@ public class Shooter extends MotorSubsystem {
         setTargetVelocity(calculateDeliveryShootingVelocity());
     }
 
-    void aimForFixedDelivery() {
-        setTargetVelocity(ShooterConstants.FIXED_DELIVERY_VELOCITY_METERS_PER_SECOND);
-    }
-
     void aimForEjection() {
         setTargetVelocity(ShooterConstants.EJECTION_VELOCITY_METERS_PER_SECOND);
     }

@@ -96,9 +96,9 @@ public class RobotContainer {
         OperatorConstants.DISABLE_INTAKE_ASSIST_TRIGGER.onTrue(FuelIntakeCommands.getDisableIntakeAssistCommand());
 
         OperatorConstants.AUTO_SHOOT_AT_HUB_TRIGGER.whileTrue(ShootingCommands.getShootAtHubCommand());
-        OperatorConstants.AUTO_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand(false));
-        OperatorConstants.SHOOT_FROM_FIXED_POSITION_TRIGGER.whileTrue(ShootingCommands.getShootFromFixedPositionCommand());
-        OperatorConstants.FIXED_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand(true));
+        OperatorConstants.AUTO_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand());
+        OperatorConstants.FIXED_HUB_SHOOTING_TRIGGER.whileTrue(ShootingCommands.getFixedHubShootingCommand());
+        OperatorConstants.FIXED_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getFixedDeliveryCommand());
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_HUB));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));

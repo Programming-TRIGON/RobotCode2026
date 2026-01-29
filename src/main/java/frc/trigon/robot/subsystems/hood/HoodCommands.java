@@ -8,11 +8,15 @@ import frc.trigon.lib.commands.GearRatioCalculationCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
+import java.util.Set;
+import java.util.function.Supplier;
+
 public class HoodCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetAngleDegrees) -> HoodCommands.getSetTargetAngleCommand(Rotation2d.fromDegrees(targetAngleDegrees)),
+                (targetAngleDegrees) -> RobotContainer.HOOD.setTargetAngle(Rotation2d.fromDegrees(targetAngleDegrees)),
                 false,
+                Set.of(RobotContainer.HOOD),
                 "Debugging/HoodTargetAngleDegrees"
         );
     }
@@ -58,9 +62,9 @@ public class HoodCommands {
         );
     }
 
-    public static Command getSetTargetAngleCommand(Rotation2d targetAngle) {
+    public static Command getSetTargetAngleCommand(Supplier<Rotation2d> targetAngleSupplier) {
         return new StartEndCommand(
-                () -> RobotContainer.HOOD.setTargetAngle(targetAngle),
+                () -> RobotContainer.HOOD.setTargetAngle(targetAngleSupplier.get()),
                 RobotContainer.HOOD::stop,
                 RobotContainer.HOOD
         );
