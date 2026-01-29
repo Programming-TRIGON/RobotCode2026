@@ -17,8 +17,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Climber extends MotorSubsystem {
     private final TalonFXMotor
-            masterMotor = ClimberConstants.MASTER_MOTOR,
-            followerMotor = ClimberConstants.FOLLOWER_MOTOR;
+            motor = ClimberConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ClimberConstants.FOC_ENABLED);
     private final DynamicMotionMagicVoltage positionRequest = new DynamicMotionMagicVoltage(
             0,
@@ -38,28 +37,27 @@ public class Climber extends MotorSubsystem {
 
     @Override
     public void setBrake(boolean brake) {
-        masterMotor.setBrake(brake);
-        followerMotor.setBrake(brake);
+        motor.setBrake(brake);
     }
 
     @Override
     public void stop() {
-        masterMotor.stopMotor();
+        motor.stopMotor();
     }
 
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("Climber")
                 .angularPosition(Units.Rotations.of(getPositionRotations()))
-                .angularVelocity(Units.RotationsPerSecond.of(masterMotor.getSignal(TalonFXSignal.VELOCITY)))
-                .voltage(Units.Volts.of(masterMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
+                .angularVelocity(Units.RotationsPerSecond.of(motor.getSignal(TalonFXSignal.VELOCITY)))
+                .voltage(Units.Volts.of(motor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
         ClimberConstants.MECHANISM.update(
                 getPositionRotations(),
-                (masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                (motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
 
         Logger.recordOutput("Poses/Components/ClimberPose", calculateComponentPose());
@@ -67,12 +65,12 @@ public class Climber extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        masterMotor.update();
+        motor.update();
     }
 
     @Override
     public void sysIDDrive(double targetVoltage) {
-        masterMotor.setControl(voltageRequest.withOutput(targetVoltage));
+        motor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     void setTargetExtendedState(ClimberConstants.ClimberState targetState) {
@@ -86,7 +84,7 @@ public class Climber extends MotorSubsystem {
     }
 
     void setTargetPositionRotations(double targetPositionRotations) {
-        masterMotor.setControl(positionRequest.withPosition(targetPositionRotations));
+        motor.setControl(positionRequest.withPosition(targetPositionRotations));
     }
 
     private void scalePositionRequestSpeed(double speedScalar) {
@@ -117,7 +115,7 @@ public class Climber extends MotorSubsystem {
     }
 
     private double getPositionRotations() {
-        return masterMotor.getSignal(TalonFXSignal.POSITION);
+        return motor.getSignal(TalonFXSignal.POSITION);
     }
 
     private double getPositionMeters() {

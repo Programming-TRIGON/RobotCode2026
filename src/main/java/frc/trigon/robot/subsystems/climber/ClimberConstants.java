@@ -17,8 +17,8 @@ import frc.trigon.lib.utilities.mechanisms.ElevatorMechanism2d;
 
 public class ClimberConstants {
     private static final int MOTOR_ID = 18;
-    private static final String MASTER_MOTOR_NAME = "ClimberMasterMotor";
-    static final TalonFXMotor MASTER_MOTOR = new TalonFXMotor(MOTOR_ID, MASTER_MOTOR_NAME);
+    private static final String MOTOR_NAME = "ClimberMasterMotor";
+    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     private static final double GEAR_RATIO = 28;
     static final double
@@ -114,14 +114,14 @@ public class ClimberConstants {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 80;
 
-        MASTER_MOTOR.applyConfiguration(config);
-        MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
+        MOTOR.applyConfiguration(config);
+        MOTOR.setPhysicsSimulation(SIMULATION);
 
-        MASTER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
+        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
+        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
+        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
+        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
     public enum ClimberState {
