@@ -140,7 +140,7 @@ public class Turret extends MotorSubsystem {
     }
 
     void alignForEjection() {
-        setTargetSelfRelativeAngle(TurretConstants.EJECTION_ANGLE);
+        setTargetSelfRelativeAngle(TurretConstants.SELF_RELATIVE_EJECTION_ANGLE);
     }
 
     void setTargetFieldRelativeAngle(Rotation2d targetAngle) {

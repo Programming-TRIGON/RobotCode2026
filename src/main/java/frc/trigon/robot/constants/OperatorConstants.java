@@ -73,14 +73,14 @@ public class OperatorConstants {
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
 
     public static boolean shouldAutoShootAtHub() {
-        return !DriverStation.isAutonomous()
+        return DriverStation.isTeleop()
                 && isInAllianceZone()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
     public static boolean shouldAutoDeliver() {
-        return !DriverStation.isAutonomous()
+        return DriverStation.isTeleop()
                 && isInDeliveryZone()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();

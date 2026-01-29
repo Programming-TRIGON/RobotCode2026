@@ -6,11 +6,15 @@ import frc.trigon.lib.commands.ExecuteEndCommand;
 import frc.trigon.lib.commands.NetworkTablesCommand;
 import frc.trigon.robot.RobotContainer;
 
+import java.util.Set;
+import java.util.function.DoubleSupplier;
+
 public class ShooterCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                ShooterCommands::getSetTargetVelocityCommand,
+                RobotContainer.SHOOTER::setTargetVelocity,
                 false,
+                Set.of(RobotContainer.SHOOTER),
                 "Debugging/TargetShooterVelocityMetersPerSecond"
         );
     }
@@ -31,14 +35,6 @@ public class ShooterCommands {
         );
     }
 
-    public static Command getAimForFixedDeliveryCommand() {
-        return new StartEndCommand(
-                RobotContainer.SHOOTER::aimForFixedDelivery,
-                RobotContainer.SHOOTER::stop,
-                RobotContainer.SHOOTER
-        );
-    }
-
     public static Command getAimForEjectionCommand() {
         return new StartEndCommand(
                 RobotContainer.SHOOTER::aimForEjection,
@@ -47,9 +43,9 @@ public class ShooterCommands {
         );
     }
 
-    public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
+    public static Command getSetTargetVelocityCommand(DoubleSupplier targetVelocityMetersPerSecond) {
         return new StartEndCommand(
-                () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityMetersPerSecond),
+                () -> RobotContainer.SHOOTER.setTargetVelocity(targetVelocityMetersPerSecond.getAsDouble()),
                 RobotContainer.SHOOTER::stop,
                 RobotContainer.SHOOTER
         );
