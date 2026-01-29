@@ -48,8 +48,8 @@ public class OperatorConstants {
     public static final Trigger //Intake Triggers
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
-            ENABLE_INTAKE_ASSIST = OPERATOR_CONTROLLER.o(),
-            DISABLE_INTAKE_ASSIST = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
+            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o(),
+            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
     public static final Trigger //Shooting Triggers
             OVERRIDE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick(),
             SHOULD_SHOOT_TRIGGER = OVERRIDE_AUTO_SHOOT_TRIGGER.negate(),

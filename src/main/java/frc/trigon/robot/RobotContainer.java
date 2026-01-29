@@ -92,8 +92,8 @@ public class RobotContainer {
 
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommands.getIntakeCommand());
         OperatorConstants.TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER.onTrue(FuelIntakeCommands.getToggleDefaultIntakeStateCommand());
-        OperatorConstants.ENABLE_INTAKE_ASSIST.onTrue(FuelIntakeCommands.getEnableAssistIntakeCommand());
-        OperatorConstants.DISABLE_INTAKE_ASSIST.onTrue(FuelIntakeCommands.getDisableIntakeAssistCommand());
+        OperatorConstants.ENABLE_INTAKE_ASSIST_TRIGGER.onTrue(FuelIntakeCommands.getEnableIntakeAssistCommand());
+        OperatorConstants.DISABLE_INTAKE_ASSIST_TRIGGER.onTrue(FuelIntakeCommands.getDisableIntakeAssistCommand());
 
         OperatorConstants.SHOULD_SHOOT_TRIGGER.whileTrue(ShootingCommands.getDefaultShootingCommand());
         OperatorConstants.SHOOT_FROM_FIXED_POSITION_TRIGGER.whileTrue(ShootingCommands.getShootFromFixedPositionCommand());

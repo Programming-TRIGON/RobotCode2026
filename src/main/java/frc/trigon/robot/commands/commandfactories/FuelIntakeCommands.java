@@ -31,7 +31,7 @@ public class FuelIntakeCommands {
         );
     }
 
-    public static Command getEnableAssistIntakeCommand() {
+    public static Command getEnableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(true)
         );
