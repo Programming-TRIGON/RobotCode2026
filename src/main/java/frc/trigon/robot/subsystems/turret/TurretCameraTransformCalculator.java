@@ -2,6 +2,7 @@ package frc.trigon.robot.subsystems.turret;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import frc.trigon.robot.RobotContainer;
 
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class TurretCameraTransformCalculator {
                 new Translation3d(),
                 new Rotation3d(0, 0, turretAngle.getRadians())
         );
-        final Pose3d rotatedTurretOrigin = TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.plus(turretAngleTransform);
+        final Pose3d rotatedTurretOrigin = TurretConstants.TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION.plus(turretAngleTransform);
         final Pose3d cameraPose = rotatedTurretOrigin.plus(turretToCameraTransform);
         return cameraPose.minus(new Pose3d());
     }
@@ -55,12 +56,17 @@ public class TurretCameraTransformCalculator {
     }
 
     private boolean isTimestampTooNew(double timestampSeconds) {
-        final Double latestTimestamp = getLatestBufferEntry().getKey();
+        final Map.Entry<Double, Rotation2d> latestBufferEntry = getLatestBufferEntry();
+        if (latestBufferEntry == null)
+            return false;
+        final Double latestTimestamp = latestBufferEntry.getKey();
         return timestampSeconds > latestTimestamp;
     }
 
     private Rotation2d estimateFutureTurretAngle(double futureTimestampSeconds) {
         final Map.Entry<Double, Rotation2d> latestBufferEntry = getLatestBufferEntry();
+        if (latestBufferEntry == null)
+            return RobotContainer.TURRET.getCurrentSelfRelativeAngle();
         final Double latestTimestamp = latestBufferEntry.getKey();
         final Rotation2d latestAngle = latestBufferEntry.getValue();
 
