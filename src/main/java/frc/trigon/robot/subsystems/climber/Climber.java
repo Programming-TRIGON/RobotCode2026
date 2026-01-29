@@ -86,7 +86,7 @@ public class Climber extends MotorSubsystem {
 
     void setTargetRetractedState() {
         scalePositionRequestSpeed(targetState.retractedSpeedScalar);
-        setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters), ClimberConstants.FULL_ROBOT_WEIGHT_SLOT);
+        setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters), ClimberConstants.ROBOT_WEIGHT_SLOT);
     }
 
     void setTargetPositionRotations(double targetPositionRotations, int slot) {

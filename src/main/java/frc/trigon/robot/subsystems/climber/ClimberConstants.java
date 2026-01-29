@@ -20,7 +20,7 @@ public class ClimberConstants {
     private static final String MOTOR_NAME = "ClimberMasterMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
-    private static final double GEAR_RATIO = 28;
+    private static final double GEAR_RATIO = 280;
     static final double
             DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 80 : 20,
             DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 80 : 50;
@@ -68,7 +68,7 @@ public class ClimberConstants {
     static final double POSITION_TOLERANCE_METERS = 0.07;
     static final double CLIMBER_RESET_VOLTAGE = -0.5;
     static final int CLIMBER_WEIGHT_SLOT = 0;
-    static final int FULL_ROBOT_WEIGHT_SLOT = 1;
+    static final int ROBOT_WEIGHT_SLOT = 1;
 
     static {
         configureMotor();
@@ -88,10 +88,10 @@ public class ClimberConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0087929 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.7126 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.052127 : 0;
 
         config.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
