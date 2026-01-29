@@ -94,8 +94,7 @@ public class ShootingCommands {
     private static Command getLoadFuelWhenReadyCommand(boolean isShootingAtHub) {
         return new SequentialCommandGroup(
                 new WaitUntilCommand(() -> canShoot(isShootingAtHub)),
-                getLoadFuelCommand()
-                        .until(ShootingCommands::shouldStopShooting)
+                getLoadFuelCommand().until(ShootingCommands::shouldStopShooting)
         ).repeatedly();
     }
 
