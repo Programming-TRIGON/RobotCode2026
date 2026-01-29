@@ -20,7 +20,11 @@ public class Climber extends MotorSubsystem {
             masterMotor = ClimberConstants.MASTER_MOTOR,
             followerMotor = ClimberConstants.FOLLOWER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ClimberConstants.FOC_ENABLED);
-    private final DynamicMotionMagicVoltage positionRequest = new DynamicMotionMagicVoltage(0, ClimberConstants.DEFAULT_MAXIMUM_VELOCITY, ClimberConstants.DEFAULT_MAXIMUM_ACCELERATION).withEnableFOC(ClimberConstants.FOC_ENABLED);
+    private final DynamicMotionMagicVoltage positionRequest = new DynamicMotionMagicVoltage(
+            0,
+            ClimberConstants.DEFAULT_MAXIMUM_VELOCITY,
+            ClimberConstants.DEFAULT_MAXIMUM_ACCELERATION
+    ).withEnableFOC(ClimberConstants.FOC_ENABLED);
     private ClimberConstants.ClimberState targetState = ClimberConstants.ClimberState.REST;
 
     public Climber() {
@@ -46,34 +50,29 @@ public class Climber extends MotorSubsystem {
     @Override
     public void updateLog(SysIdRoutineLog log) {
         log.motor("Climber")
-                .linearPosition(Units.Meters.of(getPositionMeters()))
-                .linearVelocity(Units.MetersPerSecond.of(rotationsToMeters(masterMotor.getSignal(TalonFXSignal.VELOCITY))))
+                .angularPosition(Units.Rotations.of(getPositionRotations()))
+                .angularVelocity(Units.RotationsPerSecond.of(masterMotor.getSignal(TalonFXSignal.VELOCITY)))
                 .voltage(Units.Volts.of(masterMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
-        Logger.recordOutput("Poses/Components/ClimberPose", calculateComponentPose());
-
         ClimberConstants.MECHANISM.update(
-                getPositionMeters(),
-                rotationsToMeters(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+                getPositionRotations(),
+                (masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
+
+        Logger.recordOutput("Poses/Components/ClimberPose", calculateComponentPose());
     }
 
     @Override
     public void updatePeriodically() {
         masterMotor.update();
-        Logger.recordOutput("Climber/CurrentPositionMeters", getPositionMeters());
     }
 
     @Override
     public void sysIDDrive(double targetVoltage) {
         masterMotor.setControl(voltageRequest.withOutput(targetVoltage));
-    }
-
-    public double metersToRotations(double positionMeters) {
-        return Conversions.distanceToRotations(positionMeters, ClimberConstants.DRUM_DIAMETER_METERS);
     }
 
     void setTargetExtendedState(ClimberConstants.ClimberState targetState) {
@@ -105,12 +104,16 @@ public class Climber extends MotorSubsystem {
     }
 
     private Pose3d calculateComponentPose() {
-        return ClimberConstants.FIRST_STAGE_VISUALIZATION_ORIGIN_POINT.transformBy(
+        return ClimberConstants.CLIMBER_VISUALIZATION_ORIGIN_POINT.transformBy(
                 new Transform3d(
                         new Translation3d(0, 0, getPositionMeters()),
                         new Rotation3d()
                 )
         );
+    }
+
+    private double metersToRotations(double positionMeters) {
+        return Conversions.distanceToRotations(positionMeters, ClimberConstants.DRUM_DIAMETER_METERS);
     }
 
     private double getPositionRotations() {
