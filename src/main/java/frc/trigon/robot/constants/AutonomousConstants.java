@@ -11,12 +11,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.LocalADStarAK;
 import frc.trigon.lib.utilities.flippable.Flippable;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.AutonomousCommands;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.io.IOException;
 
@@ -27,7 +32,20 @@ public class AutonomousConstants {
     public static final String DEFAULT_AUTO_NAME = "DefaultAutoName";
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 0.5;//TODO: Calibrate
-    public static final PathConstraints DRIVE_TO_SCORING_LOCATION_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900));
+    public static final PathConstraints
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900)),
+            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(300), Units.degreesToRadians(600));
+    public static LoggedDashboardChooser<Command>
+            FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
+            SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
+            THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>());
+    public static LoggedDashboardChooser<FlippablePose2d> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("ClimbChooser", new SendableChooser<>());
+
+    public static double
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 10,
+            DELIVERY_TIMEOUT_SECONDS = 10,
+            TIME_TO_CLIMB_BEFORE_AUTO_ENDS_SECONDS = 3;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
@@ -59,6 +77,8 @@ public class AutonomousConstants {
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         configureAutoBuilder();
         registerCommands();
+        initializeAutoChoosers();
+
     }
 
     private static void configureAutoBuilder() {
@@ -80,6 +100,28 @@ public class AutonomousConstants {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void initializeAutoChoosers() {
+        configureClimbPositionChooser();
+        configureAutonomousPositionChooser(FIRST_AUTONOMOUS_CHOOSER);
+        configureAutonomousPositionChooser(SECOND_AUTONOMOUS_CHOOSER);
+        configureAutonomousPositionChooser(THIRD_AUTONOMOUS_CHOOSER);
+    }
+
+    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Command> firstAutonomousChooser) {
+        firstAutonomousChooser.addOption("Depot", AutonomousCommands.getCollectFromDepotCommand());
+        firstAutonomousChooser.addOption("Score", AutonomousCommands.getScoreCommand());
+        firstAutonomousChooser.addOption("CollectFromNeutralZone", AutonomousCommands.getCollectFromNeutralZoneCommand());
+        firstAutonomousChooser.addOption("Delivery", AutonomousCommands.getDeliveryCommand());
+        firstAutonomousChooser.addDefaultOption("Nothing", null);
+    }
+
+    private static void configureClimbPositionChooser() {
+        CLIMB_POSITION_CHOOSER.addOption("LeftClimb", FieldConstants.LEFT_CLIMB_POSITION);
+        CLIMB_POSITION_CHOOSER.addOption("CenterClimb", FieldConstants.CENTER_CLIMB_POSITION);
+        CLIMB_POSITION_CHOOSER.addOption("RightClimb", FieldConstants.RIGHT_CLIMB_POSITION);
+        CLIMB_POSITION_CHOOSER.addDefaultOption("NoClimb", null);
     }
 
     private static void registerCommands() {

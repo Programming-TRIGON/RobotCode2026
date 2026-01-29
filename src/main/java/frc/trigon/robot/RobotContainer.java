@@ -5,12 +5,12 @@
 
 package frc.trigon.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
+import frc.trigon.robot.commands.commandfactories.AutonomousCommands;
 import frc.trigon.robot.commands.commandfactories.FuelIntakeCommands;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
@@ -37,7 +37,6 @@ import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.turret.Turret;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
     public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator();
@@ -53,11 +52,9 @@ public class RobotContainer {
     public static final Shooter SHOOTER = new Shooter();
     public static final Spindexer SPINDEXER = new Spindexer();
     public static final Turret TURRET = new Turret();
-    private LoggedDashboardChooser<Command> autoChooser;
 
     public RobotContainer() {
         initializeGeneralSystems();
-        buildAutoChooser();
         configureBindings();
     }
 
@@ -65,7 +62,7 @@ public class RobotContainer {
      * @return the command to run in autonomous mode
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        AutonomousCommands.getAutonomousCommand();
     }
 
     private void configureBindings() {
@@ -111,9 +108,5 @@ public class RobotContainer {
         LEDConstants.init();
         AutonomousConstants.init();
         ShootingLookupTable3D.init();
-    }
-
-    private void buildAutoChooser() {
-        autoChooser = new LoggedDashboardChooser<>("AutoChooser", AutoBuilder.buildAutoChooser());
     }
 }

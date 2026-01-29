@@ -4,11 +4,9 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 
 import java.io.IOException;
@@ -33,6 +31,15 @@ public class FieldConstants {
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
     public static final FlippableTranslation2d HUB_POSITION = new FlippableTranslation2d(4.636, 4, true); // TODO: Update to actual hub position
+    public static final FlippablePose2d
+            LEFT_CLIMB_POSITION = new FlippablePose2d(1.45, 4.25, Rotation2d.fromDegrees(0), true),
+            RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.get().getX(), 3.28, Rotation2d.fromDegrees(0), true),
+            CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.get().getX() + LEFT_CLIMB_POSITION.get().getX()) / 2, LEFT_CLIMB_POSITION.get().getY(), Rotation2d.fromDegrees(0), true),
+            DEPOT_POSITION = new FlippablePose2d(0.9, 6, Rotation2d.fromDegrees(180), true),
+            LEFT_INTAKE_POSITION = new FlippablePose2d(6.2, 7, Rotation2d.fromDegrees(-30), true),
+            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.get().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.get().getY(), Rotation2d.fromDegrees(30), true),
+            LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
+            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.get().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.get().getY(), Rotation2d.fromDegrees(0), true);
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
