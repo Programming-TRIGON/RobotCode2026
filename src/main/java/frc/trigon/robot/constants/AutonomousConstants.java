@@ -24,6 +24,7 @@ import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 /**
  * A class that contains the constants and configurations for everything related to the 15-second autonomous period at the start of the match.
@@ -35,7 +36,7 @@ public class AutonomousConstants {
     public static final PathConstraints
             DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(300), Units.degreesToRadians(600));
-    public static LoggedDashboardChooser<Command>
+    public static LoggedDashboardChooser<Supplier<Command>>
             FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
             THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>());
@@ -45,7 +46,7 @@ public class AutonomousConstants {
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 10,
             DELIVERY_TIMEOUT_SECONDS = 10,
-            TIME_TO_CLIMB_BEFORE_AUTO_ENDS_SECONDS = 3;
+            SCORING_TIMEOUT_SECONDS = 6;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
@@ -76,7 +77,6 @@ public class AutonomousConstants {
         Pathfinding.setPathfinder(new LocalADStarAK());
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         configureAutoBuilder();
-        registerCommands();
         initializeAutoChoosers();
 
     }
@@ -109,11 +109,11 @@ public class AutonomousConstants {
         configureAutonomousPositionChooser(THIRD_AUTONOMOUS_CHOOSER);
     }
 
-    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Command> firstAutonomousChooser) {
-        firstAutonomousChooser.addOption("Depot", AutonomousCommands.getCollectFromDepotCommand());
-        firstAutonomousChooser.addOption("Score", AutonomousCommands.getScoreCommand());
-        firstAutonomousChooser.addOption("CollectFromNeutralZone", AutonomousCommands.getCollectFromNeutralZoneCommand());
-        firstAutonomousChooser.addOption("Delivery", AutonomousCommands.getDeliveryCommand());
+    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Supplier<Command>> firstAutonomousChooser) {
+        firstAutonomousChooser.addOption("Depot", AutonomousCommands::getCollectFromDepotCommand);
+        firstAutonomousChooser.addOption("Score", AutonomousCommands::getScoreCommand);
+        firstAutonomousChooser.addOption("CollectFromNeutralZone", AutonomousCommands::getCollectFromNeutralZoneCommand);
+        firstAutonomousChooser.addOption("Delivery", AutonomousCommands::getDeliveryCommand);
         firstAutonomousChooser.addDefaultOption("Nothing", null);
     }
 
@@ -122,9 +122,5 @@ public class AutonomousConstants {
         CLIMB_POSITION_CHOOSER.addOption("CenterClimb", FieldConstants.CENTER_CLIMB_POSITION);
         CLIMB_POSITION_CHOOSER.addOption("RightClimb", FieldConstants.RIGHT_CLIMB_POSITION);
         CLIMB_POSITION_CHOOSER.addDefaultOption("NoClimb", null);
-    }
-
-    private static void registerCommands() {
-        //TODO: Implement
     }
 }

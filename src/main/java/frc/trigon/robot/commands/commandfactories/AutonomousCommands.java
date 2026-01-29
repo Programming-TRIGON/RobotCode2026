@@ -3,14 +3,14 @@ package frc.trigon.robot.commands.commandfactories;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandclasses.GamePieceAutoDriveCommand;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.subsystems.intake.IntakeCommands;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.json.simple.parser.ParseException;
 
@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 public class AutonomousCommands {
     public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get(),
-                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get(),
-                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get(),
+                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get().get(),
                 getClimbCommand(AutonomousConstants.CLIMB_POSITION_CHOOSER.get()).onlyIf(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get() != null)
         );
     }
@@ -33,7 +33,7 @@ public class AutonomousCommands {
     public static Command getDeliveryCommand() {
         return new ParallelCommandGroup(
                 SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                FuelIntakeCommands.getIntakeCommand(),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         ShootingCommands.getDeliveryCommand(),
@@ -43,32 +43,37 @@ public class AutonomousCommands {
     }
 
     public static Command getCollectFromNeutralZoneCommand() {
-        return new ParallelCommandGroup(
-                SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                FuelIntakeCommands.getIntakeCommand(),
-                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
-        ).withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
+        return new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        new PrintCommand("Starting Neutral Zone Collection"),
+                        SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
+                        ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
+                ).until(() -> RobotContainer.SWERVE.atPose(isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION)),
+                new GamePieceAutoDriveCommand()
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
     }
 
     public static Command getScoreCommand() {
         return new ParallelCommandGroup(
                 SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : () -> FieldConstants.LEFT_IDEAL_SHOOTING_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
-        );
+                ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
+        ).withTimeout(AutonomousConstants.SCORING_TIMEOUT_SECONDS);
     }
 
     public static Command getCollectFromDepotCommand() {
-        return new ParallelCommandGroup(
-                SwerveCommands.getDriveToPoseCommand(() -> FieldConstants.DEPOT_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                FuelIntakeCommands.getIntakeCommand(),
-                ShootingCommands.getShootAtHubCommand().onlyIf(AutonomousCommands::isInAllianceZone)
-        ).withTimeout(AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
+        return new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        SwerveCommands.getDriveToPoseCommand(() -> FieldConstants.DEPOT_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
+                        ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
+                ),
+                new GamePieceAutoDriveCommand()
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).withTimeout(AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
     }
 
     public static Command getClimbCommand(FlippablePose2d climbPosition) {
         return new SequentialCommandGroup(
                 SwerveCommands.getDriveToPoseCommand(() -> climbPosition, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
-                null // TODO: Add climb command
+                new InstantCommand() // TODO: Add climb command
         );
     }
 
