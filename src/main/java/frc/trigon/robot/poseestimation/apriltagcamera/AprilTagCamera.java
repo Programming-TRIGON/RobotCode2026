@@ -1,6 +1,9 @@
 package frc.trigon.robot.poseestimation.apriltagcamera;
 
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
@@ -15,31 +18,44 @@ import org.littletonrobotics.junction.Logger;
 public class AprilTagCamera {
     protected final String name;
     private final AprilTagCameraInputsAutoLogged inputs = new AprilTagCameraInputsAutoLogged();
-    private final Transform2d cameraToRobotCenter;
+    private final DynamicCameraTransform dynamicCameraTransform;
     private final StandardDeviations standardDeviations;
     private final AprilTagCameraIO aprilTagCameraIO;
     private Pose2d estimatedRobotPose = new Pose2d();
 
     /**
-     * Constructs a new AprilTagCamera.
+     * Constructs a new AprilTagCamera with a static camera transform.
      *
      * @param aprilTagCameraType  the type of camera
      * @param name                the camera's name
-     * @param robotCenterToCamera the transform of the robot's origin point to the camera.
-     *                            only the x, y and yaw values will be used for transforming the camera pose to the robot's center,
-     *                            to avoid more inaccuracies like pitch and roll.
-     *                            The reset will be used for creating a camera in simulation
+     * @param robotCenterToCamera the static transform from robot center to camera
      * @param standardDeviations  the initial calibrated standard deviations for the camera's estimated pose,
-     *                            will be changed as the distance from the tag(s) changes and the number of tags changes
+     *                            adjusted based on distance from tags and number of visible tags
      */
     public AprilTagCamera(AprilTagCameraConstants.AprilTagCameraType aprilTagCameraType,
                           String name, Transform3d robotCenterToCamera,
                           StandardDeviations standardDeviations) {
+        this(aprilTagCameraType, name, new DynamicCameraTransform(robotCenterToCamera), standardDeviations);
+    }
+
+    /**
+     * Constructs a new AprilTagCamera with a dynamic camera transform.
+     *
+     * @param aprilTagCameraType     the type of camera
+     * @param name                   the camera's name
+     * @param dynamicCameraTransform the dynamic transform from robot center to camera,
+     *                               supports time-dependent camera positioning
+     * @param standardDeviations     the initial calibrated standard deviations for the camera's estimated pose,
+     *                               adjusted based on distance from tags and number of visible tags
+     */
+    public AprilTagCamera(AprilTagCameraConstants.AprilTagCameraType aprilTagCameraType,
+                          String name, DynamicCameraTransform dynamicCameraTransform,
+                          StandardDeviations standardDeviations) {
         this.name = name;
         this.standardDeviations = standardDeviations;
-        this.cameraToRobotCenter = toTransform2d(robotCenterToCamera).inverse();
+        this.dynamicCameraTransform = dynamicCameraTransform;
 
-        aprilTagCameraIO = AprilTagCameraIO.generateIO(aprilTagCameraType, name, robotCenterToCamera);
+        aprilTagCameraIO = AprilTagCameraIO.generateIO(aprilTagCameraType, name, dynamicCameraTransform);
     }
 
     public void update() {
@@ -106,18 +122,18 @@ public class AprilTagCamera {
         if (!inputs.hasConstrainedResult || isWithinBestTagRangeForAccurateSolvePNPResult())
             return chooseBestNormalSolvePNPPose();
 
-        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose.toPose2d());
+        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
     }
 
     private Pose2d chooseBestNormalSolvePNPPose() {
-        final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose.toPose2d());
+        final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
 
         if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose))
             return bestPose;
         if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1 || DriverStation.isDisabled())
             return bestPose;
 
-        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose.toPose2d());
+        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
         final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(inputs.latestResultTimestampSeconds).getRotation();
 
         final double bestAngleDifference = Math.abs(bestPose.getRotation().minus(robotAngleAtResultTime).getRadians());
@@ -126,8 +142,8 @@ public class AprilTagCamera {
         return bestAngleDifference > alternateAngleDifference ? alternatePose : bestPose;
     }
 
-    private Pose2d cameraPoseToRobotPose(Pose2d cameraPose) {
-        return cameraPose.transformBy(cameraToRobotCenter);
+    private Pose2d cameraPoseToRobotPose(Pose2d cameraPose, double resultTimestampSeconds) {
+        return dynamicCameraTransform.calculate2dRobotPose(cameraPose, resultTimestampSeconds);
     }
 
     /**
@@ -165,13 +181,6 @@ public class AprilTagCamera {
         for (int i = 0; i < usedTagPoses.length; i++)
             usedTagPoses[i] = FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[i]);
         Logger.recordOutput("UsedTags/" + this.getName(), usedTagPoses);
-    }
-
-    private Transform2d toTransform2d(Transform3d transform3d) {
-        final Translation2d robotCenterToCameraTranslation = transform3d.getTranslation().toTranslation2d();
-        final Rotation2d robotCenterToCameraRotation = transform3d.getRotation().toRotation2d();
-
-        return new Transform2d(robotCenterToCameraTranslation, robotCenterToCameraRotation);
     }
 
     private double calculateAverageDistanceFromTags() {

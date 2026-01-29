@@ -13,6 +13,7 @@ import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraConstants;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraIO;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraInputsAutoLogged;
+import frc.trigon.robot.poseestimation.apriltagcamera.DynamicCameraTransform;
 import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.estimation.VisionEstimation;
@@ -25,12 +26,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
-    private final Transform3d robotToCamera;
+    protected final DynamicCameraTransform dynamicCameraTransform;
     final PhotonCamera photonCamera;
 
-    public AprilTagPhotonCameraIO(String cameraName, Transform3d robotToCamera) {
+    public AprilTagPhotonCameraIO(String cameraName, DynamicCameraTransform dynamicCameraTransform) {
         photonCamera = new PhotonCamera(cameraName);
-        this.robotToCamera = robotToCamera;
+        this.dynamicCameraTransform = dynamicCameraTransform;
     }
 
     @Override
@@ -138,12 +139,14 @@ public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
         if (cameraMatrix.isEmpty() || distCoeffs.isEmpty())
             return null;
 
-        Pose3d fieldToRobotSeed = bestCameraSolvePNPPose.transformBy(this.robotToCamera.inverse());
-        final Rotation2d robotYawAtTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(result.getTimestampSeconds()).getRotation();
+        final double resultTimestamp = result.getTimestampSeconds();
+        final Transform3d robotCenterToCamera = dynamicCameraTransform.get3dRobotCenterToCamera(resultTimestamp);
+        Pose3d fieldToRobotGuess = bestCameraSolvePNPPose.transformBy(robotCenterToCamera.inverse());
+        final Rotation2d robotYawAtTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(resultTimestamp).getRotation();
 
         if (!AprilTagCameraConstants.CONSTRAINED_SOLVE_PNP_PARAMS.headingFree()) {
-            fieldToRobotSeed = new Pose3d(
-                    fieldToRobotSeed.getTranslation(),
+            fieldToRobotGuess = new Pose3d(
+                    fieldToRobotGuess.getTranslation(),
                     new Rotation3d(robotYawAtTimestamp)
             );
         }
@@ -152,8 +155,8 @@ public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
                 cameraMatrix.get(),
                 distCoeffs.get(),
                 result.getTargets(),
-                robotToCamera,
-                fieldToRobotSeed,
+                robotCenterToCamera,
+                fieldToRobotGuess,
                 FieldConstants.APRIL_TAG_FIELD_LAYOUT,
                 TargetModel.kAprilTag36h11,
                 AprilTagCameraConstants.CONSTRAINED_SOLVE_PNP_PARAMS.headingFree(),
@@ -161,7 +164,7 @@ public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
                 AprilTagCameraConstants.CONSTRAINED_SOLVE_PNP_PARAMS.headingScaleFactor()
         );
 
-        return pnpResult.map(value -> Pose3d.kZero.plus(value.best).transformBy(robotToCamera)).orElse(null);
+        return pnpResult.map(value -> Pose3d.kZero.plus(value.best).transformBy(robotCenterToCamera)).orElse(null);
     }
 
     private int[] getVisibleTagIDs(PhotonTrackedTarget[] targets) {
