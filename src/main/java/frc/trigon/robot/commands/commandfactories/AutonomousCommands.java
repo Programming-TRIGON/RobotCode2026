@@ -32,7 +32,10 @@ public class AutonomousCommands {
 
     public static Command getDeliveryCommand() {
         return new ParallelCommandGroup(
-                getSafeDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION),
+                new SequentialCommandGroup(
+                        getSafeDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION, 3),
+                        new GamePieceAutoDriveCommand()
+                ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),

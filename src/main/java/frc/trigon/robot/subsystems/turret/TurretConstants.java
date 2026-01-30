@@ -38,7 +38,7 @@ public class TurretConstants {
     private static final double GEAR_RATIO = 52;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
-    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0.5 : 0;
+    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0.2 : 0;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -96,12 +96,12 @@ public class TurretConstants {
         config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
         config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 110 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.3 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 1 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.02 : 0;
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 6.2 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.05 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;
 
