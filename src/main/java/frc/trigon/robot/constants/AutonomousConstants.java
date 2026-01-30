@@ -42,7 +42,7 @@ public class AutonomousConstants {
 
     public static double
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 3,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
             DELIVERY_TIMEOUT_SECONDS = 8,
             SCORING_TIMEOUT_SECONDS = 6;
 
