@@ -145,8 +145,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
 
     private ArrayList<Translation2d> getAssistableGamePieces(Pose2d robotPose) {
         final ArrayList<Translation2d> gamePiecePositionsOnField = new ArrayList<>(RobotContainer.OBJECT_POSE_ESTIMATOR.getObjectsOnField());
-//        if (!DriverStation.isAutonomous())
-//            gamePiecePositionsOnField.removeIf(gamePiecePosition -> !isGamePieceAssistable(gamePiecePosition, robotPose));
+        gamePiecePositionsOnField.removeIf(gamePiecePosition -> !isGamePieceAssistable(gamePiecePosition, robotPose));
 
         return gamePiecePositionsOnField;
     }

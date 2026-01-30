@@ -45,7 +45,7 @@ public class AutonomousCommands {
     public static Command getCollectFromNeutralZoneCommand() {
         return new ParallelDeadlineGroup(
                 new SequentialCommandGroup(
-                        getSafeDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, 3),
+                        getSafeDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION, 3),
                         new GamePieceAutoDriveCommand().withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS)
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
