@@ -132,12 +132,12 @@ public class ShootingCalculations {
         return robotAngleToHub.plus(targetSelfRelativeYaw);
     }
 
-    private Translation2d calculateVelocityRelativeToPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
+    public static Translation2d calculateVelocityRelativeToPoint(Translation2d fieldPoint, Translation2d currentPosition, Translation2d robotFieldRelativeVelocity) {
         final Rotation2d angleToPoint = calculateAngleToPoint(fieldPoint, currentPosition);
         return robotFieldRelativeVelocity.rotateBy(angleToPoint.unaryMinus());
     }
 
-    private Rotation2d calculateAngleToPoint(Translation2d fieldPoint, Translation2d currentPosition) {
+    public static Rotation2d calculateAngleToPoint(Translation2d fieldPoint, Translation2d currentPosition) {
         return fieldPoint.minus(currentPosition).getAngle();
     }
 }

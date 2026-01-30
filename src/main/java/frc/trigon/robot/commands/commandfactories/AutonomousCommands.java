@@ -6,8 +6,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandclasses.GamePieceAutoDriveCommand;
+import frc.trigon.robot.commands.commandclasses.gamepieceautodrive.GamePieceAutoDriveCommand;
 import frc.trigon.robot.constants.AutonomousConstants;
+import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.subsystems.intake.IntakeCommands;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.json.simple.parser.ParseException;
 
@@ -18,99 +21,135 @@ import java.util.function.Supplier;
  * A class that contains command factories for preparation commands and commands used during the 15-second autonomous period at the start of each match.
  */
 public class AutonomousCommands {
-    private static FlippablePose2d TARGET_SCORING_POSE = null;
-
-    /**
-     * Creates a dynamic autonomous command intended for the 15-second autonomous period at the beginning of a match.
-     * Dynamic means that the command isn't pre-programmed and instead autonomously decides what game pieces to collect and where to score.
-     *
-     * @param intakeLocations  the locations at which to collect game pieces
-     * @param scoringLocations the locations at which to score
-     * @return the command
-     */
-    public static Command getDynamicAutonmousCommand(FlippablePose2d[] intakeLocations, FlippablePose2d... scoringLocations) {
+    public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-                getDriveAndScoreCommand(scoringLocations),
-                getCollectCommand(intakeLocations)
-        ).repeatedly().withName(generateDynamicAutonomousRoutineName(intakeLocations, scoringLocations));
+                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get().get(),
+                getClimbCommand(AutonomousConstants.CLIMB_POSITION_CHOOSER.get()).onlyIf(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get() != null)
+        );
     }
 
-    private static Command getCollectCommand(FlippablePose2d[] intakeLocations) {
+    public static Command getDeliveryCommand() {
         return new ParallelCommandGroup(
-                getIntakeSequenceCommand(),
-                getDriveToGamePieceCommand(intakeLocations)
-        ).until(AutonomousCommands::hasGamePiece);
+                new SequentialCommandGroup(
+                        getSafeDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION, 3),
+                        new GamePieceAutoDriveCommand()
+                ),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
+                GeneralCommands.getContinuousConditionalCommand(
+                        ShootingCommands.getShootAtHubCommand(),
+                        ShootingCommands.getDeliveryCommand(),
+                        AutonomousCommands::isInAllianceZone
+                )
+        ).withTimeout(AutonomousConstants.DELIVERY_TIMEOUT_SECONDS);
     }
 
-    private static boolean hasGamePiece() {
-        //TODO: implement
-        return false;
+    public static Command getCollectFromNeutralZoneCommand() {
+        return new ParallelDeadlineGroup(
+                new SequentialCommandGroup(
+                        getSafeDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION, 3),
+                        new GamePieceAutoDriveCommand().withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS)
+                ),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
+                ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
+        );
     }
 
-    private static Command getDriveToGamePieceCommand(FlippablePose2d[] intakeLocations) {
+    public static Command getScoreCommand() {
+        return new ParallelCommandGroup(
+                getSafeDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION),
+                ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone).repeatedly()
+        ).withTimeout(AutonomousConstants.SCORING_TIMEOUT_SECONDS);
+    }
+
+    public static Command getCollectFromDepotCommand() {
+        return new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        getSafeDriveToPoseCommand(() -> FieldConstants.DEPOT_POSITION),
+                        ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone).repeatedly()
+                ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
+                new GamePieceAutoDriveCommand().alongWith(ShootingCommands.getShootAtHubCommand())
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).withTimeout(AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
+    }
+
+    public static Command getClimbCommand(FlippablePose2d climbPosition) {
+        return new SequentialCommandGroup(
+                getSafeDriveToPoseCommand(() -> climbPosition),
+                new InstantCommand() // TODO: Add climb command
+        );
+    }
+
+    private static Command getSafeDriveToPoseCommand(Supplier<FlippablePose2d> targetPose) {
+        return getSafeDriveToPoseCommand(targetPose, 0);
+    }
+
+    private static Command getSafeDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, double endVelocity) {
         return new ConditionalCommand(
-                new GamePieceAutoDriveCommand().onlyWhile(() -> RobotContainer.OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot() != null),
-                getFindGamePieceCommand(intakeLocations),
-                AutonomousCommands::shouldCollectGamePiece
+                getDriveThroughTrenchCommand(targetPose, endVelocity),
+                SwerveCommands.getDriveToPoseCommand(targetPose, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS, endVelocity),
+                () -> shouldDriveThroughTrench(targetPose.get())
         );
     }
 
-    private static boolean shouldCollectGamePiece() {
-        return RobotContainer.OBJECT_POSE_ESTIMATOR.getClosestObjectToRobot() != null;
-    }
-
-    private static Command getFindGamePieceCommand(FlippablePose2d[] intakeLocations) {
-        //TODO: implement
-        return null;
-    }
-
-    private static Command getIntakeSequenceCommand() {
-        //TODO: implement
-        return null;
-    }
-
-    private static Command getDriveAndScoreCommand(FlippablePose2d[] scoringLocations) {
-        return new ParallelCommandGroup(
-                getDriveToScoringLocationCommand(scoringLocations),
-                getScoringSequenceCommand()
-        );
-    }
-
-    private static Command getScoringSequenceCommand() {
+    private static Command getDriveThroughTrenchCommand(Supplier<FlippablePose2d> targetPose, double endVelocity) {
         return new SequentialCommandGroup(
-                new WaitUntilCommand(() -> TARGET_SCORING_POSE != null),
-                getScoreCommand()
+                SwerveCommands.getDriveToPoseCommand(AutonomousCommands::getTrenchEntryPose, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS, 4),
+                SwerveCommands.getDriveToPoseCommand(() -> AutonomousCommands.getTrenchExitPose(targetPose.get()), AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS, 4),
+                SwerveCommands.getDriveToPoseCommand(targetPose, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS, endVelocity)
         );
     }
 
-    private static Command getScoreCommand() {
-        //TODO: implement
-        return null;
+    private static boolean shouldDriveThroughTrench(FlippablePose2d targetPose) {
+        return (!isInAllianceZone() && isPoseInAllianceZone(targetPose)) || (isInAllianceZone() && !isPoseInAllianceZone(targetPose));
     }
 
-    private static Command getDriveToScoringLocationCommand(FlippablePose2d[] scoringLocations) {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> TARGET_SCORING_POSE = calculateBestOpenScoringPose(scoringLocations)),
-                new WaitUntilCommand(() -> TARGET_SCORING_POSE != null).raceWith(SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
-                SwerveCommands.getDriveToPoseCommand(() -> TARGET_SCORING_POSE, AutonomousConstants.DRIVE_TO_SCORING_LOCATION_CONSTRAINTS).repeatedly()
-        );
+    private static FlippablePose2d getTrenchExitPose(FlippablePose2d targetPose) {
+        final FlippablePose2d targetTrenchExitPose = isRight() ?
+                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE) :
+                getClosestPoseToPose(targetPose, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
+        if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90 || RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() < -90)
+            return new FlippablePose2d(targetTrenchExitPose.getBlueObject().getTranslation(), Math.PI, true);
+        return targetTrenchExitPose;
     }
 
-    private static FlippablePose2d calculateBestOpenScoringPose(FlippablePose2d[] scoringLocations) {
-        //TODO: implement
-        return null;
+    private static FlippablePose2d getTrenchEntryPose() {
+        final FlippablePose2d targetTrenchEntryPose = isRight() ?
+                isInAllianceZone() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE :
+                isInAllianceZone() ? FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE;
+        if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90)
+            return new FlippablePose2d(targetTrenchEntryPose.getBlueObject().getTranslation(), Math.PI, true);
+        return targetTrenchEntryPose;
     }
 
-    /**
-     * Generates a name for the dynamic autonomous routine based on the intake and scoring locations.
-     *
-     * @param intakeLocations  the intake locations
-     * @param scoringLocations the scoring locations
-     * @return the name of the dynamic autonomous routine
-     */
-    private static String generateDynamicAutonomousRoutineName(FlippablePose2d[] intakeLocations, FlippablePose2d[] scoringLocations) {
-        //TODO: implement
-        return "";
+    private static FlippablePose2d getClosestPoseToPose(FlippablePose2d pose, FlippablePose2d... poses) {
+        FlippablePose2d closestPose = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (FlippablePose2d candidatePose : poses) {
+            final double distance = pose.get().getTranslation().getDistance(candidatePose.get().getTranslation());
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestPose = candidatePose;
+            }
+        }
+        return closestPose;
+    }
+
+    private static boolean isRight() {
+        return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getY() < FieldConstants.FIELD_WIDTH_METERS / 2;
+    }
+
+    private static boolean isInAllianceZone() {
+        return isPoseInAllianceZone(new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true));
+    }
+
+    private static boolean isPoseInAllianceZone(FlippablePose2d pose) {
+        return pose.get().getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
+    }
+
+    private static boolean shouldCollectGamePiecesFromNeutralZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X && RobotContainer.OBJECT_POSE_ESTIMATOR.hasObjects();
     }
 
     /**

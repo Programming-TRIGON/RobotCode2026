@@ -15,7 +15,7 @@ import frc.trigon.robot.constants.AutonomousConstants;
 
 public class SwerveModuleConstants {
     private static final double
-            DRIVE_MOTOR_GEAR_RATIO = 6.03,//R1: 7.03, R2: 6.03, R3: 5.27
+            DRIVE_MOTOR_GEAR_RATIO = 7.03,//R1: 7.03, R2: 6.03, R3: 5.27
             STEER_MOTOR_GEAR_RATIO = 287.0 / 11.0;
     static final boolean ENABLE_FOC = true;
 
@@ -80,9 +80,9 @@ public class SwerveModuleConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.016046 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.8774 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 00.020691 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0010955 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.74583 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.01247 : 0;
 
         config.Feedback.VelocityFilterTimeConstant = 0;
 
