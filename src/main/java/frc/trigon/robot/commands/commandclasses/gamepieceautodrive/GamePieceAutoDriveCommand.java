@@ -24,12 +24,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         );
     }
 
-    /**
-     * Creates a command that periodically calculates the best cluster and updates the atomic reference.
-     * This acts as the "vision processing" thread for this command group.
-     *
-     * @return A {@link Command} that runs continuously to update the target.
-     */
     private Command createTargetUpdateCommand() {
         return new RunCommand(() -> {
             GamePieceCluster bestCluster = findBestCluster();
@@ -37,11 +31,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         });
     }
 
-    /**
-     * Creates the drive command that moves the robot towards the currently selected target cluster.
-     *
-     * @return A {@link Command} that executes the swerve drive logic.
-     */
     private Command createDriveCommand() {
         return new SequentialCommandGroup(
                 new InstantCommand(AutonomousConstants.GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER::reset),
@@ -53,80 +42,62 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         ).onlyWhile(this::hasValidTarget);
     }
 
-    /**
-     * Calculates the output for the X-axis PID controller based on the current target.
-     *
-     * @return The calculated output for the X-axis velocity, or 0.0 if no target exists.
-     */
     private double getXControllerOutput() {
         Translation2d error = getTranslationError();
-        if (error == null)
-            return 0.0;
-        return AutonomousConstants.GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER.calculate(error.getX());
+        if (error == null) return 0.0;
+
+        // CRITICAL FIX 1: Negate the error here.
+        // Controller calculates (Setpoint - Measurement).
+        // We want (0 - (-Distance)) = +Distance to drive forward.
+        return AutonomousConstants.GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER.calculate(-error.getX());
     }
 
-    /**
-     * Calculates the output for the Y-axis PID controller based on the current target.
-     *
-     * @return The calculated output for the Y-axis velocity, or 0.0 if no target exists.
-     */
     private double getYControllerOutput() {
         Translation2d error = getTranslationError();
         if (error == null) return 0.0;
-        return AutonomousConstants.GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER.calculate(error.getY());
+
+        // CRITICAL FIX 1: Negate the error here too.
+        return AutonomousConstants.GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER.calculate(-error.getY());
     }
 
-    /**
-     * Retrieves the target heading for the robot based on the selected cluster's approach angle.
-     *
-     * @return A {@link FlippableRotation2d} representing the desired heading, or null if no target exists.
-     */
     private FlippableRotation2d getTargetHeading() {
         GamePieceCluster cluster = currentTargetCluster.get();
-        if (cluster == null)
-            return null;
+        if (cluster == null) return null;
         return new FlippableRotation2d(cluster.getApproachHeading(), false);
     }
 
-    /**
-     * Calculates the vector from the robot to the target centroid, rotated to be robot-relative.
-     * This is used as the error input for the self-relative PID controllers.
-     *
-     * @return A {@link Translation2d} representing the distance error in robot-relative coordinates, or null if no target exists.
-     */
     private Translation2d getTranslationError() {
         GamePieceCluster cluster = currentTargetCluster.get();
-        if (cluster == null)
-            return null;
+        if (cluster == null) return null;
 
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         Translation2d fieldRelativeError = cluster.getCentroid().minus(robotPose.getTranslation());
 
+        // CRITICAL FIX 2: You MUST use unaryMinus() here.
+        // This rotates the "World Vector" backwards to match the "Robot's Perspective".
+        // Without this, Left/Right are swapped, causing swerving.
         return fieldRelativeError.rotateBy(robotPose.getRotation().unaryMinus());
     }
 
-    /**
-     * Checks if a valid target is currently identified and if the robot is far enough away to continue driving.
-     *
-     * @return {@code true} if a target exists and distance is greater than the intake check distance; {@code false} otherwise.
-     */
     private boolean hasValidTarget() {
         Translation2d error = getTranslationError();
-        return error != null && error.getNorm() > AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS;
+        Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+
+        // CRITICAL FIX 3: Stop if the ROBOT is past the line.
+        // Previously we only checked if the GAME PIECE was past the line.
+        boolean robotIsSafe = robotPose.getX() < GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+
+        return error != null &&
+                robotIsSafe &&
+                error.getNorm() > AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS;
     }
 
-    /**
-     * Scans all tracked objects on the field, groups them into clusters, and identifies the "best" one to target.
-     * The selection is based on a scoring algorithm that weighs cluster size against distance from the robot.
-     *
-     * @return The {@link GamePieceCluster} with the highest score, or null if no valid game pieces are found.
-     */
+    // --- Vision Logic (Unchanged) ---
     private GamePieceCluster findBestCluster() {
         List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
 
-        if (allObjects.isEmpty())
-            return null;
+        if (allObjects.isEmpty()) return null;
 
         GamePieceCluster bestCluster = null;
         double maxScore = -Double.MAX_VALUE;
@@ -148,42 +119,20 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         return bestCluster;
     }
 
-    /**
-     * Finds all game pieces that are within a specific radius of a seed piece to form a cluster.
-     *
-     * @param seed       The central game piece used to find neighbors.
-     * @param allObjects A list of all detected game pieces on the field.
-     * @return A list of {@link Translation2d} objects representing the cluster, including the seed.
-     */
     private List<Translation2d> getNeighbors(Translation2d seed, List<Translation2d> allObjects) {
         List<Translation2d> neighbors = new ArrayList<>();
         for (Translation2d other : allObjects) {
             if (isOutOfBounds(other)) continue;
-
             if (seed.getDistance(other) <= GamePieceAutoDriveConstants.CLUSTER_RADIUS_METERS)
                 neighbors.add(other);
         }
         return neighbors;
     }
 
-    /**
-     * Checks if a game piece is outside the valid collection area (e.g., on the opponent's side of the field).
-     *
-     * @param piece The position of the game piece to check.
-     * @return {@code true} if the piece is out of bounds; {@code false} otherwise.
-     */
     private boolean isOutOfBounds(Translation2d piece) {
         return piece.getX() > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
     }
 
-    /**
-     * Calculates a score for a potential target cluster.
-     * Higher scores are better.
-     *
-     * @param count    The number of game pieces in the cluster.
-     * @param distance The distance from the robot to the cluster centroid in meters.
-     * @return The calculated score.
-     */
     private double calculateClusterScore(int count, double distance) {
         return (count * GamePieceAutoDriveConstants.SCORE_WEIGHT_COUNT) - (distance * GamePieceAutoDriveConstants.SCORE_PENALTY_DISTANCE);
     }

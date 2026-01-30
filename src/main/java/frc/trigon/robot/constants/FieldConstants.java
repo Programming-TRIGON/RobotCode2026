@@ -37,7 +37,11 @@ public class FieldConstants {
             LEFT_INTAKE_POSITION = new FlippablePose2d(7, 7.3, Rotation2d.fromDegrees(-40), true),
             RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(40), true),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
-            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true);
+            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(3.9, 7.4, Rotation2d.kZero, true),
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(5.53, LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE.getBlueObject().getY(), Rotation2d.kZero, true);
     private static final double
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;

@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 public class AutonomousConstants {
     public static final String DEFAULT_AUTO_NAME = "DefaultAutoName";
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
-    public static final double FEEDFORWARD_SCALAR = 0.5;//TODO: Calibrate
+    public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
     public static final PathConstraints
             DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(300), Units.degreesToRadians(600));
@@ -42,13 +42,13 @@ public class AutonomousConstants {
 
     public static double
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 8,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 3,
             DELIVERY_TIMEOUT_SECONDS = 8,
             SCORING_TIMEOUT_SECONDS = 6;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-            new PIDConstants(7, 0, 0) :
+            new PIDConstants(9, 0, 0) :
             new PIDConstants(0, 0, 0),
             AUTO_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(2, 0, 0) :
