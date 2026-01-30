@@ -323,6 +323,7 @@ public class Swerve extends MotorSubsystem {
     }
 
     private boolean atTranslationPosition(double currentTranslationPosition, double targetTranslationPosition, double currentTranslationVelocity) {
+//        System.out.println("Current Pos: " + currentTranslationPosition + ", Target Pos: " + targetTranslationPosition + ", Current Vel: " + currentTranslationVelocity);
         return Math.abs(currentTranslationPosition - targetTranslationPosition) < SwerveConstants.TRANSLATION_TOLERANCE_METERS &&
                 Math.abs(currentTranslationVelocity) < SwerveConstants.TRANSLATION_VELOCITY_TOLERANCE;
     }

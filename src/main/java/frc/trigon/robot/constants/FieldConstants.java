@@ -34,8 +34,8 @@ public class FieldConstants {
             RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.getBlueObject().getX(), 3.28, Rotation2d.fromDegrees(0), true),
             CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.getBlueObject().getX() + LEFT_CLIMB_POSITION.getBlueObject().getX()) / 2, LEFT_CLIMB_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
             DEPOT_POSITION = new FlippablePose2d(0.9, 6, Rotation2d.fromDegrees(180), true),
-            LEFT_INTAKE_POSITION = new FlippablePose2d(6.2, 7, Rotation2d.fromDegrees(-30), true),
-            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(30), true),
+            LEFT_INTAKE_POSITION = new FlippablePose2d(7, 7.3, Rotation2d.fromDegrees(-40), true),
+            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(40), true),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
             RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true);
     private static final double
@@ -46,7 +46,7 @@ public class FieldConstants {
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
-            ALLIANCE_ZONE_LENGTH = 4.625594,
+            ALLIANCE_ZONE_LENGTH = 4,
             DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.5;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
