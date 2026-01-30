@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandclasses.GamePieceAutoDriveCommand;
+import frc.trigon.robot.commands.commandclasses.IntakeAssistCommand;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
@@ -45,17 +45,16 @@ public class AutonomousCommands {
     public static Command getCollectFromNeutralZoneCommand() {
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new PrintCommand("Starting Neutral Zone Collection"),
                         SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_INTAKE_POSITION : () -> FieldConstants.LEFT_INTAKE_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
                         ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
                 ).until(() -> RobotContainer.SWERVE.atPose(isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION)),
-                new GamePieceAutoDriveCommand()
+                new IntakeAssistCommand(1, 1, 1).alongWith(new PrintCommand("intakingmoving"))
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).withTimeout(AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
     }
 
     public static Command getScoreCommand() {
         return new ParallelCommandGroup(
-                SwerveCommands.getDriveToPoseCommand(isRight() ? () -> FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : () -> FieldConstants.LEFT_IDEAL_SHOOTING_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
+                SwerveCommands.getDriveToPoseCommand(() -> isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
                 ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
         ).withTimeout(AutonomousConstants.SCORING_TIMEOUT_SECONDS);
     }
@@ -65,8 +64,8 @@ public class AutonomousCommands {
                 new ParallelCommandGroup(
                         SwerveCommands.getDriveToPoseCommand(() -> FieldConstants.DEPOT_POSITION, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS),
                         ShootingCommands.getShootAtHubCommand().onlyWhile(AutonomousCommands::isInAllianceZone)
-                ),
-                new GamePieceAutoDriveCommand()
+                ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
+                new IntakeAssistCommand(1, 1, 1).alongWith(new PrintCommand("intakingmoving"))
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).withTimeout(AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
     }
 

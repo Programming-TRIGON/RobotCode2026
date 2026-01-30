@@ -31,13 +31,13 @@ public class FieldConstants {
 
     public static final FlippablePose2d
             LEFT_CLIMB_POSITION = new FlippablePose2d(1.45, 4.25, Rotation2d.fromDegrees(0), true),
-            RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.get().getX(), 3.28, Rotation2d.fromDegrees(0), true),
-            CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.get().getX() + LEFT_CLIMB_POSITION.get().getX()) / 2, LEFT_CLIMB_POSITION.get().getY(), Rotation2d.fromDegrees(0), true),
+            RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.getBlueObject().getX(), 3.28, Rotation2d.fromDegrees(0), true),
+            CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.getBlueObject().getX() + LEFT_CLIMB_POSITION.getBlueObject().getX()) / 2, LEFT_CLIMB_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
             DEPOT_POSITION = new FlippablePose2d(0.9, 6, Rotation2d.fromDegrees(180), true),
             LEFT_INTAKE_POSITION = new FlippablePose2d(6.2, 7, Rotation2d.fromDegrees(-30), true),
-            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.get().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.get().getY(), Rotation2d.fromDegrees(30), true),
+            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(30), true),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
-            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.get().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.get().getY(), Rotation2d.fromDegrees(0), true);
+            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true);
     private static final double
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;

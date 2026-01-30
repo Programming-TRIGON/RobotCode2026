@@ -44,16 +44,16 @@ public class AutonomousConstants {
 
     public static double
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 10,
-            DELIVERY_TIMEOUT_SECONDS = 10,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 8,
+            DELIVERY_TIMEOUT_SECONDS = 8,
             SCORING_TIMEOUT_SECONDS = 6;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-            new PIDConstants(0, 0, 0) :
+            new PIDConstants(5, 0, 0) :
             new PIDConstants(0, 0, 0),
             AUTO_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-                    new PIDConstants(0, 0, 0) :
+                    new PIDConstants(2, 0, 0) :
                     new PIDConstants(0, 0, 0);
 
 

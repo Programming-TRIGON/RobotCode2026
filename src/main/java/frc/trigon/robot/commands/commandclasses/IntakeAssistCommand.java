@@ -178,7 +178,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
     private double calculateVelocityTowardsGamePiece(Translation2d fieldRelativeDistanceFromGamePiece) {
         final Translation2d fieldRelativeJoystickPosition = getFieldRelativeJoystickPosition();
 
-        final Rotation2d joystickAngle = fieldRelativeJoystickPosition.getAngle();
+        final Rotation2d joystickAngle = fieldRelativeJoystickPosition.getNorm() < 1e-6 ? new Rotation2d() : fieldRelativeJoystickPosition.getAngle();
         final Rotation2d fieldRelativeGamePieceAngleFromRobot = fieldRelativeDistanceFromGamePiece.getAngle();
         final Rotation2d angularOffset = joystickAngle.minus(fieldRelativeGamePieceAngleFromRobot);
 
