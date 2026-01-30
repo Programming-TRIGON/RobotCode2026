@@ -32,7 +32,7 @@ public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900)),
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3.3, 3, Units.degreesToRadians(200), Units.degreesToRadians(200)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(300), Units.degreesToRadians(600));
     public static LoggedDashboardChooser<Supplier<Command>>
             FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
@@ -41,7 +41,7 @@ public class AutonomousConstants {
     public static LoggedDashboardChooser<FlippablePose2d> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("ClimbChooser", new SendableChooser<>());
 
     public static double
-            DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
             DELIVERY_TIMEOUT_SECONDS = 8,
             SCORING_TIMEOUT_SECONDS = 6;
