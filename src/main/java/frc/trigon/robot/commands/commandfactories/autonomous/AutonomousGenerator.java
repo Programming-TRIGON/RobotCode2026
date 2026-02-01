@@ -58,7 +58,7 @@ public class AutonomousGenerator {
         };
     }
 
-    @AutoLogOutput(key = "ShouldStartDrivingToClimb")
+    @AutoLogOutput(key = "Autonomous/ShouldStartDrivingToClimb")
     static boolean shouldStartDrivingToClimb() {
         if (!shouldClimb())
             return false;
@@ -71,6 +71,7 @@ public class AutonomousGenerator {
         return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds + AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS;
     }
 
+    @AutoLogOutput(key = "Autonomous/ShouldClimb")
     public static boolean shouldClimb() {
         return CLIMB_POSITION_CHOOSER.get() != AutonomousClimbPosition.NO_CLIMB;
     }

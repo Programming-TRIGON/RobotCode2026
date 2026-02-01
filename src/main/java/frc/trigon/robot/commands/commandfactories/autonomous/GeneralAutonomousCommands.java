@@ -100,6 +100,8 @@ public class GeneralAutonomousCommands {
     private static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
         if (nextState == null && AutonomousGenerator.shouldClimb())
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
+        if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
+            return FieldConstants.DEPOT_POSITION;
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
     }
 
