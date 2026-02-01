@@ -37,7 +37,7 @@ public class AutonomousConstants {
     public static double
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
-            DEPOT_COLLECTION_TIMEOUT_SECONDS = 14, //6,
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
             DELIVERY_TIMEOUT_SECONDS = 6,
             SCORING_TIMEOUT_SECONDS = 4,
