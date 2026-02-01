@@ -19,15 +19,15 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 /**
- * A class that contains command factories for preparation commands and commands used during the 15-second autonomous period at the start of each match.
+ * A class that contains command factories for preparation commands and commands used during the 20-second autonomous period at the start of each match.
  */
 public class GeneralAutonomousCommands {
     public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get().get(),
-                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get().get(),
-                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? new InstantCommand() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get().get(),
-                getClimbCommand(AutonomousConstants.CLIMB_POSITION_CHOOSER.get()).onlyIf(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get() != null)
+                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get().get(),
+                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get().get(),
+                getClimbCommand(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get()).onlyIf(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get() != null)
         );
     }
 
@@ -80,10 +80,10 @@ public class GeneralAutonomousCommands {
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
-    public static Command getClimbCommand(FlippablePose2d climbPosition) {
+    public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
-                        () -> climbPosition,
+                        climbPosition,
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,

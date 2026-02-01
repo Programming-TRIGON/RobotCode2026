@@ -29,10 +29,6 @@ public class GamePieceCluster {
         return distanceToRobot;
     }
 
-    public int getSize() {
-        return 1;
-    }
-
     private Translation2d calculateCentroid(List<Translation2d> pieces) {
         double sumX = 0;
         double sumY = 0;
@@ -40,6 +36,8 @@ public class GamePieceCluster {
             sumX += piece.getX();
             sumY += piece.getY();
         }
+        if (pieces.isEmpty())
+            return new Translation2d();
         return new Translation2d(sumX / pieces.size(), sumY / pieces.size());
     }
 

@@ -39,7 +39,7 @@ public class AutonomousConstants {
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
-    public static LoggedDashboardChooser<Supplier<Command>>
+    public static final LoggedDashboardChooser<Supplier<Command>>
             FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
             THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>());
@@ -112,12 +112,12 @@ public class AutonomousConstants {
         configureAutonomousPositionChooser(THIRD_AUTONOMOUS_CHOOSER);
     }
 
-    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Supplier<Command>> firstAutonomousChooser) {
-        firstAutonomousChooser.addOption("Depot", () -> GeneralAutonomousCommands.getCollectFromDepotCommand(true, 6));
-        firstAutonomousChooser.addOption("Score", () -> GeneralAutonomousCommands.getScoreCommand(4));
-        firstAutonomousChooser.addOption("CollectFromNeutralZone", () -> GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(true, 1.5));
-        firstAutonomousChooser.addOption("Delivery", () -> GeneralAutonomousCommands.getDeliveryCommand(true, 6));
-        firstAutonomousChooser.addDefaultOption("Nothing", null);
+    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Supplier<Command>> autonomousChooser) {
+        autonomousChooser.addOption("Depot", () -> GeneralAutonomousCommands.getCollectFromDepotCommand(true, 6));
+        autonomousChooser.addOption("Score", () -> GeneralAutonomousCommands.getScoreCommand(4));
+        autonomousChooser.addOption("CollectFromNeutralZone", () -> GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(true, 1.5));
+        autonomousChooser.addOption("Delivery", () -> GeneralAutonomousCommands.getDeliveryCommand(true, 6));
+        autonomousChooser.addDefaultOption("Nothing", null);
     }
 
     private static void configureClimbPositionChooser() {
