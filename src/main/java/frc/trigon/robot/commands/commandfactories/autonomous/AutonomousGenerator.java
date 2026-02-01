@@ -1,13 +1,16 @@
 package frc.trigon.robot.commands.commandfactories.autonomous;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
+import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.misc.MatchTracker;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutonomousGenerator {
@@ -26,18 +29,23 @@ public class AutonomousGenerator {
 
     public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
+                getAutonomousStateSequenceCommand().until(AutonomousGenerator::shouldStartDrivingToClimb),
+                GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose).onlyIf(AutonomousGenerator::shouldClimb)
+        );
+    }
+
+    private static Command getAutonomousStateSequenceCommand() {
+        return new SequentialCommandGroup(
                 getCommandFromState(FIRST_AUTONOMOUS_CHOOSER.get(), null, SECOND_AUTONOMOUS_CHOOSER.get()),
                 getCommandFromState(SECOND_AUTONOMOUS_CHOOSER.get(), FIRST_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(THIRD_AUTONOMOUS_CHOOSER.get(), SECOND_AUTONOMOUS_CHOOSER.get(), null),
-                new ConditionalCommand(
-                        GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose),
-                        Commands.none(),
-                        AutonomousGenerator::shouldClimb
-                )
+                getCommandFromState(THIRD_AUTONOMOUS_CHOOSER.get(), SECOND_AUTONOMOUS_CHOOSER.get(), null)
         );
     }
 
     private static Command getCommandFromState(AutonomousState state, AutonomousState previousState, AutonomousState nextState) {
+        if (state == null)
+            return Commands.none();
+
         return switch (state) {
             case DELIVERY ->
                     GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS);
@@ -48,6 +56,19 @@ public class AutonomousGenerator {
             case COLLECT_FROM_NEUTRAL_ZONE ->
                     GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(previousState, AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
         };
+    }
+
+    @AutoLogOutput(key = "ShouldStartDrivingToClimb")
+    static boolean shouldStartDrivingToClimb() {
+        if (!shouldClimb())
+            return false;
+
+        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d targetClimbPose = CLIMB_POSITION_CHOOSER.get().climbPose.get();
+        final double distanceToClimbPoseMeters = currentRobotPose.getTranslation().getDistance(targetClimbPose.getTranslation());
+        final double estimatedDriveTimeSeconds = distanceToClimbPoseMeters / AutonomousConstants.ROBOT_AVERAGE_SPEED_METERS_PER_SECOND;
+        final double timeToLeaveForClimbSeconds = AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS + estimatedDriveTimeSeconds + AutonomousConstants.CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS;
+        return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds + AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS;
     }
 
     public static boolean shouldClimb() {
@@ -82,7 +103,7 @@ public class AutonomousGenerator {
         CENTER_L1(FieldConstants.CENTER_CLIMB_POSITION),
         NO_CLIMB(null);
 
-        FlippablePose2d climbPose;
+        final FlippablePose2d climbPose;
 
         AutonomousClimbPosition(FlippablePose2d climbPose) {
             this.climbPose = climbPose;

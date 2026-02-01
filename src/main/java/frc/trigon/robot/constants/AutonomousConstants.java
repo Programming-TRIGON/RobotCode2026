@@ -23,7 +23,6 @@ import java.io.IOException;
  * A class that contains the constants and configurations for everything related to the 15-second autonomous period at the start of the match.
  */
 public class AutonomousConstants {
-    public static final String DEFAULT_AUTO_NAME = "DefaultAutoName";
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
     public static final PathConstraints
@@ -36,10 +35,17 @@ public class AutonomousConstants {
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
 
     public static double
-            DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
+            TOTAL_MATCH_TIME_SECONDS = 160,
+            AUTONOMOUS_TIME_SECONDS = 20,
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 14, //6,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
             DELIVERY_TIMEOUT_SECONDS = 6,
-            SCORING_TIMEOUT_SECONDS = 4;
+            SCORING_TIMEOUT_SECONDS = 4,
+            ESTIMATED_CLIMBING_TIME_SECONDS = 3,
+            START_CLIMBING_TIME_SECONDS = AUTONOMOUS_TIME_SECONDS - ESTIMATED_CLIMBING_TIME_SECONDS;
+    public static final double
+            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 3.0,
+            CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
@@ -48,7 +54,6 @@ public class AutonomousConstants {
             AUTO_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(2, 0, 0) :
                     new PIDConstants(0, 0, 0);
-
 
     public static final PIDController GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
             new PIDController(0.5, 0, 0) :
