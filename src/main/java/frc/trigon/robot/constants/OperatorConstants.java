@@ -53,8 +53,8 @@ public class OperatorConstants {
     public static final Trigger //Intake Triggers
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
-            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o(),
-            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
+            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
+            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS));
     public static final Trigger //Shooting Triggers
             DISABLE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick().or(OPERATOR_CONTROLLER.a()),
             AUTO_SHOOT_AT_HUB_TRIGGER = new Trigger(OperatorConstants::shouldAutoShootAtHub),
