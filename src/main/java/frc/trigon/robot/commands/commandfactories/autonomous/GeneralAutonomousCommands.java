@@ -24,7 +24,11 @@ import java.util.function.Supplier;
 public class GeneralAutonomousCommands {
     public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
-                getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                new ConditionalCommand(
+                        new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
+                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                        () -> previousState == AutonomousGenerator.AutonomousState.COLLECT_FROM_NEUTRAL_ZONE || previousState == AutonomousGenerator.AutonomousState.DELIVERY
+                ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
@@ -36,7 +40,11 @@ public class GeneralAutonomousCommands {
 
     public static Command getCollectFromNeutralZoneCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
-                getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                new ConditionalCommand(
+                        new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
+                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                        () -> previousState == AutonomousGenerator.AutonomousState.COLLECT_FROM_NEUTRAL_ZONE || previousState == AutonomousGenerator.AutonomousState.DELIVERY
+                ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 ShootingCommands.getShootAtHubCommand().onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone)
         );
