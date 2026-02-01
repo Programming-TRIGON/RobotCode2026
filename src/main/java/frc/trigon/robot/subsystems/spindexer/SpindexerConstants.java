@@ -58,7 +58,7 @@ public class SpindexerConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.ExternalFeedback.RotorToSensorRatio = GEAR_RATIO;
+        config.ExternalFeedback.withSensorToMechanismRatio(GEAR_RATIO);
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 1.2 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
