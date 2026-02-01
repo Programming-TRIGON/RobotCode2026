@@ -49,7 +49,7 @@ public class ShooterConstants {
     );
 
     static final double EJECTION_VELOCITY_METERS_PER_SECOND = 3;
-    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
+    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.4;
     static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.05;
     static final double
             DELIVERY_VELOCITY_SLOPE = 0.9,

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.CommandConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
@@ -26,7 +27,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
             new PIDController(5, 0, 0) :
             new PIDController(2.4, 0, 0),
             yPIDController = RobotHardwareStats.isSimulation() ?
-                    new PIDController(0.25, 0, 0) :
+                    new PIDController(0.3, 0, 0) :
                     new PIDController(0.26, 0, 0),
             thetaPIDController = RobotHardwareStats.isSimulation() ?
                     new PIDController(0.1, 0, 0) :
@@ -68,7 +69,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
 
     private double calculateTranslationPower(boolean isXAxis, boolean shouldAssist) {
         final Translation2d selfRelativeJoystickValue = getSelfRelativeJoystickPosition();
-        final double joystickValue = isXAxis ? selfRelativeJoystickValue.getX() : selfRelativeJoystickValue.getY();
+        final double joystickValue = CommandConstants.calculateDriveStickAxisValue(isXAxis ? selfRelativeJoystickValue.getX() : selfRelativeJoystickValue.getY());
 
         if (!shouldAssist || hasNoTrackedGamePiece())
             return joystickValue;
@@ -82,7 +83,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
     }
 
     private double calculateThetaPower(boolean shouldAssist) {
-        final double joystickValue = OperatorConstants.DRIVER_CONTROLLER.getRightX();
+        final double joystickValue = CommandConstants.calculateDriveStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getRightX());
 
         if (!shouldAssist || hasNoTrackedGamePiece())
             return joystickValue;

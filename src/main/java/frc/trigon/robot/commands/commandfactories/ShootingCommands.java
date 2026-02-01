@@ -96,7 +96,7 @@ public class ShootingCommands {
         return new SequentialCommandGroup(
                 new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub)),
                 getLoadFuelCommand()
-                        .until(ShootingCommands::shouldStopShooting)
+                        .until(() -> ShootingCommands.shouldStopShooting(isAutoShootingAtHub))
         ).repeatedly();
     }
 
@@ -108,8 +108,11 @@ public class ShootingCommands {
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {
-        return (!isShootingAtHub || canShootAtHub()) &&
-                RobotContainer.SHOOTER.atTargetVelocity()
+        if (isShootingAtHub) {
+            return canShootAtHub() && RobotContainer.SHOOTER.atTargetVelocity() && RobotContainer.HOOD.atTargetAngle() &&
+                    RobotContainer.TURRET.atTargetShootingCalculationsAngle(false);
+        }
+        return RobotContainer.SHOOTER.atTargetVelocity()
                 && RobotContainer.HOOD.atTargetAngle()
                 && RobotContainer.TURRET.atTargetAngle(false);
     }
@@ -118,8 +121,8 @@ public class ShootingCommands {
         return RobotContainer.SHOOTER.isAimingAtHub();
     }
 
-    private static boolean shouldStopShooting() {
-        return !RobotContainer.TURRET.atTargetAngle(true);
+    private static boolean shouldStopShooting(boolean isShootingAtHub) {
+        return isShootingAtHub ? !RobotContainer.TURRET.atTargetShootingCalculationsAngle(true) : !RobotContainer.TURRET.atTargetAngle(true);
     }
 
     private static void updateShootingCalculations() {

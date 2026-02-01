@@ -17,7 +17,7 @@ import frc.trigon.lib.utilities.LocalADStarAK;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandfactories.AutonomousCommands;
+import frc.trigon.robot.commands.commandfactories.autonomous.GeneralAutonomousCommands;
 import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -32,8 +32,13 @@ public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3.3, 3, Units.degreesToRadians(200), Units.degreesToRadians(200)),
-            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(300), Units.degreesToRadians(600));
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(4, 7, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 2, Units.degreesToRadians(100), Units.degreesToRadians(100));
+    public static final double
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME = 1,
+            SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
     public static LoggedDashboardChooser<Supplier<Command>>
             FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
@@ -108,10 +113,10 @@ public class AutonomousConstants {
     }
 
     private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Supplier<Command>> firstAutonomousChooser) {
-        firstAutonomousChooser.addOption("Depot", AutonomousCommands::getCollectFromDepotCommand);
-        firstAutonomousChooser.addOption("Score", AutonomousCommands::getScoreCommand);
-        firstAutonomousChooser.addOption("CollectFromNeutralZone", AutonomousCommands::getCollectFromNeutralZoneCommand);
-        firstAutonomousChooser.addOption("Delivery", AutonomousCommands::getDeliveryCommand);
+        firstAutonomousChooser.addOption("Depot", () -> GeneralAutonomousCommands.getCollectFromDepotCommand(true, 6));
+        firstAutonomousChooser.addOption("Score", () -> GeneralAutonomousCommands.getScoreCommand(4));
+        firstAutonomousChooser.addOption("CollectFromNeutralZone", () -> GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(true, 1.5));
+        firstAutonomousChooser.addOption("Delivery", () -> GeneralAutonomousCommands.getDeliveryCommand(true, 6));
         firstAutonomousChooser.addDefaultOption("Nothing", null);
     }
 

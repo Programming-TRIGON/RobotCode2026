@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
-import frc.trigon.robot.commands.commandfactories.AutonomousCommands;
+import frc.trigon.robot.commands.commandfactories.autonomous.GeneralAutonomousCommands;
 import frc.trigon.robot.commands.commandfactories.FuelIntakeCommands;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.commands.commandfactories.ShootingCommands;
@@ -63,7 +63,7 @@ public class RobotContainer {
      * @return the command to run in autonomous mode
      */
     public Command getAutonomousCommand() {
-        return AutonomousCommands.getAutonomousCommand();
+        return GeneralAutonomousCommands.getAutonomousCommand();
     }
 
     private void configureBindings() {
@@ -100,7 +100,7 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
-        OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
+        OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(TurretCommands.getDebuggingCommand());
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
