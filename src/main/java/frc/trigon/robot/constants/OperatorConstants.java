@@ -23,6 +23,7 @@ public class OperatorConstants {
             DRIVER_CONTROLLER_PORT, DRIVER_CONTROLLER_RIGHT_STICK_EXPONENT, DRIVER_CONTROLLER_LEFT_STICK_EXPONENT, DRIVER_CONTROLLER_DEADBAND
     );
     public static final KeyboardController OPERATOR_CONTROLLER = new KeyboardController();
+    private static final double DOUBLE_TAP_TIMEOUT_SECONDS = 0.5;
 
     public static final double
             POV_DIVIDER = 2,
@@ -41,7 +42,7 @@ public class OperatorConstants {
             );
 
     public static final Trigger //General Triggers
-            RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
+            RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
@@ -65,7 +66,7 @@ public class OperatorConstants {
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().or(OPERATOR_CONTROLLER.k()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().or(OPERATOR_CONTROLLER.l());
     public static final Trigger //Climb Triggers
-            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c());
+            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c()).multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS);
     //          CANCEL_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()).or(OPERATOR_CONTROLLER.x()),
     //          CONTINUE_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper()).or(OPERATOR_CONTROLLER.v());
     public static final Trigger //Debugging Triggers
