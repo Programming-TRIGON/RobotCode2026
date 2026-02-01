@@ -68,7 +68,7 @@ public class AutonomousGenerator {
         final double distanceToClimbPoseMeters = currentRobotPose.getTranslation().getDistance(targetClimbPose.getTranslation());
         final double estimatedDriveTimeSeconds = distanceToClimbPoseMeters / AutonomousConstants.ROBOT_AVERAGE_SPEED_METERS_PER_SECOND;
         final double timeToLeaveForClimbSeconds = AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS + estimatedDriveTimeSeconds + AutonomousConstants.CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS;
-        return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds + AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS;
+        return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds;
     }
 
     @AutoLogOutput(key = "Autonomous/ShouldClimb")
