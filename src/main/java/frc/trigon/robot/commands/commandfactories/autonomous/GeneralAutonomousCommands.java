@@ -22,18 +22,9 @@ import java.util.function.Supplier;
  * A class that contains command factories for preparation commands and commands used during the 20-second autonomous period at the start of each match.
  */
 public class GeneralAutonomousCommands {
-    public static Command getAutonomousCommand() {
-        return new SequentialCommandGroup(
-                AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.FIRST_AUTONOMOUS_CHOOSER.get().get(),
-                AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.SECOND_AUTONOMOUS_CHOOSER.get().get(),
-                AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get() == null ? Commands.none() : AutonomousConstants.THIRD_AUTONOMOUS_CHOOSER.get().get(),
-                getClimbCommand(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get()).onlyIf(() -> AutonomousConstants.CLIMB_POSITION_CHOOSER.get() != null)
-        );
-    }
-
-    public static Command getDeliveryCommand(boolean shootPreload, double collectionTimeout) {
+    public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
-                getDriveToFuelInNeutralZoneCommand(shootPreload, collectionTimeout),
+                getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
@@ -43,18 +34,18 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    public static Command getCollectFromNeutralZoneCommand(boolean shootPreload, double collectionTimeout) {
+    public static Command getCollectFromNeutralZoneCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
-                getDriveToFuelInNeutralZoneCommand(shootPreload, collectionTimeout),
+                getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 ShootingCommands.getShootAtHubCommand().onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone)
         );
     }
 
-    public static Command getScoreCommand(double timeout) {
+    public static Command getScoreCommand(AutonomousGenerator.AutonomousState nextState, double timeout) {
         return new ParallelCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
-                        () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION,
+                        () -> getScoringPose(nextState),
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
@@ -104,6 +95,12 @@ public class GeneralAutonomousCommands {
                 ),
                 new GamePieceAutoDriveCommand(false).withTimeout(timeout)
         );
+    }
+
+    private static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
+        if (nextState == null && AutonomousGenerator.shouldClimb())
+            return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
+        return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
     }
 
     private static boolean shouldCollectGamePiecesFromNeutralZone() {

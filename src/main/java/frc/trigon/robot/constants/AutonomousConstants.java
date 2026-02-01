@@ -9,20 +9,15 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.LocalADStarAK;
 import frc.trigon.lib.utilities.flippable.Flippable;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandfactories.autonomous.GeneralAutonomousCommands;
+import frc.trigon.robot.commands.commandfactories.autonomous.AutonomousGenerator;
 import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
 /**
  * A class that contains the constants and configurations for everything related to the 15-second autonomous period at the start of the match.
@@ -39,17 +34,12 @@ public class AutonomousConstants {
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
-    public static final LoggedDashboardChooser<Supplier<Command>>
-            FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
-            SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
-            THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>());
-    public static LoggedDashboardChooser<FlippablePose2d> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("ClimbChooser", new SendableChooser<>());
 
     public static double
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
-            DELIVERY_TIMEOUT_SECONDS = 8,
-            SCORING_TIMEOUT_SECONDS = 6;
+            DELIVERY_TIMEOUT_SECONDS = 6,
+            SCORING_TIMEOUT_SECONDS = 4;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
@@ -80,8 +70,7 @@ public class AutonomousConstants {
         Pathfinding.setPathfinder(new LocalADStarAK());
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         configureAutoBuilder();
-        initializeAutoChoosers();
-
+        AutonomousGenerator.init();
     }
 
     private static void configureAutoBuilder() {
@@ -103,27 +92,5 @@ public class AutonomousConstants {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static void initializeAutoChoosers() {
-        configureClimbPositionChooser();
-        configureAutonomousPositionChooser(FIRST_AUTONOMOUS_CHOOSER);
-        configureAutonomousPositionChooser(SECOND_AUTONOMOUS_CHOOSER);
-        configureAutonomousPositionChooser(THIRD_AUTONOMOUS_CHOOSER);
-    }
-
-    private static void configureAutonomousPositionChooser(LoggedDashboardChooser<Supplier<Command>> autonomousChooser) {
-        autonomousChooser.addOption("Depot", () -> GeneralAutonomousCommands.getCollectFromDepotCommand(true, 6));
-        autonomousChooser.addOption("Score", () -> GeneralAutonomousCommands.getScoreCommand(4));
-        autonomousChooser.addOption("CollectFromNeutralZone", () -> GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(true, 1.5));
-        autonomousChooser.addOption("Delivery", () -> GeneralAutonomousCommands.getDeliveryCommand(true, 6));
-        autonomousChooser.addDefaultOption("Nothing", null);
-    }
-
-    private static void configureClimbPositionChooser() {
-        CLIMB_POSITION_CHOOSER.addOption("LeftClimb", FieldConstants.LEFT_CLIMB_POSITION);
-        CLIMB_POSITION_CHOOSER.addOption("CenterClimb", FieldConstants.CENTER_CLIMB_POSITION);
-        CLIMB_POSITION_CHOOSER.addOption("RightClimb", FieldConstants.RIGHT_CLIMB_POSITION);
-        CLIMB_POSITION_CHOOSER.addDefaultOption("NoClimb", null);
     }
 }
