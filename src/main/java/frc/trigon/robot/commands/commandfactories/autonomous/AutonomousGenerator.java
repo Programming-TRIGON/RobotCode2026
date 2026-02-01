@@ -12,6 +12,7 @@ import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MatchTracker;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class AutonomousGenerator {
     public static final LoggedDashboardChooser<AutonomousState>
@@ -19,6 +20,7 @@ public class AutonomousGenerator {
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
             THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>());
     public static LoggedDashboardChooser<AutonomousClimbPosition> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("ClimbChooser", new SendableChooser<>());
+    public static LoggedNetworkBoolean IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("Autonomous/IsClimbHighestPriority", true);
 
     public static void init() {
         configureAutonomousChooser(FIRST_AUTONOMOUS_CHOOSER);
@@ -60,7 +62,7 @@ public class AutonomousGenerator {
 
     @AutoLogOutput(key = "Autonomous/ShouldStartDrivingToClimb")
     static boolean shouldStartDrivingToClimb() {
-        if (!shouldClimb())
+        if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
             return false;
 
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
