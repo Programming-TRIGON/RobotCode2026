@@ -9,6 +9,8 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 import java.util.function.Supplier;
 
@@ -37,8 +39,8 @@ public class SafeAutonomousDriveCommands {
             double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
     ) {
         return new SequentialCommandGroup(
-                getDriveSlowlyInAllianceZoneCommand(SafeAutonomousDriveCommands::getTrenchEntryPose, normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
-                getDriveSlowlyInAllianceZoneCommand(() -> SafeAutonomousDriveCommands.getTrenchExitPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
+                getDriveSlowlyInAllianceZoneCommand(() -> getTrenchEntryPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
+                getDriveSlowlyInAllianceZoneCommand(() -> getTrenchExitPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
                 getDriveSlowlyInAllianceZoneCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime)
         );
     }
@@ -70,10 +72,10 @@ public class SafeAutonomousDriveCommands {
         return targetTrenchExitPose;
     }
 
-    private static FlippablePose2d getTrenchEntryPose() {
-        final FlippablePose2d targetTrenchEntryPose = isRight() ?
-                isInAllianceZone() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE :
-                isInAllianceZone() ? FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE;
+    private static FlippablePose2d getTrenchEntryPose(FlippablePose2d targetPose) {
+        final FlippablePose2d targetTrenchEntryPose = isInAllianceZone() ?
+                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE) :
+                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
         if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90)
             return new FlippablePose2d(targetTrenchEntryPose.getBlueObject().getTranslation(), Math.PI, true);
         return targetTrenchEntryPose;
@@ -92,10 +94,12 @@ public class SafeAutonomousDriveCommands {
         return closestPose;
     }
 
+    @AutoLogOutput(key = "Autonomous/IsRight")
     public static boolean isRight() {
         return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getY() < FieldConstants.FIELD_WIDTH_METERS / 2;
     }
 
+    @AutoLogOutput(key = "Autonomous/IsInAllianceZone")
     public static boolean isInAllianceZone() {
         return isPoseInAllianceZone(new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true));
     }
@@ -103,5 +107,4 @@ public class SafeAutonomousDriveCommands {
     private static boolean isPoseInAllianceZone(FlippablePose2d pose) {
         return pose.get().getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
-
 }

@@ -19,15 +19,17 @@ public class AutonomousGenerator {
             FIRST_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FirstAutonomousChooser", new SendableChooser<>()),
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
             THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>()),
-            FOURTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FourthAutonomousChooser", new SendableChooser<>());
+            FOURTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FourthAutonomousChooser", new SendableChooser<>()),
+            FIFTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FifthAutonomousChooser", new SendableChooser<>());
     public static LoggedDashboardChooser<AutonomousClimbPosition> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("AutonomousClimbChooser", new SendableChooser<>());
-    public static LoggedNetworkBoolean IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("Autonomous/IsClimbHighestPriority", true);
+    public static LoggedNetworkBoolean IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("IsClimbHighestPriority", true);
 
     public static void init() {
         configureAutonomousChooser(FIRST_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(SECOND_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(THIRD_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FOURTH_AUTONOMOUS_CHOOSER);
+        configureAutonomousChooser(FIFTH_AUTONOMOUS_CHOOSER);
         configureClimbPositionChooser(CLIMB_POSITION_CHOOSER);
     }
 
@@ -43,7 +45,8 @@ public class AutonomousGenerator {
                 getCommandFromState(FIRST_AUTONOMOUS_CHOOSER.get(), null, SECOND_AUTONOMOUS_CHOOSER.get()),
                 getCommandFromState(SECOND_AUTONOMOUS_CHOOSER.get(), FIRST_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get()),
                 getCommandFromState(THIRD_AUTONOMOUS_CHOOSER.get(), SECOND_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(FOURTH_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), null)
+                getCommandFromState(FOURTH_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
+                getCommandFromState(FIFTH_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get(), null)
         );
     }
 
@@ -64,7 +67,7 @@ public class AutonomousGenerator {
     }
 
     @AutoLogOutput(key = "Autonomous/ShouldStartDrivingToClimb")
-    static boolean shouldStartDrivingToClimb() {
+    private static boolean shouldStartDrivingToClimb() {
         if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
             return false;
 
