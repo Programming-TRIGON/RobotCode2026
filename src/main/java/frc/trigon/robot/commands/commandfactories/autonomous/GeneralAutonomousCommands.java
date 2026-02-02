@@ -2,6 +2,7 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.Flippable;
@@ -12,6 +13,9 @@ import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.commands.commandfactories.ShootingCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import frc.trigon.robot.misc.shootingphysics.ShootingState;
+import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
@@ -81,14 +85,6 @@ public class GeneralAutonomousCommands {
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
-    private static Command getShootAtHubWhileDrivingCommand() {
-        return GeneralCommands.getContinuousConditionalCommand(
-                ShootingCommands.getShootAtHubCommand(),
-                TurretCommands.getAlignToHubCommand(),
-                SafeAutonomousDriveCommands::isInAllianceZone
-        );
-    }
-
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
@@ -97,8 +93,16 @@ public class GeneralAutonomousCommands {
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1000
-                ),
+                ).raceWith(getShootAtHubWhileDrivingCommand()),
                 new InstantCommand() // TODO: Add climb command
+        );
+    }
+
+    private static Command getShootAtHubWhileDrivingCommand() {
+        return GeneralCommands.getContinuousConditionalCommand(
+                ShootingCommands.getShootAtHubCommand(),
+                getPrepareForShootingCommand(),
+                SafeAutonomousDriveCommands::isInAllianceZone
         );
     }
 
@@ -112,6 +116,22 @@ public class GeneralAutonomousCommands {
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME : 0
                 ).until(GeneralAutonomousCommands::shouldRobotStartIntaking),
                 new GamePieceAutoDriveCommand(false).withTimeout(timeout)
+        );
+    }
+
+    private static Command getPrepareForShootingCommand() {
+        return getAimWithTargetShootingState(
+                () -> ShootingCalculations.getInstance().calculateTargetShootingState(
+                        SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get() : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get(),
+                        new Translation2d()
+                )
+        );
+    }
+
+    private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState) {
+        return new ParallelCommandGroup(
+                TurretCommands.getSetTargetFieldRelativeAngleCommand(targetShootingState.get()::targetFieldRelativeYaw),
+                HoodCommands.getSetTargetAngleCommand(targetShootingState.get()::targetPitch)
         );
     }
 
