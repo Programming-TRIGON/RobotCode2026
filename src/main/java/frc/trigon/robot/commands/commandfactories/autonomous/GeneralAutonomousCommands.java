@@ -4,6 +4,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandclasses.gamepieceautodrive.GamePieceAutoDriveCommand;
@@ -13,6 +14,7 @@ import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -46,7 +48,7 @@ public class GeneralAutonomousCommands {
                         () -> previousState == AutonomousGenerator.AutonomousState.COLLECT_FROM_NEUTRAL_ZONE || previousState == AutonomousGenerator.AutonomousState.DELIVERY
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                ShootingCommands.getShootAtHubCommand().onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone)
+                getShootAtHubWhileDrivingCommand()
         );
     }
 
@@ -59,7 +61,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1000
                 ),
-                ShootingCommands.getShootAtHubCommand().onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone).repeatedly()
+                getShootAtHubWhileDrivingCommand()
         ).withTimeout(timeout);
     }
 
@@ -73,10 +75,18 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                                 shootWhileDriving ? 1000 : 0
                         ),
-                        ShootingCommands.getShootAtHubCommand().onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone).repeatedly()
+                        getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
                 new GamePieceAutoDriveCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
+    }
+
+    private static Command getShootAtHubWhileDrivingCommand() {
+        return GeneralCommands.getContinuousConditionalCommand(
+                ShootingCommands.getShootAtHubCommand(),
+                TurretCommands.getAlignToHubCommand(),
+                SafeAutonomousDriveCommands::isInAllianceZone
+        );
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
@@ -100,9 +110,14 @@ public class GeneralAutonomousCommands {
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME : 0
-                ),
+                ).until(GeneralAutonomousCommands::shouldRobotStartIntaking),
                 new GamePieceAutoDriveCommand(false).withTimeout(timeout)
         );
+    }
+
+    private static boolean shouldRobotStartIntaking() {
+        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return Flippable.isRedAlliance() ? currentRobotPose.getX() < (FieldConstants.FIELD_LENGTH_METERS - AutonomousConstants.START_INTAKING_X) : currentRobotPose.getX() > AutonomousConstants.START_INTAKING_X;
     }
 
     private static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {

@@ -38,14 +38,15 @@ public class AutonomousConstants {
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 0.8,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
             DELIVERY_TIMEOUT_SECONDS = 6,
-            SCORING_TIMEOUT_SECONDS = 4,
+            SCORING_TIMEOUT_SECONDS = 3.3,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3,
             START_CLIMBING_TIME_SECONDS = AUTONOMOUS_TIME_SECONDS - ESTIMATED_CLIMBING_TIME_SECONDS;
     public static final double
-            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 3.0,
-            CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
+            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 2,
+            CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 1;
+    public static final double START_INTAKING_X = 6.2;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?

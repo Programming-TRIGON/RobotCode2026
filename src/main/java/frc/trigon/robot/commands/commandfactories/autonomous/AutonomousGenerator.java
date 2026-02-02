@@ -4,13 +4,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MatchTracker;
-import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
@@ -37,7 +38,7 @@ public class AutonomousGenerator {
         return new SequentialCommandGroup(
                 getAutonomousStateSequenceCommand().until(AutonomousGenerator::shouldStartDrivingToClimb),
                 GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose).onlyIf(AutonomousGenerator::shouldClimb)
-        );
+        ).alongWith(getLogCommand());
     }
 
     private static Command getAutonomousStateSequenceCommand() {
@@ -66,7 +67,17 @@ public class AutonomousGenerator {
         };
     }
 
-    @AutoLogOutput(key = "Autonomous/ShouldStartDrivingToClimb")
+    private static Command getLogCommand() {
+        return new RunCommand(AutonomousGenerator::log);
+    }
+
+    private static void log() {
+        Logger.recordOutput("Autonomous/ShouldClimb", shouldClimb());
+        Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
+        Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
+        Logger.recordOutput("Autonomous/IsInAllianceZone", SafeAutonomousDriveCommands.isInAllianceZone());
+    }
+
     private static boolean shouldStartDrivingToClimb() {
         if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
             return false;
@@ -79,7 +90,6 @@ public class AutonomousGenerator {
         return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds;
     }
 
-    @AutoLogOutput(key = "Autonomous/ShouldClimb")
     public static boolean shouldClimb() {
         return CLIMB_POSITION_CHOOSER.get() != AutonomousClimbPosition.NO_CLIMB;
     }

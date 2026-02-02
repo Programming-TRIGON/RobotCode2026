@@ -94,12 +94,10 @@ public class SafeAutonomousDriveCommands {
         return closestPose;
     }
 
-    @AutoLogOutput(key = "Autonomous/IsRight")
     public static boolean isRight() {
         return RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getY() < FieldConstants.FIELD_WIDTH_METERS / 2;
     }
 
-    @AutoLogOutput(key = "Autonomous/IsInAllianceZone")
     public static boolean isInAllianceZone() {
         return isPoseInAllianceZone(new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true));
     }
