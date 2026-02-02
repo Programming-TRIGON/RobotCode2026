@@ -1,10 +1,15 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -35,7 +40,7 @@ public class OperatorConstants {
                     INTAKE_ASSIST_MAXIMUM_ASSISTABLE_ANGLE_FORMULA_INTERCEPT
             );
 
-    public static final Trigger
+    public static final Trigger //General Triggers
             RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
@@ -44,8 +49,50 @@ public class OperatorConstants {
             BACKWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.left(),
             FORWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.up(),
             BACKWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.down();
+    public static final Trigger //Intake Triggers
+            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
+            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
+            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o(),
+            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
+    public static final Trigger //Shooting Triggers
+            DISABLE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick().or(OPERATOR_CONTROLLER.a()),
+            AUTO_SHOOT_AT_HUB_TRIGGER = new Trigger(OperatorConstants::shouldAutoShootAtHub),
+            AUTO_DELIVERY_TRIGGER = new Trigger(OperatorConstants::shouldAutoDeliver),
+            FIXED_HUB_SHOOTING_TRIGGER = DRIVER_CONTROLLER.rightBumper().and(DISABLE_AUTO_SHOOT_TRIGGER).or(OPERATOR_CONTROLLER.s()),
+            FIXED_DELIVERY_TRIGGER = DRIVER_CONTROLLER.leftBumper().and(DISABLE_AUTO_SHOOT_TRIGGER).or(OPERATOR_CONTROLLER.d()),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER = DRIVER_CONTROLLER.povUp().or(OPERATOR_CONTROLLER.i()),
+            SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER = DRIVER_CONTROLLER.povLeft().or(OPERATOR_CONTROLLER.j()),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().or(OPERATOR_CONTROLLER.k()),
+            SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().or(OPERATOR_CONTROLLER.l());
+    public static final Trigger //Climb Triggers
+            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c());
+    //          CANCEL_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()).or(OPERATOR_CONTROLLER.x()),
+    //          CONTINUE_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper()).or(OPERATOR_CONTROLLER.v());
+    public static final Trigger //Debugging Triggers
+            UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
+            SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
 
-    public static final Trigger
-            TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = OPERATOR_CONTROLLER.i().or(DRIVER_CONTROLLER.b()),
-            INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger();
+    public static boolean shouldAutoShootAtHub() {
+        return DriverStation.isTeleop()
+                && isInAllianceZone()
+                && MatchTracker.isHubActive()
+                && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    public static boolean shouldAutoDeliver() {
+        return DriverStation.isTeleop()
+                && isInDeliveryZone()
+                && MatchTracker.isHubActive()
+                && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
+    }
+
+    public static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
+    }
+
+    public static boolean isInDeliveryZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+    }
 }
