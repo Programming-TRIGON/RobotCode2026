@@ -7,7 +7,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 
@@ -19,20 +18,25 @@ public class FieldConstants {
     public static final double
             FIELD_WIDTH_METERS = FlippingUtil.fieldSizeY,
             FIELD_LENGTH_METERS = FlippingUtil.fieldSizeX;
+
     private static final List<Integer> I_HATE_YOU = List.of(
             //Tags to ignore
     );
-
-    public static final FlippableTranslation2d
-            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 1.76), true),
-            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(new Translation2d(1.7175, 7.065), true);
-
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = createAprilTagFieldLayout();
     private static final Transform3d TAG_OFFSET = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
-    public static final FlippableTranslation2d HUB_POSITION = new FlippableTranslation2d(4.636, 4, true); // TODO: Update to actual hub position
+    private static final double
+            BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
+            DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
+    public static final FlippableTranslation2d
+            HUB_POSITION = new FlippableTranslation2d(4.625594, FIELD_WIDTH_METERS / 2, true),
+            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
+    public static final double
+            ALLIANCE_ZONE_LENGTH = 4.625594,
+            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.5;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {

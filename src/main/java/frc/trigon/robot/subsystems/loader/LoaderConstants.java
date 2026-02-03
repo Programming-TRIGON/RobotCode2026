@@ -80,8 +80,8 @@ public class LoaderConstants {
     }
 
     public enum LoaderState {
-        LOAD(2),
-        EJECT(-2),
+        LOAD(6),
+        LOAD_FOR_EJECT(2),
         STOP(0);
 
         public final double targetVelocityMetersPerSecond;

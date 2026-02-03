@@ -38,7 +38,7 @@ public class TurretConstants {
     private static final double GEAR_RATIO = 52;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
-    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = 6.2;
+    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0.5 : 0;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -70,7 +70,12 @@ public class TurretConstants {
             MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
+    static final Rotation2d
+            NORMAL_TOLERANCE = Rotation2d.fromDegrees(2),
+            WIDE_TOLERANCE = Rotation2d.fromDegrees(15);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
+    static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
+    static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
 
     static {
         configureMasterMotor();
@@ -91,18 +96,18 @@ public class TurretConstants {
         config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
         config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 400 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.3 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.02 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 6.2 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.UseSlot1;
+        config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;
 
-        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 400 : 0;
+        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
         config.Slot1.kI = config.Slot0.kI;
-        config.Slot1.kD = 0;
+        config.Slot1.kD = 2;
         config.Slot1.kS = config.Slot0.kS;
         config.Slot1.kV = 0;
         config.Slot1.kA = 0;
