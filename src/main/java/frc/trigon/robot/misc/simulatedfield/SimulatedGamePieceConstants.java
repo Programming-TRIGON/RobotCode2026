@@ -1,7 +1,9 @@
 package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation3d;
 import frc.trigon.robot.constants.FieldConstants;
 
@@ -48,6 +50,7 @@ public class SimulatedGamePieceConstants {
     private static final int
             DEPOT_FUEL_ROWS = 6,
             DEPOT_FUEL_COLUMNS = 4;
+    private static final Translation2d DEPOT_CENTER_POSITION = new Translation2d(0.31, 5.96);
 
     public static final double
             EJECTION_FROM_HUB_MINIMUM_VELOCITY_METERS_PER_SECOND = 4,
@@ -73,7 +76,8 @@ public class SimulatedGamePieceConstants {
             SimulationFieldHandler.addHeldFuel(currentHeldFuel);
         }
 
-        initializeDepotFuel(0.31, 5.96);
+        initializeDepotFuel(DEPOT_CENTER_POSITION.getX(), DEPOT_CENTER_POSITION.getY());
+        initializeDepotFuel(FieldConstants.FIELD_LENGTH_METERS - DEPOT_CENTER_POSITION.getX(), FieldConstants.FIELD_WIDTH_METERS - DEPOT_CENTER_POSITION.getY());
     }
 
     private static void initializeDepotFuel(double depotCenterX, double depotCenterY) {
