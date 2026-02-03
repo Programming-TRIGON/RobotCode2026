@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
@@ -312,7 +313,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     private GamePieceCluster findBestCluster() {
         List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-
         if (allObjects.isEmpty()) return null;
 
         GamePieceCluster bestCluster = null;
@@ -346,6 +346,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     private boolean isOutOfBounds(Translation2d piece) {
+        if (Flippable.isRedAlliance())
+            return piece.getX() < GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS;
         return piece.getX() > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
     }
 
