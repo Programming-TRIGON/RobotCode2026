@@ -33,17 +33,9 @@ public class ClimberCommands {
         );
     }
 
-    public static Command getSetTargetExtendedStateCommand(ClimberConstants.ClimberState targetState) {
+    public static Command getSetTargetStateCommand(ClimberConstants.ClimberState targetState) {
         return new StartEndCommand(
                 () -> RobotContainer.CLIMBER.setTargetState(targetState),
-                RobotContainer.CLIMBER::stop,
-                RobotContainer.CLIMBER
-        );
-    }
-
-    public static Command getSetTargetRetractedStateCommand() {
-        return new StartEndCommand(
-                RobotContainer.CLIMBER::setTargetRetractedState,
                 RobotContainer.CLIMBER::stop,
                 RobotContainer.CLIMBER
         );

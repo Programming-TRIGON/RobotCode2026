@@ -9,12 +9,12 @@ import frc.trigon.robot.subsystems.climber.ClimberConstants;
 public class ClimbCommands {
     public static Command getClimbToL1Command(Trigger continueTrigger) {
         return new SequentialCommandGroup(
-                ClimberCommands.getSetTargetExtendedStateCommand(ClimberConstants.ClimberState.CLIMB_L1).until(continueTrigger),
-                ClimberCommands.getSetTargetRetractedStateCommand()
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_PREPARE).until(continueTrigger),
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_L1)
         );
     }
 
-    public static Command getClimbDownFromL1Command() {
-        return ClimberCommands.getSetTargetExtendedStateCommand(ClimberConstants.ClimberState.CLIMB_L1);
+    public static Command getClimbDownFromL1Command(Trigger continueTrigger) {
+        return ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_DOWN);
     }
 }
