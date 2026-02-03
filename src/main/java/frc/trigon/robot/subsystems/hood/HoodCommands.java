@@ -21,15 +21,6 @@ public class HoodCommands {
         );
     }
 
-    public static Command getGearRatioCalculationCommand() {
-        return new GearRatioCalculationCommand(
-                HoodConstants.MOTOR,
-                HoodConstants.ENCODER,
-                0.5,
-                RobotContainer.HOOD
-        );
-    }
-
     public static Command getAimAtHubCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.HOOD::aimAtHub,
