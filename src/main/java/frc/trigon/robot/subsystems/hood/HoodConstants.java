@@ -18,7 +18,7 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 import frc.trigon.robot.subsystems.turret.TurretConstants;
 
 public class HoodConstants {
-    private static final int MOTOR_ID = 18;
+    private static final int MOTOR_ID = 17;
     private static final String MOTOR_NAME = "HoodMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
@@ -82,7 +82,7 @@ public class HoodConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
