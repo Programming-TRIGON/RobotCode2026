@@ -1,20 +1,21 @@
 package frc.trigon.robot.commands.commandfactories.autonomous;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
-import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class SafeAutonomousDriveCommands {
@@ -27,11 +28,8 @@ public class SafeAutonomousDriveCommands {
     }
 
     public static Command getSafeDriveToPoseCommand(
-            Supplier<FlippablePose2d> targetPose,
-            PathConstraints normalPathConstrains,
-            double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints,
-            double driveSlowlyInAllianceZoneTime
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
     ) {
         return new ConditionalCommand(
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
@@ -41,17 +39,62 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static Command getDriveThroughTrenchCommand(
-            Supplier<FlippablePose2d> targetPose,
-            PathConstraints normalPathConstrains,
-            double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints,
-            double driveSlowlyInAllianceZoneTime
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
+    ) {
+        return new ConditionalCommand(
+                getPathThroughTrenchCommand(targetPose.get(), normalPathConstrains, endVelocity),
+                getDriveThroughTrenchWithDrivingSlowlyCommand(
+                        targetPose.get(),
+                        normalPathConstrains,
+                        endVelocity,
+                        driveSlowlyInAllianceZoneConstraints,
+                        driveSlowlyInAllianceZoneTime
+                ),
+                () -> driveSlowlyInAllianceZoneTime != 0
+        );
+    }
+
+    private static Command getDriveThroughTrenchWithDrivingSlowlyCommand(
+            FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
     ) {
         return new SequentialCommandGroup(
-                getDriveSlowlyInAllianceZoneCommand(() -> getTrenchEntryPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
-                getDriveSlowlyInAllianceZoneCommand(() -> getTrenchExitPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
-                getDriveSlowlyInAllianceZoneCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime)
+                getPathThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity).until(SafeAutonomousDriveCommands::isInAllianceZone),
+                getPathThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTime).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone),
+                getPathThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity)
         );
+    }
+
+    private static Command getPathThroughTrenchCommand(
+            FlippablePose2d targetPose,
+            PathConstraints normalPathConstrains,
+            double endVelocity
+    ) {
+        return AutoBuilder.followPath(getPathThroughTrench(
+                targetPose,
+                normalPathConstrains,
+                endVelocity
+        ));
+    }
+
+    private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity) {
+        final List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+                RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(),
+                getTrenchEntryPose(targetPose).get(),
+                getTrenchExitPose(targetPose).get(),
+                targetPose.get()
+        );
+
+        final PathPlannerPath path = new PathPlannerPath(
+                waypoints,
+                normalPathConstrains,
+                null,
+                new GoalEndState(endVelocity, targetPose.get().getRotation())
+        );
+
+        path.preventFlipping = true;
+        return path;
     }
 
     private static Command getDriveSlowlyInAllianceZoneCommand(
@@ -76,9 +119,9 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static FlippablePose2d getTrenchExitPose(FlippablePose2d targetPose) {
-        final FlippablePose2d targetTrenchExitPose = isRight() ?
-                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE) :
-                getClosestPoseToPose(targetPose, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
+        final FlippablePose2d targetTrenchExitPose = isInAllianceZone() ?
+                getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE) :
+                getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE);
         if (targetPose.get().getRotation().getDegrees() > 90 || targetPose.get().getRotation().getDegrees() < -90)
             return new FlippablePose2d(targetTrenchExitPose.get().getTranslation(), RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getRadians(), false);
         return targetTrenchExitPose;
