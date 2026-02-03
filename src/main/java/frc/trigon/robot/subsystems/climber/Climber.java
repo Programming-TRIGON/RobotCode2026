@@ -79,8 +79,9 @@ public class Climber extends MotorSubsystem {
 
     void setTargetState(ClimberConstants.ClimberState targetState) {
         this.targetState = targetState;
-        final int slot = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SLOT : ClimberConstants.NON_CLIMBER_SLOT;
-        scalePositionRequestSpeed(targetState.speedScalar);
+        final int slot = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SLOT : ClimberConstants.NON_CLIMBING_SLOT;
+        final double speedScalar = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SPEED_SCALAR : ClimberConstants.NON_CLIMBING_SPEED_SCALAR;
+        scalePositionRequestSpeed(speedScalar);
         setTargetPositionRotations(metersToRotations(targetState.targetPositionMeters), slot);
     }
 
