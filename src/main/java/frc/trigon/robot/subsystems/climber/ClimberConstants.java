@@ -20,7 +20,7 @@ public class ClimberConstants {
     private static final String MOTOR_NAME = "ClimberMasterMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
-    private static final double GEAR_RATIO = 280;
+    private static final double GEAR_RATIO = 28;
     static final double
             DEFAULT_MAXIMUM_VELOCITY = RobotHardwareStats.isSimulation() ? 80 : 20,
             DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 80 : 50;
@@ -30,7 +30,7 @@ public class ClimberConstants {
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
     private static final double
-            CLIMBER_MASS_KILOGRAMS = 60,
+            CLIMBER_MASS_KILOGRAMS = 1,
             DRUM_RADIUS_METERS = 0.04,
             MAXIMUM_CLIMBER_HEIGHT_METERS = 1.8;
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
@@ -99,10 +99,10 @@ public class ClimberConstants {
         config.Slot1.kP = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot1.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot1.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot1.kS = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot1.kV = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kS = RobotHardwareStats.isSimulation() ? 0.0087929 : 0;
+        config.Slot1.kV = RobotHardwareStats.isSimulation() ? 2.7126 : 0;
         config.Slot1.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot1.kG = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot1.kG = RobotHardwareStats.isSimulation() ? 0.052127 : 0;
 
         config.HardwareLimitSwitch.ReverseLimitEnable = true;
         config.HardwareLimitSwitch.ReverseLimitType = ReverseLimitTypeValue.NormallyOpen;
