@@ -16,8 +16,7 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends MotorSubsystem {
-    private final TalonFXMotor
-            motor = ClimberConstants.MOTOR;
+    private final TalonFXMotor motor = ClimberConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ClimberConstants.FOC_ENABLED);
     private final DynamicMotionMagicVoltage positionRequest = new DynamicMotionMagicVoltage(
             0,
@@ -74,20 +73,17 @@ public class Climber extends MotorSubsystem {
     }
 
 
-    public boolean atTargetExtendedState() {
-        return calculateTargetExtendedStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
+    public boolean atTargetState() {
+        return calculateTargetStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
     }
 
-    void setTargetExtendedState(ClimberConstants.ClimberState targetState) {
+    void setTargetState(ClimberConstants.ClimberState targetState) {
         this.targetState = targetState;
-        scalePositionRequestSpeed(targetState.extendedSpeedScalar);
-        setTargetPositionRotations(metersToRotations(targetState.targetExtendedPositionMeters), ClimberConstants.CLIMBER_WEIGHT_SLOT);
+        final int slot = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SLOT : ClimberConstants.NON_CLIMBER_SLOT;
+        scalePositionRequestSpeed(targetState.speedScalar);
+        setTargetPositionRotations(metersToRotations(targetState.targetPositionMeters), slot);
     }
 
-    void setTargetRetractedState() {
-        scalePositionRequestSpeed(targetState.retractedSpeedScalar);
-        setTargetPositionRotations(metersToRotations(targetState.targetRetractedPositionMeters), ClimberConstants.ROBOT_WEIGHT_SLOT);
-    }
 
     void setTargetPositionRotations(double targetPositionRotations, int slot) {
         motor.setControl(positionRequest.withPosition(targetPositionRotations).withSlot(slot));
@@ -104,8 +100,8 @@ public class Climber extends MotorSubsystem {
         positionRequest.Jerk = positionRequest.Acceleration * 10;
     }
 
-    private double calculateTargetExtendedStateDistance() {
-        return Math.abs(targetState.targetExtendedPositionMeters - getPositionMeters());
+    private double calculateTargetStateDistance() {
+        return Math.abs(targetState.targetPositionMeters - getPositionMeters());
     }
 
     private Pose3d calculateComponentPose() {
@@ -124,7 +120,6 @@ public class Climber extends MotorSubsystem {
     private double getPositionMeters() {
         return rotationsToMeters(getPositionRotations());
     }
-
 
     private double getPositionRotations() {
         return motor.getSignal(TalonFXSignal.POSITION);

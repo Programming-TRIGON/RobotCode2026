@@ -67,8 +67,8 @@ public class ClimberConstants {
     static final double DRUM_DIAMETER_METERS = DRUM_RADIUS_METERS * 2;
     static final double POSITION_TOLERANCE_METERS = 0.07;
     static final double CLIMBER_RESET_VOLTAGE = -0.5;
-    static final int CLIMBER_WEIGHT_SLOT = 0;
-    static final int ROBOT_WEIGHT_SLOT = 1;
+    static final int NON_CLIMBER_SLOT = 0;
+    static final int CLIMBING_SLOT = 1;
 
     static {
         configureMotor();
@@ -129,19 +129,19 @@ public class ClimberConstants {
     }
 
     public enum ClimberState {
-        REST(0, 0, 0.7, 0.7),
-        CLIMB_L1(0.5, 0, 1, 0.5);
+        REST(0, 1, false),
+        CLIMB_PREPARE(0.8, 1, false),
+        CLIMB_L1(0.5, 1, true),
+        CLIMB_DOWN(0.8, 1, true);
 
-        public final double targetExtendedPositionMeters;
-        public final double targetRetractedPositionMeters;
-        final double extendedSpeedScalar;
-        final double retractedSpeedScalar;
+        public final double targetPositionMeters;
+        final double speedScalar;
+        final boolean affectedByRobotWeight;
 
-        ClimberState(double targetExtendedPositionMeters, double targetRetractedPositionMeters, double extendedSpeedScalar, double retractedSpeedScalar) {
-            this.targetExtendedPositionMeters = targetExtendedPositionMeters;
-            this.targetRetractedPositionMeters = targetRetractedPositionMeters;
-            this.extendedSpeedScalar = extendedSpeedScalar;
-            this.retractedSpeedScalar = retractedSpeedScalar;
+        ClimberState(double targetPositionMeters, double speedScalar, boolean affectedByRobotWeight) {
+            this.targetPositionMeters = targetPositionMeters;
+            this.speedScalar = speedScalar;
+            this.affectedByRobotWeight = affectedByRobotWeight;
         }
     }
 }

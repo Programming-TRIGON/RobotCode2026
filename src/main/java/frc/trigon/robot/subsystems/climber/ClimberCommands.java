@@ -10,7 +10,7 @@ import java.util.Set;
 public class ClimberCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotations(targetPosition, ClimberConstants.CLIMBER_WEIGHT_SLOT),
+                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotations(targetPosition, ClimberConstants.NON_CLIMBER_SLOT),
                 false,
                 Set.of(RobotContainer.CLIMBER),
                 "Debugging/ClimberTargetPositionRotations"
@@ -35,7 +35,7 @@ public class ClimberCommands {
 
     public static Command getSetTargetExtendedStateCommand(ClimberConstants.ClimberState targetState) {
         return new StartEndCommand(
-                () -> RobotContainer.CLIMBER.setTargetExtendedState(targetState),
+                () -> RobotContainer.CLIMBER.setTargetState(targetState),
                 RobotContainer.CLIMBER::stop,
                 RobotContainer.CLIMBER
         );
@@ -48,5 +48,4 @@ public class ClimberCommands {
                 RobotContainer.CLIMBER
         );
     }
-
 }
