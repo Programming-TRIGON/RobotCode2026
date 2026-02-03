@@ -14,7 +14,7 @@ public class ClimbCommands {
         );
     }
 
-    public static Command getClimbDownFromL1Command(Trigger continueTrigger) {
+    public static Command getClimbDownFromL1Command() {
         return ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_DOWN);
     }
 }
