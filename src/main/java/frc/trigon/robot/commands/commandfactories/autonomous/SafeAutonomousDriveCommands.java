@@ -9,8 +9,6 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
-import frc.trigon.robot.subsystems.turret.TurretCommands;
-import org.littletonrobotics.junction.AutoLogOutput;
 
 import java.util.function.Supplier;
 
@@ -74,11 +72,26 @@ public class SafeAutonomousDriveCommands {
 
     private static FlippablePose2d getTrenchEntryPose(FlippablePose2d targetPose) {
         final FlippablePose2d targetTrenchEntryPose = isInAllianceZone() ?
-                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE) :
-                getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
+                getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE) :
+                getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
         if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90)
             return new FlippablePose2d(targetTrenchEntryPose.getBlueObject().getTranslation(), Math.PI, true);
         return targetTrenchEntryPose;
+    }
+
+    private static FlippablePose2d getLowestTravelDistancePose(FlippablePose2d targetPose, FlippablePose2d... poses) {
+        FlippablePose2d lowestTravelDistancePose = null;
+        double lowestTravelDistance = Double.MAX_VALUE;
+        for (FlippablePose2d candidatePose : poses) {
+            final double distanceFromRobot = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getDistance(candidatePose.get().getTranslation());
+            final double distanceToTarget = candidatePose.get().getTranslation().getDistance(targetPose.get().getTranslation());
+            final double travelDistance = distanceToTarget + distanceFromRobot;
+            if (travelDistance < lowestTravelDistance) {
+                lowestTravelDistance = travelDistance;
+                lowestTravelDistancePose = candidatePose;
+            }
+        }
+        return lowestTravelDistancePose;
     }
 
     private static FlippablePose2d getClosestPoseToPose(FlippablePose2d pose, FlippablePose2d... poses) {
