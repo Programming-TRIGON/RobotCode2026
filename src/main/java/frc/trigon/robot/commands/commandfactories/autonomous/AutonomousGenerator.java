@@ -110,10 +110,16 @@ public class AutonomousGenerator {
     }
 
     public enum AutonomousState {
-        DELIVERY,
-        SCORE,
-        COLLECT_FROM_DEPOT,
-        COLLECT_FROM_NEUTRAL_ZONE
+        DELIVERY(false),
+        SCORE(true),
+        COLLECT_FROM_DEPOT(true),
+        COLLECT_FROM_NEUTRAL_ZONE(false);
+
+        final boolean isInAllianceZone;
+
+        AutonomousState(boolean isInAllianceZone) {
+            this.isInAllianceZone = isInAllianceZone;
+        }
     }
 
     public enum AutonomousClimbPosition {

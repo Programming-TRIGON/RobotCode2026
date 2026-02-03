@@ -113,7 +113,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      *
      * ── Geometry (intake at BACK, i.e. 180° in robot frame) ──
      * The intake tip is (ROBOT_HALF_WIDTH + INTAKE_REACH) behind the robot
-     * centre.  In world frame:
+     * center.  In world frame:
      *     tipX = robotX  –  intakeLength * cos(heading)
      *
      * Require tipX >= effectiveWallX:
@@ -190,10 +190,9 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     private boolean shouldDrive() {
         Translation2d error = getTranslationError();
-        if (error == null) return false;
-        if (error.getNorm() <= AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS)
+        if (error == null)
             return false;
-        return true;
+        return !(error.getNorm() <= AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS);
     }
 
     /**
