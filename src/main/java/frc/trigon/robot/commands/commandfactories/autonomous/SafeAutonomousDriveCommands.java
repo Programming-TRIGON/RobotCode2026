@@ -1,15 +1,19 @@
 package frc.trigon.robot.commands.commandfactories.autonomous;
 
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
+import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.Supplier;
 
@@ -23,19 +27,25 @@ public class SafeAutonomousDriveCommands {
     }
 
     public static Command getSafeDriveToPoseCommand(
-            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains,
-            double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
+            Supplier<FlippablePose2d> targetPose,
+            PathConstraints normalPathConstrains,
+            double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints,
+            double driveSlowlyInAllianceZoneTime
     ) {
         return new ConditionalCommand(
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
                 getDriveSlowlyInAllianceZoneCommand(targetPose, AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
                 () -> shouldDriveThroughTrench(targetPose.get())
-        );
+        ).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/ShouldDriveThroughTrench", shouldDriveThroughTrench(targetPose.get()))));
     }
 
     private static Command getDriveThroughTrenchCommand(
-            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains,
-            double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
+            Supplier<FlippablePose2d> targetPose,
+            PathConstraints normalPathConstrains,
+            double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints,
+            double driveSlowlyInAllianceZoneTime
     ) {
         return new SequentialCommandGroup(
                 getDriveSlowlyInAllianceZoneCommand(() -> getTrenchEntryPose(targetPose.get()), normalPathConstrains, 4, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTime),
@@ -45,8 +55,11 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static Command getDriveSlowlyInAllianceZoneCommand(
-            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains,
-            double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime
+            Supplier<FlippablePose2d> targetPose,
+            PathConstraints normalPathConstrains,
+            double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints,
+            double driveSlowlyInAllianceZoneTime
     ) {
         if (driveSlowlyInAllianceZoneTime == 0)
             return SwerveCommands.getDriveToPoseCommand(targetPose, normalPathConstrains, endVelocity);
@@ -59,15 +72,15 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static boolean shouldDriveThroughTrench(FlippablePose2d targetPose) {
-        return (!isInAllianceZone() && isPoseInAllianceZone(targetPose)) || (isInAllianceZone() && !isPoseInAllianceZone(targetPose));
+        return (!isInAllianceZone() && isPoseInAllianceZone(targetPose.get())) || (isInAllianceZone() && !isPoseInAllianceZone(targetPose.get()));
     }
 
     private static FlippablePose2d getTrenchExitPose(FlippablePose2d targetPose) {
         final FlippablePose2d targetTrenchExitPose = isRight() ?
                 getClosestPoseToPose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE) :
                 getClosestPoseToPose(targetPose, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
-        if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90 || RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() < -90)
-            return new FlippablePose2d(targetTrenchExitPose.getBlueObject().getTranslation(), Math.PI, true);
+        if (targetPose.get().getRotation().getDegrees() > 90 || targetPose.get().getRotation().getDegrees() < -90)
+            return new FlippablePose2d(targetTrenchExitPose.get().getTranslation(), RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getRadians(), false);
         return targetTrenchExitPose;
     }
 
@@ -75,8 +88,8 @@ public class SafeAutonomousDriveCommands {
         final FlippablePose2d targetTrenchEntryPose = isInAllianceZone() ?
                 getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE) :
                 getLowestTravelDistancePose(targetPose, FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE, FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
-        if (RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation().getDegrees() > 90)
-            return new FlippablePose2d(targetTrenchEntryPose.getBlueObject().getTranslation(), Math.PI, true);
+        if (targetPose.get().getRotation().getDegrees() > 90 || targetPose.get().getRotation().getDegrees() < -90)
+            return new FlippablePose2d(targetTrenchEntryPose.getBlueObject().getTranslation(), 0, true);
         return targetTrenchEntryPose;
     }
 
@@ -115,10 +128,12 @@ public class SafeAutonomousDriveCommands {
     }
 
     public static boolean isInAllianceZone() {
-        return isPoseInAllianceZone(new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true));
+        return isPoseInAllianceZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose());
     }
 
-    private static boolean isPoseInAllianceZone(FlippablePose2d pose) {
-        return pose.get().getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
+    private static boolean isPoseInAllianceZone(Pose2d pose) {
+        if (Flippable.isRedAlliance())
+            return pose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
+        return pose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 }

@@ -20,6 +20,7 @@ import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -81,7 +82,9 @@ public class GeneralAutonomousCommands {
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
-                new GamePieceAutoDriveCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
+                new PrintCommand("Arrived at depot, starting collection"),
+                new GamePieceAutoDriveCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout),
+                new PrintCommand("Finished depot collection")
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 

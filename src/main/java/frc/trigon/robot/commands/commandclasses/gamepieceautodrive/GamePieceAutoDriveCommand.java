@@ -9,6 +9,7 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     private FlippableRotation2d getTargetHeading() {
         FlippableRotation2d heading = commandedHeading.get();
         if (heading == null) heading = lastValidHeading;
+        Logger.recordOutput("GamePieceAutoDrive/RawApproachHeadingDeg", heading == null ? 99999999 : heading.get().getDegrees());
         return clampHeadingForWall(heading);
     }
 
@@ -170,6 +172,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         Translation2d error = getTranslationError();
         if (error == null) return 0.0;
         double output = AutonomousConstants.GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER.calculate(-error.getX());
+        Logger.recordOutput("GamePieceAutoDrive/X", output * getIntakeSpeedScale());
         return output * getIntakeSpeedScale();
     }
 
@@ -178,6 +181,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         Translation2d error = getTranslationError();
         if (error == null) return 0.0;
         double output = AutonomousConstants.GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER.calculate(-error.getY());
+        Logger.recordOutput("GamePieceAutoDrive/Y", output * getIntakeSpeedScale());
         return output * getIntakeSpeedScale();
     }
 
