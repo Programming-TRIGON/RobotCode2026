@@ -6,9 +6,11 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.phoenix6.Phoenix6SignalThread;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.misc.MechanismCameraTransformCalculator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,8 +18,15 @@ public class Intake extends MotorSubsystem {
     private final TalonFXMotor angleMotor = IntakeConstants.ANGLE_MOTOR;
     private final TalonFXMotor intakeMotor = IntakeConstants.INTAKE_MOTOR;
     private final CANcoderEncoder angleEncoder = IntakeConstants.ANGLE_ENCODER;
+    private final MechanismCameraTransformCalculator intakeCameraTransformCalculator = new MechanismCameraTransformCalculator(
+            IntakeConstants.INTAKE_ANGLE_HISTORY_SIZE_SECONDS,
+            IntakeConstants.INTAKE_ORIGIN_POINT_FOR_CAMERA_CALCULATION,
+            this::getCurrentArmAngle,
+            false
+    );
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
+    private double[] latestThreadedAngles = new double[0];
     private IntakeConstants.IntakeState targetState = IntakeConstants.IntakeState.REST;
 
     public Intake() {
@@ -62,7 +71,6 @@ public class Intake extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        angleMotor.update();
         intakeMotor.update();
         angleEncoder.update();
         Logger.recordOutput("Intake/CurrentPositionDegrees", getCurrentArmAngle().getDegrees());
@@ -73,6 +81,23 @@ public class Intake extends MotorSubsystem {
         angleMotor.stopMotor();
         intakeMotor.stopMotor();
         IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(0);
+    }
+
+    public Transform3d calculateIntakeCameraTransformAtTime(double timestampSeconds) {
+        return intakeCameraTransformCalculator.calculateRobotToCameraAtTime(timestampSeconds, IntakeConstants.ORIGIN_TO_CAMERA_TRANSFORM);
+    }
+
+    public void updateLatestThreadedPositions() { // TODO: This function and logic are ugly. Find a better way to do this, perhaps in the Phoenix6SignalThread class itself.
+        angleMotor.update();
+        latestThreadedAngles = angleMotor.getThreadedSignal(TalonFXSignal.POSITION);
+    }
+
+    public void updateCameraTransforms() {
+        intakeCameraTransformCalculator.update(
+                latestThreadedAngles,
+                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
+                angleMotor.getSignal(TalonFXSignal.VELOCITY)
+        );
     }
 
     public boolean atState(IntakeConstants.IntakeState targetState) {
