@@ -10,15 +10,11 @@ import java.util.Set;
 public class ClimberCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotations(targetPosition, ClimberConstants.NON_CLIMBING_SLOT),
+                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotationsAndMotionMagicSlot(targetPosition, ClimberConstants.NON_CLIMBING_SLOT),
                 false,
                 Set.of(RobotContainer.CLIMBER),
                 "Debugging/ClimberTargetPositionRotations"
         );
-    }
-
-    public static boolean IS_CLIMBING(){
-        return RobotContainer.CLIMBER.atState(ClimberConstants.ClimberState.CLIMB_PREPARE);
     }
 
     public static Command getResetPositionCommand() {

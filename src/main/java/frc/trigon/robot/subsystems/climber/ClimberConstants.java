@@ -26,13 +26,13 @@ public class ClimberConstants {
             DEFAULT_MAXIMUM_ACCELERATION = RobotHardwareStats.isSimulation() ? 80 : 50;
     static final boolean FOC_ENABLED = true;
 
-    static final double MINIMUM_CLIMBER_HEIGHT_METERS = 0.73;
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
     private static final double
             CLIMBER_MASS_KILOGRAMS = 1,
             DRUM_RADIUS_METERS = 0.04,
-            MAXIMUM_CLIMBER_HEIGHT_METERS = 1.8;
+            MINIMUM_CLIMBER_HEIGHT_METERS = 0,
+            MAXIMUM_CLIMBER_HEIGHT_METERS = 1;
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
     private static final ElevatorSimulation SIMULATION = new ElevatorSimulation(
             GEARBOX,
