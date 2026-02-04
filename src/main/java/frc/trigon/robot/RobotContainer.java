@@ -25,8 +25,6 @@ import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimator;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.climber.Climber;
-import frc.trigon.robot.subsystems.climber.ClimberCommands;
-import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.Hood;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.Intake;
@@ -88,7 +86,7 @@ public class RobotContainer {
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
         TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
-        CLIMBER.setDefaultCommand(ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.REST));
+        CLIMBER.setDefaultCommand(ClimbCommands.getClimberDefaultCommand());
     }
 
     private void bindControllerCommands() {
@@ -110,8 +108,7 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
-        OperatorConstants.CANCEL_CLIMB_TRIGGER.onTrue(ClimbCommands.getSetDefaultCommandToRestCommand());
-        OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command().until(OperatorConstants.CANCEL_CLIMB_TRIGGER));
+        OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

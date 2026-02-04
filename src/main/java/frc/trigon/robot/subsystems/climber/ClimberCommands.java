@@ -10,7 +10,7 @@ import java.util.Set;
 public class ClimberCommands {
     public static Command getDebuggingCommand() {
         return new NetworkTablesCommand(
-                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotationsAndMotionMagicSlot(targetPosition, ClimberConstants.NON_CLIMBING_SLOT),
+                (targetPosition) -> RobotContainer.CLIMBER.setTargetPositionRotations(targetPosition, ClimberConstants.NON_CLIMBING_SLOT),
                 false,
                 Set.of(RobotContainer.CLIMBER),
                 "Debugging/ClimberTargetPositionRotations"
@@ -19,7 +19,7 @@ public class ClimberCommands {
 
     public static Command getResetPositionCommand() {
         return new StartEndCommand(
-                RobotContainer.CLIMBER::resetPosition,
+                RobotContainer.CLIMBER::zeroPosition,
                 RobotContainer.CLIMBER::stop,
                 RobotContainer.CLIMBER
         );

@@ -90,15 +90,14 @@ public class Climber extends MotorSubsystem {
         final int slot = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SLOT : ClimberConstants.NON_CLIMBING_SLOT;
         final double speedScalar = targetState.affectedByRobotWeight ? ClimberConstants.CLIMBING_SPEED_SCALAR : ClimberConstants.NON_CLIMBING_SPEED_SCALAR;
         scalePositionRequestSpeed(speedScalar);
-        setTargetPositionRotationsAndMotionMagicSlot(metersToRotations(targetState.targetPositionMeters), slot);
+        setTargetPositionRotations(metersToRotations(targetState.targetPositionMeters), slot);
     }
 
-
-    void setTargetPositionRotationsAndMotionMagicSlot(double targetPositionRotations, int slot) {
+    void setTargetPositionRotations(double targetPositionRotations, int slot) {
         motor.setControl(positionRequest.withPosition(targetPositionRotations).withSlot(slot));
     }
 
-    void resetPosition() {
+    void zeroPosition() {
         targetState = ClimberConstants.ClimberState.REST;
         motor.setControl(voltageRequest.withOutput(ClimberConstants.CLIMBER_RESET_VOLTAGE));
     }
