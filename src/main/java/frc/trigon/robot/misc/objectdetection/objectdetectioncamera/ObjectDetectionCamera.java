@@ -19,8 +19,8 @@ public class ObjectDetectionCamera extends SubsystemBase {
     private final String hostname;
     private final DynamicCameraTransform dynamicCameraTransform;
 
-    public ObjectDetectionCamera(String hostname, Transform3d dynamicCameraTransform) {
-        this(hostname, new DynamicCameraTransform(dynamicCameraTransform));
+    public ObjectDetectionCamera(String hostname, Transform3d robotCenterToCamera) {
+        this(hostname, new DynamicCameraTransform(robotCenterToCamera));
     }
 
     public ObjectDetectionCamera(String hostname, DynamicCameraTransform dynamicCameraTransform) {
