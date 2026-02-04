@@ -25,7 +25,7 @@ public class MechanismCameraTransformCalculator {
     }
 
     public void update(double[] positions, double[] timestamps, double velocityRotationsPerSecond) {
-        if (positions.length > timestamps.length) {
+        if (positions.length != timestamps.length) {
             System.out.println("Mechanism positions and timestamps arrays must have the same length. " +
                     "Positions length: " + positions.length + ", Timestamps length: " + timestamps.length);
             return;
