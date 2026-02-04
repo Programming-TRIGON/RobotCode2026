@@ -98,8 +98,8 @@ public class IntakeConstants {
             new Rotation3d(0, 0, 0)
     );
     static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.19, -0.3, 0.04),
-            new Rotation3d(0, Math.toRadians(36), Math.toRadians(30))
+            new Translation3d(0.19, -0.3, 0.3),
+            new Rotation3d(0, Math.toRadians(20), Math.toRadians(30))
     );
 
     static {

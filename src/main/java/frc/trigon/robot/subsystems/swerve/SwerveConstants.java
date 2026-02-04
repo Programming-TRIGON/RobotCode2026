@@ -99,6 +99,7 @@ public class SwerveConstants {
         configurePIDControllers();
     }
 
+    @SuppressWarnings("all")
     private static void configureGyro() {
         final Pigeon2Configuration config = new Pigeon2Configuration();
         //TODO:Calibrate

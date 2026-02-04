@@ -8,17 +8,20 @@ import java.util.function.Supplier;
 
 public class MechanismCameraTransformCalculator {
     private final TimeInterpolatableBuffer<Rotation2d> angleBuffer;
-    private final Supplier<Rotation2d> fallbackAngleSupplier;
     private final Pose3d mechanismOrigin;
+    private final Supplier<Rotation2d> fallbackAngleSupplier;
+    private final boolean isYawMechanism;
     private double latestVelocityRotationsPerSecond = 0.0;
 
     public MechanismCameraTransformCalculator(
             double historyBufferSizeSeconds,
             Pose3d mechanismOrigin,
-            Supplier<Rotation2d> fallbackAngleSupplier) {
+            Supplier<Rotation2d> fallbackAngleSupplier,
+            boolean isYawMechanism) {
         this.angleBuffer = TimeInterpolatableBuffer.createBuffer(Rotation2d::interpolate, historyBufferSizeSeconds);
         this.mechanismOrigin = mechanismOrigin;
         this.fallbackAngleSupplier = fallbackAngleSupplier;
+        this.isYawMechanism = isYawMechanism;
     }
 
     public void update(double[] positions, double[] timestamps, double velocityRotationsPerSecond) {
@@ -37,7 +40,7 @@ public class MechanismCameraTransformCalculator {
         final Rotation2d angle = calculateAngleAtTime(timestampSeconds);
         final Transform3d rotationTransform = new Transform3d(
                 new Translation3d(),
-                new Rotation3d(0, 0, angle.getRadians())
+                new Rotation3d(0, isYawMechanism ? 0 : -angle.getRadians(), isYawMechanism ? angle.getRadians() : 0)
         );
         final Pose3d rotatedOrigin = mechanismOrigin.plus(rotationTransform);
         final Pose3d cameraPose = rotatedOrigin.plus(mechanismToCameraTransform);

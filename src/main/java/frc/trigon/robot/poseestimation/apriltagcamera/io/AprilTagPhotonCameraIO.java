@@ -27,7 +27,7 @@ import java.util.Optional;
 
 public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
     protected final DynamicCameraTransform dynamicCameraTransform;
-    final PhotonCamera photonCamera;
+    protected final PhotonCamera photonCamera;
 
     public AprilTagPhotonCameraIO(String cameraName, DynamicCameraTransform dynamicCameraTransform) {
         photonCamera = new PhotonCamera(cameraName);

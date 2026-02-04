@@ -122,19 +122,19 @@ public class AprilTagCamera {
         if (!inputs.hasConstrainedResult || isWithinBestTagRangeForAccurateSolvePNPResult())
             return chooseBestNormalSolvePNPPose();
 
-        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
+        return cameraPoseToRobotPose(inputs.constrainedSolvePNPPose, getLatestResultTimestampSeconds());
     }
 
     private Pose2d chooseBestNormalSolvePNPPose() {
-        final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
+        final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose, getLatestResultTimestampSeconds());
 
         if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose))
             return bestPose;
         if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1 || DriverStation.isDisabled())
             return bestPose;
 
-        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose.toPose2d(), inputs.latestResultTimestampSeconds);
-        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(inputs.latestResultTimestampSeconds).getRotation();
+        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose, getLatestResultTimestampSeconds());
+        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(getLatestResultTimestampSeconds()).getRotation();
 
         final double bestAngleDifference = Math.abs(bestPose.getRotation().minus(robotAngleAtResultTime).getRadians());
         final double alternateAngleDifference = Math.abs(alternatePose.getRotation().minus(robotAngleAtResultTime).getRadians());
@@ -142,8 +142,8 @@ public class AprilTagCamera {
         return bestAngleDifference > alternateAngleDifference ? alternatePose : bestPose;
     }
 
-    private Pose2d cameraPoseToRobotPose(Pose2d cameraPose, double resultTimestampSeconds) {
-        return dynamicCameraTransform.calculate2dRobotPose(cameraPose, resultTimestampSeconds);
+    private Pose2d cameraPoseToRobotPose(Pose3d cameraPose, double resultTimestampSeconds) {
+        return dynamicCameraTransform.calculate2dRobotPose(cameraPose.toPose2d(), resultTimestampSeconds);
     }
 
     /**

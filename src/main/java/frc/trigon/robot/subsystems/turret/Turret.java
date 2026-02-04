@@ -30,7 +30,8 @@ public class Turret extends MotorSubsystem {
     private final MechanismCameraTransformCalculator turretCameraTransformCalculator = new MechanismCameraTransformCalculator(
             TurretConstants.TURRET_ANGLE_HISTORY_SIZE_SECONDS,
             TurretConstants.TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION,
-            this::getCurrentSelfRelativeAngle
+            this::getCurrentSelfRelativeAngle,
+            true
     );
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);

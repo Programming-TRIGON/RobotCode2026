@@ -21,7 +21,8 @@ public class Intake extends MotorSubsystem {
     private final MechanismCameraTransformCalculator intakeCameraTransformCalculator = new MechanismCameraTransformCalculator(
             IntakeConstants.INTAKE_ANGLE_HISTORY_SIZE_SECONDS,
             IntakeConstants.INTAKE_ORIGIN_POINT_FOR_CAMERA_CALCULATION,
-            this::getCurrentArmAngle
+            this::getCurrentArmAngle,
+            false
     );
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(IntakeConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(IntakeConstants.FOC_ENABLED);

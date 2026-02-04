@@ -54,6 +54,17 @@ public class DynamicCameraTransform {
     }
 
     /**
+     * Gets the 2D transform from camera to robot center.
+     * Only x, y, and yaw components are preserved to avoid pitch and roll inaccuracies.
+     *
+     * @param timestampSeconds the timestamp for the transform
+     * @return the 2D transform from camera to robot center
+     */
+    public Transform2d get2dCameraToRobotCenter(double timestampSeconds) {
+        return get2dRobotCenterToCamera(timestampSeconds).inverse();
+    }
+
+    /**
      * Gets the 2D transform from robot center to camera.
      * Only x, y, and yaw components are preserved to avoid pitch and roll inaccuracies.
      *
@@ -65,14 +76,13 @@ public class DynamicCameraTransform {
     }
 
     /**
-     * Gets the 2D transform from camera to robot center.
-     * Only x, y, and yaw components are preserved to avoid pitch and roll inaccuracies.
+     * Gets the 3D transform from camera to robot center.
      *
      * @param timestampSeconds the timestamp for the transform
-     * @return the 2D transform from camera to robot center
+     * @return the 3D transform from camera to robot center
      */
-    public Transform2d get2dCameraToRobotCenter(double timestampSeconds) {
-        return toTransform2d(get3dCameraToRobotCenter(timestampSeconds));
+    public Transform3d get3dCameraToRobotCenter(double timestampSeconds) {
+        return get3dRobotCenterToCamera(timestampSeconds).inverse();
     }
 
     /**
@@ -83,16 +93,6 @@ public class DynamicCameraTransform {
      */
     public Transform3d get3dRobotCenterToCamera(double timestampSeconds) {
         return robotCenterToCameraFunction.apply(timestampSeconds);
-    }
-
-    /**
-     * Gets the 3D transform from camera to robot center.
-     *
-     * @param timestampSeconds the timestamp for the transform
-     * @return the 3D transform from camera to robot center
-     */
-    public Transform3d get3dCameraToRobotCenter(double timestampSeconds) {
-        return get3dRobotCenterToCamera(timestampSeconds).inverse();
     }
 
     /**

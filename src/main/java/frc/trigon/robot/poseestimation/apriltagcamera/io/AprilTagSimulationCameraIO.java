@@ -16,7 +16,7 @@ public class AprilTagSimulationCameraIO extends AprilTagPhotonCameraIO {
 
         cameraSimulation = new PhotonCameraSim(photonCamera, AprilTagCameraConstants.SIMULATION_CAMERA_PROPERTIES);
         cameraSimulation.enableDrawWireframe(true);
-        CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(3, () -> AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()))));
+        CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(0.5, () -> AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()))));
     }
 
     @Override
