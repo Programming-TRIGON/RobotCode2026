@@ -11,6 +11,7 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
@@ -130,8 +131,24 @@ public class Turret extends MotorSubsystem {
         setTargetFieldRelativeAngle(targetFieldRelativeYaw);
     }
 
-    void alignToClosestAprilTag() {
-        // TODO: add logic
+    FlippablePose2d alignToClosestAprilTag() {
+        double minimumDistance = Double.POSITIVE_INFINITY;
+        Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        FlippablePose2d closestTag = null;
+
+        for (Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
+            FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), true);
+            Pose2d currentTagPose = tagPose.get();
+            double xToTagMeters = currentTagPose.getX() - robotPose.getX();
+            double yToTagMeters = currentTagPose.getY() - robotPose.getY();
+            double distance = Math.hypot(xToTagMeters, yToTagMeters);
+
+            if (distance < minimumDistance) {
+                minimumDistance = distance;
+                closestTag = tagPose;
+            }
+        }
+        return closestTag;
     }
 
     void alignForDelivery() {
