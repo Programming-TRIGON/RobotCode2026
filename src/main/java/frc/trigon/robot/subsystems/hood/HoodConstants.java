@@ -19,8 +19,8 @@ import frc.trigon.robot.subsystems.turret.TurretConstants;
 
 public class HoodConstants {
     private static final int
-            MOTOR_ID = 18,
-            ENCODER_ID = 18;
+            MOTOR_ID = 19,
+            ENCODER_ID = 19;
     private static final String
             MOTOR_NAME = "HoodMotor",
             ENCODER_NAME = "HoodEncoder";

@@ -16,7 +16,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class Intake extends MotorSubsystem {
     private final TalonFXMotor angleMotor = IntakeConstants.ANGLE_MOTOR;
-    private final TalonFXMotor intakeMotor = IntakeConstants.INTAKE_MOTOR;
+    private final TalonFXMotor masterIntakeMotor = IntakeConstants.MASTER_INTAKE_MOTOR;
+    private final TalonFXMotor followerIntakeMotor = IntakeConstants.FOLLOWER_INTAKE_MOTOR;
     private final CANcoderEncoder angleEncoder = IntakeConstants.ANGLE_ENCODER;
     private final MechanismCameraTransformCalculator intakeCameraTransformCalculator = new MechanismCameraTransformCalculator(
             IntakeConstants.INTAKE_ANGLE_HISTORY_SIZE_SECONDS,
@@ -47,7 +48,7 @@ public class Intake extends MotorSubsystem {
                 getCurrentArmAngle(),
                 Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
         );
-        IntakeConstants.INTAKE_MOTOR_MECHANISM.update(
+        IntakeConstants.MASTER_INTAKE_MOTOR_MECHANISM.update(
                 getCurrentIntakeVoltage()
         );
 
@@ -71,7 +72,7 @@ public class Intake extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        intakeMotor.update();
+        masterIntakeMotor.update();
         angleEncoder.update();
         Logger.recordOutput("Intake/CurrentPositionDegrees", getCurrentArmAngle().getDegrees());
     }
@@ -79,8 +80,9 @@ public class Intake extends MotorSubsystem {
     @Override
     public void stop() {
         angleMotor.stopMotor();
-        intakeMotor.stopMotor();
-        IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(0);
+        masterIntakeMotor.stopMotor();
+        followerIntakeMotor.stopMotor();
+        IntakeConstants.MASTER_INTAKE_MOTOR_MECHANISM.setTargetVelocity(0);
     }
 
     public Transform3d calculateIntakeCameraTransformAtTime(double timestampSeconds) {
@@ -129,12 +131,12 @@ public class Intake extends MotorSubsystem {
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {
-        IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(targetVoltage);
-        intakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
+        IntakeConstants.MASTER_INTAKE_MOTOR_MECHANISM.setTargetVelocity(targetVoltage);
+        masterIntakeMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     private double getCurrentIntakeVoltage() {
-        return intakeMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE);
+        return masterIntakeMotor.getSignal(TalonFXSignal.MOTOR_VOLTAGE);
     }
 
     private Pose3d calculateVisualizationPose() {
