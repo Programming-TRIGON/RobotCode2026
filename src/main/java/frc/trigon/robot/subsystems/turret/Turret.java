@@ -134,13 +134,17 @@ public class Turret extends MotorSubsystem {
     FlippablePose2d alignToClosestAprilTag() {
         double minimumDistance = Double.POSITIVE_INFINITY;
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        FlippablePose2d flippableRobotPose = new FlippablePose2d(robotPose, true); // הפוך לפי alliance
+        Pose2d robotPoseFlipped = flippableRobotPose.get();
+
         FlippablePose2d closestTag = null;
 
         for (Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
             FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), true);
             Pose2d currentTagPose = tagPose.get();
-            double xToTagMeters = currentTagPose.getX() - robotPose.getX();
-            double yToTagMeters = currentTagPose.getY() - robotPose.getY();
+
+            double xToTagMeters = currentTagPose.getX() - robotPoseFlipped.getX();
+            double yToTagMeters = currentTagPose.getY() - robotPoseFlipped.getY();
             double distance = Math.hypot(xToTagMeters, yToTagMeters);
 
             if (distance < minimumDistance) {
@@ -148,6 +152,7 @@ public class Turret extends MotorSubsystem {
                 closestTag = tagPose;
             }
         }
+
         return closestTag;
     }
 
