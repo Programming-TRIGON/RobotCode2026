@@ -27,9 +27,6 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.climber.Climber;
 import frc.trigon.robot.subsystems.climber.ClimberCommands;
 import frc.trigon.robot.subsystems.climber.ClimberConstants;
-import frc.trigon.robot.subsystems.shooter.Shooter;
-import frc.trigon.robot.subsystems.shooter.ShooterCommands;
-import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.hood.Hood;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.Intake;
@@ -37,9 +34,12 @@ import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.loader.Loader;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
+import frc.trigon.robot.subsystems.shooter.Shooter;
+import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.spindexer.Spindexer;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
+import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.turret.Turret;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -110,6 +110,7 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
+        OperatorConstants.CANCEL_CLIMB_TRIGGER.onTrue(ClimbCommands.getSetDefaultCommandToRestCommand());
         OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command().until(OperatorConstants.CANCEL_CLIMB_TRIGGER));
     }
 
