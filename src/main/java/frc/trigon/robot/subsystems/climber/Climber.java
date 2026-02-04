@@ -73,7 +73,7 @@ public class Climber extends MotorSubsystem {
     }
 
     public boolean isClimbing() {
-        return atState(ClimberConstants.ClimberState.CLIMB_PREPARE);
+        return targetState == ClimberConstants.ClimberState.CLIMB_PREPARE;
     }
 
     public boolean atTargetState() {
