@@ -14,6 +14,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.misc.MechanismCameraTransformCalculator;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -26,6 +27,11 @@ public class Turret extends MotorSubsystem {
             masterMotor = TurretConstants.MASTER_MOTOR,
             followerMotor = TurretConstants.FOLLOWER_MOTOR;
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
+    private final MechanismCameraTransformCalculator turretCameraTransformCalculator = new MechanismCameraTransformCalculator(
+            TurretConstants.TURRET_ANGLE_HISTORY_SIZE_SECONDS,
+            TurretConstants.TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION,
+            this::getCurrentSelfRelativeAngle
+    );
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private double[] latestThreadedPositions = new double[0];
@@ -87,13 +93,21 @@ public class Turret extends MotorSubsystem {
         targetSelfRelativeAngle = new Rotation2d();
     }
 
+    public Transform3d calculateRightCameraTransformAtTime(double timestampSeconds) {
+        return turretCameraTransformCalculator.calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_RIGHT_CAMERA_TRANSFORM);
+    }
+
+    public Transform3d calculateLeftCameraTransformAtTime(double timestampSeconds) {
+        return turretCameraTransformCalculator.calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_LEFT_CAMERA_TRANSFORM);
+    }
+
     public void updateLatestThreadedPositions() { // TODO: This function and logic are ugly. Find a better way to do this, perhaps in the Phoenix6SignalThread class itself.
         masterMotor.update();
         latestThreadedPositions = masterMotor.getThreadedSignal(TalonFXSignal.POSITION);
     }
 
     public void updateCameraTransforms() {
-        TurretCameraTransformCalculator.getInstance().update(
+        turretCameraTransformCalculator.update(
                 latestThreadedPositions,
                 Phoenix6SignalThread.getInstance().getLatestTimestamps(),
                 masterMotor.getSignal(TalonFXSignal.VELOCITY)

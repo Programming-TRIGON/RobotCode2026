@@ -3,10 +3,7 @@ package frc.trigon.robot.subsystems.intake;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.*;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
@@ -20,6 +17,7 @@ import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
 import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
+import frc.trigon.robot.constants.RobotConstants;
 
 public class IntakeConstants {
     private static final int
@@ -31,9 +29,9 @@ public class IntakeConstants {
             ANGLE_MOTOR_NAME = "IntakeAngleMotor",
             ANGLE_ENCODER_NAME = "IntakeAngleEncoder";
     static final TalonFXMotor
-            INTAKE_MOTOR = new TalonFXMotor(INTAKE_MOTOR_ID, INTAKE_MOTOR_NAME),
+            INTAKE_MOTOR = new TalonFXMotor(INTAKE_MOTOR_ID, INTAKE_MOTOR_NAME, RobotConstants.CANIVORE_NAME),
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
-    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME);
+    static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     private static final double ANGLE_MOTOR_GEAR_RATIO = 40;
     private static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
@@ -94,6 +92,15 @@ public class IntakeConstants {
     );
 
     static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
+    static final double INTAKE_ANGLE_HISTORY_SIZE_SECONDS = 2;
+    static final Pose3d INTAKE_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
+            new Translation3d(0.14985, 0, 0.13525),
+            new Rotation3d(0, 0, 0)
+    );
+    static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
+            new Translation3d(0.19, -0.3, 0.04),
+            new Rotation3d(0, Math.toRadians(36), Math.toRadians(30))
+    );
 
     static {
         configureAngleMotor();
@@ -132,11 +139,11 @@ public class IntakeConstants {
 
         ANGLE_MOTOR.applyConfiguration(config);
         ANGLE_MOTOR.setPhysicsSimulation(INTAKE_ANGLE_SIMULATION);
-        ANGLE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        ANGLE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         ANGLE_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        ANGLE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 250);
+        ANGLE_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
     private static void configureIntakeMotor() {
@@ -169,8 +176,8 @@ public class IntakeConstants {
         ANGLE_ENCODER.applyConfiguration(config);
         ANGLE_ENCODER.setSimulationInputsFromTalonFX(ANGLE_MOTOR);
 
-        ANGLE_ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
-        ANGLE_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
+        ANGLE_ENCODER.registerSignal(CANcoderSignal.POSITION, 250);
+        ANGLE_ENCODER.registerSignal(CANcoderSignal.VELOCITY, 250);
     }
 
     public enum IntakeState {

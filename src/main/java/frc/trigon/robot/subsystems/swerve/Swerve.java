@@ -314,6 +314,7 @@ public class Swerve extends MotorSubsystem {
 
         RobotContainer.ROBOT_POSE_ESTIMATOR.updatePoseEstimatorOdometry(swerveWheelPositions, gyroRotations, phoenix6SignalThread.getLatestTimestamps());
         RobotContainer.TURRET.updateCameraTransforms();
+        RobotContainer.INTAKE.updateCameraTransforms();
     }
 
     private SwerveModulePosition[] getSwerveWheelPositions(int odometryUpdateIndex) {
@@ -363,6 +364,7 @@ public class Swerve extends MotorSubsystem {
 
         phoenix6SignalThread.updateLatestTimestamps();
         RobotContainer.TURRET.updateLatestThreadedPositions();
+        RobotContainer.INTAKE.updateLatestThreadedPositions();
     }
 
     @AutoLogOutput(key = "Swerve/CurrentStates")
