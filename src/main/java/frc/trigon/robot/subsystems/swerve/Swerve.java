@@ -58,9 +58,12 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Phoenix6SignalThread.SIGNALS_LOCK.lock();
-        updateHardware();
-        Phoenix6SignalThread.SIGNALS_LOCK.unlock();
+        Phoenix6SignalThread.QUEUES_LOCK.lock();
+        try {
+            updateHardware();
+        } finally {
+            Phoenix6SignalThread.QUEUES_LOCK.unlock();
+        }
 
         updatePoseEstimatorStates();
         RobotContainer.ROBOT_POSE_ESTIMATOR.periodic();
@@ -313,6 +316,8 @@ public class Swerve extends MotorSubsystem {
         }
 
         RobotContainer.ROBOT_POSE_ESTIMATOR.updatePoseEstimatorOdometry(swerveWheelPositions, gyroRotations, phoenix6SignalThread.getLatestTimestamps());
+        RobotContainer.TURRET.updateCameraTransforms();
+        RobotContainer.INTAKE.updateCameraTransforms();
     }
 
     private SwerveModulePosition[] getSwerveWheelPositions(int odometryUpdateIndex) {
@@ -361,6 +366,8 @@ public class Swerve extends MotorSubsystem {
             currentModule.updatePeriodically();
 
         phoenix6SignalThread.updateLatestTimestamps();
+        RobotContainer.TURRET.updateLatestThreadedPositions();
+        RobotContainer.INTAKE.updateLatestThreadedPositions();
     }
 
     @AutoLogOutput(key = "Swerve/CurrentStates")

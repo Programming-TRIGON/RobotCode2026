@@ -42,7 +42,7 @@ public class FieldConstants {
         try {
             return SHOULD_USE_HOME_TAG_LAYOUT ?
                     new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "field_calibration.json") :
-                    AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+                    AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

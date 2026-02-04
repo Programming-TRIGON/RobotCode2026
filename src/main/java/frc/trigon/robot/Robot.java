@@ -12,6 +12,7 @@ import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.hardware.phoenix6.Phoenix6Inputs;
 import frc.trigon.robot.constants.RobotConstants;
 import frc.trigon.robot.misc.simulatedfield.SimulationFieldHandler;
+import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -61,6 +62,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         SimulationFieldHandler.update();
+        AprilTagCameraConstants.VISION_SIMULATION.update(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedOdometryPose());
     }
 
     @Override

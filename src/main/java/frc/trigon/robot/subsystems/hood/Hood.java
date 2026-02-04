@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.RobotContainer;
@@ -17,7 +16,6 @@ import org.littletonrobotics.junction.Logger;
 public class Hood extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = HoodConstants.MOTOR;
-    private final CANcoderEncoder encoder = HoodConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED);
     private Rotation2d targetAngle = Rotation2d.fromDegrees(0);
@@ -67,7 +65,6 @@ public class Hood extends MotorSubsystem {
     @Override
     public void updatePeriodically() {
         motor.update();
-        encoder.update();
     }
 
     @Override
@@ -111,6 +108,14 @@ public class Hood extends MotorSubsystem {
     void setTargetAngle(Rotation2d targetAngle) {
         this.targetAngle = targetAngle;
         motor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
+    }
+
+    void setTargetVoltageToResetVoltage() {
+        motor.setControl(voltageRequest.withOutput(HoodConstants.HOOD_RESET_VOLTAGE));
+    }
+
+    void zeroPosition() {
+        motor.setPosition(HoodConstants.MINIMUM_ANGLE.getRotations());
     }
 
     private Pose3d calculateVisualizationPose() {
