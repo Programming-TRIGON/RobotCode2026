@@ -184,10 +184,10 @@ public class IntakeConstants {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 60; // change based on what the mentors say.
 
+        FOLLOWER_INTAKE_MOTOR.applyConfiguration(config);
+
         final Follower followRequest = new Follower(MASTER_INTAKE_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_INTAKE_MOTOR.setControl(followRequest);
-
-        FOLLOWER_INTAKE_MOTOR.applyConfiguration(config);
 
         FOLLOWER_INTAKE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         FOLLOWER_INTAKE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
