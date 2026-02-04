@@ -28,6 +28,7 @@ public class Turret extends MotorSubsystem {
     private final CANcoderEncoder encoder = TurretConstants.ENCODER;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(TurretConstants.FOC_ENABLED);
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
+    private double[] latestThreadedPositions = new double[0];
     private Rotation2d targetSelfRelativeAngle = new Rotation2d();
 
     public Turret() {
@@ -60,15 +61,8 @@ public class Turret extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        masterMotor.update();
         followerMotor.update();
         encoder.update();
-
-        TurretCameraTransformCalculator.getInstance().update(
-                masterMotor.getThreadedSignal(TalonFXSignal.POSITION),
-                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
-                masterMotor.getSignal(TalonFXSignal.VELOCITY)
-        );
     }
 
     @Override
@@ -91,6 +85,19 @@ public class Turret extends MotorSubsystem {
     public void stop() {
         masterMotor.stopMotor();
         targetSelfRelativeAngle = new Rotation2d();
+    }
+
+    public void updateLatestThreadedPositions() { // TODO: This function and logic are ugly. Find a better way to do this, perhaps in the Phoenix6SignalThread class itself.
+        masterMotor.update();
+        latestThreadedPositions = masterMotor.getThreadedSignal(TalonFXSignal.POSITION);
+    }
+
+    public void updateCameraTransforms() {
+        TurretCameraTransformCalculator.getInstance().update(
+                latestThreadedPositions,
+                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
+                masterMotor.getSignal(TalonFXSignal.VELOCITY)
+        );
     }
 
     public Pose3d calculateVisualizationPose() {

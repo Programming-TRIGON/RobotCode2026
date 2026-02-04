@@ -1,6 +1,8 @@
 package frc.trigon.robot.poseestimation.apriltagcamera.io;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraConstants;
 import frc.trigon.robot.poseestimation.apriltagcamera.AprilTagCameraInputsAutoLogged;
 import frc.trigon.robot.poseestimation.apriltagcamera.DynamicCameraTransform;
@@ -14,7 +16,7 @@ public class AprilTagSimulationCameraIO extends AprilTagPhotonCameraIO {
 
         cameraSimulation = new PhotonCameraSim(photonCamera, AprilTagCameraConstants.SIMULATION_CAMERA_PROPERTIES);
         cameraSimulation.enableDrawWireframe(true);
-        AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()));
+        CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(3, () -> AprilTagCameraConstants.VISION_SIMULATION.addCamera(cameraSimulation, dynamicCameraTransform.get3dRobotCenterToCamera(Timer.getFPGATimestamp()))));
     }
 
     @Override

@@ -3,6 +3,7 @@ package frc.trigon.robot.subsystems.turret;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import frc.trigon.robot.RobotContainer;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.Map;
 
@@ -22,7 +23,8 @@ public class TurretCameraTransformCalculator {
 
     public void update(double[] turretPositions, double[] timestamps, double velocityRotationsPerSecond) {
         if (turretPositions.length > timestamps.length) {
-            System.out.println("Turret positions and timestamps arrays must have the same length.");
+            System.out.println("Turret positions and timestamps arrays must have the same length. " +
+                    "Positions length: " + turretPositions.length + ", Timestamps length: " + timestamps.length);
             return;
         }
 
@@ -32,11 +34,17 @@ public class TurretCameraTransformCalculator {
     }
 
     public Transform3d calculateRobotToRightCameraAtTime(double timestampSeconds) {
-        return calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_RIGHT_CAMERA_TRANSFORM);
+//        return calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_RIGHT_CAMERA_TRANSFORM);
+        var a = calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_RIGHT_CAMERA_TRANSFORM);
+        Logger.recordOutput("Cameras/RightTurretCameraTransformAtTime", new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(timestampSeconds)).plus(a));
+        return a;
     }
 
     public Transform3d calculateRobotToLeftCameraAtTime(double timestampSeconds) {
-        return calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_LEFT_CAMERA_TRANSFORM);
+//        return calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_LEFT_CAMERA_TRANSFORM);
+        var a = calculateRobotToCameraAtTime(timestampSeconds, TurretConstants.TURRET_TO_LEFT_CAMERA_TRANSFORM);
+        Logger.recordOutput("Cameras/LeftTurretCameraTransformAtTime", new Pose3d(RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(timestampSeconds)).plus(a));
+        return a;
     }
 
     private Transform3d calculateRobotToCameraAtTime(double timestampSeconds, Transform3d turretToCameraTransform) {
@@ -54,22 +62,16 @@ public class TurretCameraTransformCalculator {
     }
 
     private Rotation2d calculateTurretAngleAtTime(double timestampSeconds) {
-        if (isTimestampTooNew(timestampSeconds))
+        final Rotation2d sampledAngle = sampleTurretAngleAtTime(timestampSeconds);
+        if (sampledAngle == null)
             return estimateFutureTurretAngle(timestampSeconds);
 
-        return sampleTurretAngleAtTime(timestampSeconds);
-    }
-
-    private boolean isTimestampTooNew(double timestampSeconds) {
-        final Map.Entry<Double, Rotation2d> latestBufferEntry = getLatestBufferEntry();
-        if (latestBufferEntry == null)
-            return false;
-        final Double latestTimestamp = latestBufferEntry.getKey();
-        return timestampSeconds > latestTimestamp;
+        return sampledAngle;
     }
 
     private Rotation2d estimateFutureTurretAngle(double futureTimestampSeconds) {
         final Map.Entry<Double, Rotation2d> latestBufferEntry = getLatestBufferEntry();
+
         if (latestBufferEntry == null)
             return RobotContainer.TURRET.getCurrentSelfRelativeAngle();
         final Double latestTimestamp = latestBufferEntry.getKey();
@@ -85,6 +87,10 @@ public class TurretCameraTransformCalculator {
     }
 
     private Map.Entry<Double, Rotation2d> getLatestBufferEntry() {
+        return turretAngleBuffer.getInternalBuffer().lastEntry();
+    }
+
+    private Map.Entry<Double, Rotation2d> getOldestBufferEntry() {
         return turretAngleBuffer.getInternalBuffer().lastEntry();
     }
 

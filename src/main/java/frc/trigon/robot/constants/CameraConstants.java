@@ -31,13 +31,13 @@ public class CameraConstants {
             RIGHT_TURRET_CAMERA = new AprilTagCamera(
             AprilTagCameraConstants.AprilTagCameraType.PHOTON_CAMERA,
             "RightTurretCamera",
-            new DynamicCameraTransform(TurretCameraTransformCalculator.getInstance()::calculateRobotToRightCameraAtTime),
+            new DynamicCameraTransform((timestamp) -> TurretCameraTransformCalculator.getInstance().calculateRobotToRightCameraAtTime(timestamp)),
             APRIL_TAG_CAMERA_STANDARD_DEVIATIONS
     ),
             LEFT_TURRET_CAMERA = new AprilTagCamera(
                     AprilTagCameraConstants.AprilTagCameraType.PHOTON_CAMERA,
                     "LeftTurretCamera",
-                    new DynamicCameraTransform(TurretCameraTransformCalculator.getInstance()::calculateRobotToLeftCameraAtTime),
+                    new DynamicCameraTransform((timestamp) -> TurretCameraTransformCalculator.getInstance().calculateRobotToLeftCameraAtTime(timestamp)),
                     APRIL_TAG_CAMERA_STANDARD_DEVIATIONS
             );
 

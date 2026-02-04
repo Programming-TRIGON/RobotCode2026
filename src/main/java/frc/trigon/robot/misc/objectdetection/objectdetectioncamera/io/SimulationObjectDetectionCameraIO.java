@@ -9,6 +9,7 @@ import frc.trigon.robot.misc.objectdetection.objectdetectioncamera.ObjectDetecti
 import frc.trigon.robot.misc.objectdetection.objectdetectioncamera.ObjectDetectionCameraInputsAutoLogged;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
+import frc.trigon.robot.poseestimation.apriltagcamera.DynamicCameraTransform;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
@@ -19,17 +20,18 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
             CAMERA_VERTICAL_FOV = Rotation2d.fromDegrees(45);
 
     private final String hostname;
-    private final Transform3d robotCenterToCamera;
+    private final DynamicCameraTransform dynamicCameraTransform;
 
-    public SimulationObjectDetectionCameraIO(String hostname, Transform3d robotCenterToCamera) {
+    public SimulationObjectDetectionCameraIO(String hostname, DynamicCameraTransform dynamicCameraTransform) {
         this.hostname = hostname;
-        this.robotCenterToCamera = robotCenterToCamera;
+        this.dynamicCameraTransform = dynamicCameraTransform;
     }
 
     @Override
     protected void updateInputs(ObjectDetectionCameraInputsAutoLogged inputs) {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final Pose3d cameraPose = new Pose3d(robotPose).plus(robotCenterToCamera);
+        final double currentTimestamp = Timer.getFPGATimestamp();
+        final Pose3d cameraPose = new Pose3d(robotPose).plus(dynamicCameraTransform.get3dRobotCenterToCamera(currentTimestamp));
         final ArrayList<Pair<SimulatedGamePiece, Rotation3d>>[] visibleGamePieces = calculateAllVisibleGamePieces(cameraPose);
 
         boolean hasAnyObject = false;
@@ -40,7 +42,7 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
         }
 
         if (hasAnyObject) {
-            updateHasNewResultInputs(inputs, visibleGamePieces);
+            updateHasNewResultInputs(inputs, visibleGamePieces, currentTimestamp);
             return;
         }
 
@@ -59,14 +61,14 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
         inputs.visibleObjectRotations = new Rotation3d[ObjectDetectionConstants.NUMBER_OF_GAME_PIECE_TYPES][0];
     }
 
-    private void updateHasNewResultInputs(ObjectDetectionCameraInputsAutoLogged inputs, ArrayList<Pair<SimulatedGamePiece, Rotation3d>>[] visibleGamePieces) {
+    private void updateHasNewResultInputs(ObjectDetectionCameraInputsAutoLogged inputs, ArrayList<Pair<SimulatedGamePiece, Rotation3d>>[] visibleGamePieces, double currentTimestamp) {
         for (int i = 0; i < visibleGamePieces.length; i++) {
             inputs.visibleObjectRotations[i] = new Rotation3d[visibleGamePieces[i].size()];
             for (int j = 0; j < visibleGamePieces[i].size(); j++)
                 inputs.visibleObjectRotations[i][j] = visibleGamePieces[i].get(j).getSecond();
         }
 
-        inputs.latestResultTimestamp = Timer.getTimestamp();
+        inputs.latestResultTimestamp = currentTimestamp;
 
         logVisibleGamePieces(visibleGamePieces);
     }
@@ -95,7 +97,6 @@ public class SimulationObjectDetectionCameraIO extends ObjectDetectionCameraIO {
 
         final Translation3d difference = cameraPosition.minus(objectPosition);
         final Rotation3d differenceAsAngle = getAngle(difference);
-
 
         return differenceAsAngle.minus(cameraPose.getRotation());
     }

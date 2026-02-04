@@ -16,6 +16,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
+import frc.trigon.robot.constants.RobotConstants;
 
 public class TurretConstants {
     private static final int
@@ -27,9 +28,9 @@ public class TurretConstants {
             FOLLOWER_MOTOR_NAME = "TurretFollowerMotor",
             ENCODER_NAME = "TurretEncoder";
     static final TalonFXMotor
-            MASTER_MOTOR = new TalonFXMotor(MASTER_MOTOR_ID, MASTER_MOTOR_NAME),
-            FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
-    static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
+            MASTER_MOTOR = new TalonFXMotor(MASTER_MOTOR_ID, MASTER_MOTOR_NAME, RobotConstants.CANIVORE_NAME),
+            FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME, RobotConstants.CANIVORE_NAME);
+    static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 52;
@@ -81,12 +82,12 @@ public class TurretConstants {
     );
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.03, -0.05, 0.0),
-            new Rotation3d(0, 0, 0)
+            new Translation3d(0.19, -0.068, 0.21),
+            new Rotation3d(0, Math.toRadians(-36), Math.toRadians(-30))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
-                    new Translation3d(0.03, 0.05, 0.0),
-                    new Rotation3d(0, 0, 0)
+                    new Translation3d(0.19, 0.068, 0.21),
+                    new Rotation3d(0, Math.toRadians(-36), Math.toRadians(30))
             );
 
     static {
