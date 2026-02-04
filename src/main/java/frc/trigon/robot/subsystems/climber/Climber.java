@@ -72,9 +72,12 @@ public class Climber extends MotorSubsystem {
         motor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
-
     public boolean atTargetState() {
-        return calculateTargetStateDistance() < ClimberConstants.POSITION_TOLERANCE_METERS;
+        return atState(targetState);
+    }
+
+    public boolean atState(ClimberConstants.ClimberState state) {
+        return calculateStateDistance(state) < ClimberConstants.POSITION_TOLERANCE_METERS;
     }
 
     void setTargetState(ClimberConstants.ClimberState targetState) {
@@ -101,8 +104,8 @@ public class Climber extends MotorSubsystem {
         positionRequest.Jerk = positionRequest.Acceleration * 10;
     }
 
-    private double calculateTargetStateDistance() {
-        return Math.abs(targetState.targetPositionMeters - getPositionMeters());
+    private double calculateStateDistance(ClimberConstants.ClimberState state) {
+        return Math.abs(state.targetPositionMeters - getPositionMeters());
     }
 
     private Pose3d calculateComponentPose() {

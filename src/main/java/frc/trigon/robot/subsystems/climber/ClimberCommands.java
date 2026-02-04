@@ -17,6 +17,10 @@ public class ClimberCommands {
         );
     }
 
+    public static boolean IS_CLIMBING(){
+        return RobotContainer.CLIMBER.atState(ClimberConstants.ClimberState.CLIMB_PREPARE);
+    }
+
     public static Command getResetPositionCommand() {
         return new StartEndCommand(
                 RobotContainer.CLIMBER::resetPosition,
