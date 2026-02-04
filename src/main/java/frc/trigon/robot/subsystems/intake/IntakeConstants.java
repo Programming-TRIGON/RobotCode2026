@@ -111,7 +111,7 @@ public class IntakeConstants {
     static {
         configureAngleMotor();
         configureMasterIntakeMotor();
-        configFollowerIntakeMotor();
+        configureFollowerIntakeMotor();
         configureAngleEncoder();
     }
 
@@ -173,7 +173,7 @@ public class IntakeConstants {
         MASTER_INTAKE_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
     }
 
-    private static void configFollowerIntakeMotor() {
+    private static void configureFollowerIntakeMotor() {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
