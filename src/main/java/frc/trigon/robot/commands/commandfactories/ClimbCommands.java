@@ -1,9 +1,6 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.climber.ClimberCommands;
 import frc.trigon.robot.subsystems.climber.ClimberConstants;
@@ -20,7 +17,10 @@ public class ClimbCommands {
     }
 
     public static Command getClimbDownFromL1Command() {
-        return ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_DOWN).until(OperatorConstants.CANCEL_CLIMB_TRIGGER);
+        return new SequentialCommandGroup(
+                new WaitUntilCommand(OperatorConstants.CANCEL_CLIMB_TRIGGER.negate()),
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_DOWN).until(OperatorConstants.CANCEL_CLIMB_TRIGGER)
+        );
     }
 
     public static Command getClimberDefaultCommand() {
