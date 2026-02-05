@@ -97,7 +97,7 @@ public class Climber extends MotorSubsystem {
         motor.setControl(positionRequest.withPosition(targetPositionRotations).withSlot(slot));
     }
 
-    void zeroPosition() {
+    void setTargetVoltageToResetVoltage() {
         targetState = ClimberConstants.ClimberState.REST;
         motor.setControl(voltageRequest.withOutput(ClimberConstants.CLIMBER_RESET_VOLTAGE));
     }

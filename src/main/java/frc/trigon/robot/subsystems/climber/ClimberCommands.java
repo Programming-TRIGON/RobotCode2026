@@ -19,7 +19,7 @@ public class ClimberCommands {
 
     public static Command getResetPositionCommand() {
         return new StartEndCommand(
-                RobotContainer.CLIMBER::zeroPosition,
+                RobotContainer.CLIMBER::setTargetVoltageToResetVoltage,
                 RobotContainer.CLIMBER::stop,
                 RobotContainer.CLIMBER
         );

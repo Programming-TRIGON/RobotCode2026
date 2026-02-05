@@ -67,10 +67,12 @@ public class ClimberConstants {
     static final double DRUM_DIAMETER_METERS = DRUM_RADIUS_METERS * 2;
     static final double POSITION_TOLERANCE_METERS = 0.07;
     static final double CLIMBER_RESET_VOLTAGE = -0.5;
-    static final int NON_CLIMBING_SLOT = 0;
-    static final int CLIMBING_SLOT = 1;
-    static final double NON_CLIMBING_SPEED_SCALAR = 1;
-    static final double CLIMBING_SPEED_SCALAR = 1;
+    static final int
+            NON_CLIMBING_SLOT = 0,
+            CLIMBING_SLOT = 1;
+    static final double
+            NON_CLIMBING_SPEED_SCALAR = 1,
+            CLIMBING_SPEED_SCALAR = 1;
 
     static {
         configureMotor();
