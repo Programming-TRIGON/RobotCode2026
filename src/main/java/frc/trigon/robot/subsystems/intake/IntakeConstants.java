@@ -153,18 +153,22 @@ public class IntakeConstants {
         ANGLE_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
-    private static void configureMasterIntakeMotor() {
+    private static TalonFXConfiguration createIntakeMotorConfig(double sensorToMechanismRatio) {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.Feedback.SensorToMechanismRatio = INTAKE_MOTOR_GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = sensorToMechanismRatio;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 60;
 
-        MASTER_INTAKE_MOTOR.applyConfiguration(config);
+        return config;
+    }
+    
+    private static void configureMasterIntakeMotor() {
+        MASTER_INTAKE_MOTOR.applyConfiguration(createIntakeMotorConfig(INTAKE_MOTOR_GEAR_RATIO));
         MASTER_INTAKE_MOTOR.setPhysicsSimulation(INTAKE_SIMULATION);
 
         MASTER_INTAKE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
@@ -174,17 +178,8 @@ public class IntakeConstants {
     }
 
     private static void configureFollowerIntakeMotor() {
-        final TalonFXConfiguration config = new TalonFXConfiguration();
-
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-
-        config.Feedback.SensorToMechanismRatio = INTAKE_MOTOR_GEAR_RATIO;
-
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 60;
-
-        FOLLOWER_INTAKE_MOTOR.applyConfiguration(config);
+        FOLLOWER_INTAKE_MOTOR.applyConfiguration(createIntakeMotorConfig(INTAKE_MOTOR_GEAR_RATIO));
+        FOLLOWER_INTAKE_MOTOR.setPhysicsSimulation(INTAKE_SIMULATION);
 
         final Follower followRequest = new Follower(MASTER_INTAKE_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_INTAKE_MOTOR.setControl(followRequest);
