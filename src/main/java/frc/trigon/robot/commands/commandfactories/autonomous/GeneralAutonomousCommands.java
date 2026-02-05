@@ -33,7 +33,7 @@ public class GeneralAutonomousCommands {
                 new ConditionalCommand(
                         new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
-                        () -> previousState == AutonomousGenerator.AutonomousState.COLLECT_FROM_NEUTRAL_ZONE || previousState == AutonomousGenerator.AutonomousState.DELIVERY
+                        () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
@@ -49,7 +49,7 @@ public class GeneralAutonomousCommands {
                 new ConditionalCommand(
                         new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
-                        () -> previousState == AutonomousGenerator.AutonomousState.COLLECT_FROM_NEUTRAL_ZONE || previousState == AutonomousGenerator.AutonomousState.DELIVERY
+                        () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 getShootAtHubWhileDrivingCommand()
@@ -63,7 +63,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1000
+                        1
                 ),
                 getShootAtHubWhileDrivingCommand()
         ).withTimeout(timeout);
@@ -77,7 +77,7 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                                shootWhileDriving ? 1000 : 0
+                                shootWhileDriving ? 1 : 0
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
@@ -92,7 +92,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1000
+                        1
                 ).raceWith(getShootAtHubWhileDrivingCommand()),
                 new InstantCommand() // TODO: Add climb command
         );
@@ -148,11 +148,6 @@ public class GeneralAutonomousCommands {
         if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
             return FieldConstants.DEPOT_POSITION;
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
-    }
-
-    private static boolean shouldCollectGamePiecesFromNeutralZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X && RobotContainer.OBJECT_POSE_ESTIMATOR.hasObjects();
     }
 
     /**

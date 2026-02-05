@@ -31,7 +31,7 @@ public class AutonomousConstants {
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_CONSTRAINTS = new PathConstraints(1.5, 3.0, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 2, Units.degreesToRadians(100), Units.degreesToRadians(100));
     public static final double
-            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME = 1,
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME = 0.2,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
 
     public static double
@@ -40,7 +40,7 @@ public class AutonomousConstants {
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
             DELIVERY_TIMEOUT_SECONDS = 6,
-            SCORING_TIMEOUT_SECONDS = 3.3,
+            SCORING_TIMEOUT_SECONDS = 3.8,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3,
             START_CLIMBING_TIME_SECONDS = AUTONOMOUS_TIME_SECONDS - ESTIMATED_CLIMBING_TIME_SECONDS;
     public static final double
