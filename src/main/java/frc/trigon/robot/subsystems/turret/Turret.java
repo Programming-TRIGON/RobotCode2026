@@ -160,29 +160,19 @@ public class Turret extends MotorSubsystem {
         setTargetFieldRelativeAngle(targetFieldRelativeYaw);
     }
 
-    FlippablePose2d alignToClosestAprilTag() {
-        double minimumDistance = Double.POSITIVE_INFINITY;
-        Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        FlippablePose2d flippableRobotPose = new FlippablePose2d(robotPose, true); // הפוך לפי alliance
-        Pose2d robotPoseFlipped = flippableRobotPose.get();
+    void alignToClosestAprilTag() {
+        final FlippablePose2d closestTag = calculateClosestAprilTagPose();
 
-        FlippablePose2d closestTag = null;
+        if (closestTag == null)
+            return;
 
-        for (Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
-            FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), true);
-            Pose2d currentTagPose = tagPose.get();
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Rotation2d targetFieldRelativeAngle = calculateTargetAngleToPose(
+                closestTag.get().getTranslation(),
+                robotPose
+        ).plus(robotPose.getRotation());
 
-            double xToTagMeters = currentTagPose.getX() - robotPoseFlipped.getX();
-            double yToTagMeters = currentTagPose.getY() - robotPoseFlipped.getY();
-            double distance = Math.hypot(xToTagMeters, yToTagMeters);
-
-            if (distance < minimumDistance) {
-                minimumDistance = distance;
-                closestTag = tagPose;
-            }
-        }
-
-        return closestTag;
+        setTargetFieldRelativeAngle(targetFieldRelativeAngle);
     }
 
     void alignForDelivery() {
@@ -206,6 +196,26 @@ public class Turret extends MotorSubsystem {
                 .withPosition(targetSelfRelativeAngle.getRotations())
                 .withFeedForward(resistSwerveRotationFeedforward)
         );
+    }
+
+    private FlippablePose2d calculateClosestAprilTagPose() {
+        double minimumDistance = Double.POSITIVE_INFINITY;
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        FlippablePose2d closestTag = null;
+
+        for (final Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
+            final FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), true);
+            final Pose2d currentTagPose = tagPose.get();
+
+            final double distance = robotPose.getTranslation().getDistance(currentTagPose.getTranslation());
+
+            if (distance < minimumDistance) {
+                minimumDistance = distance;
+                closestTag = tagPose;
+            }
+        }
+
+        return closestTag;
     }
 
     private double calculateResistSwerveRotationFeedforward() {
