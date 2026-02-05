@@ -66,7 +66,7 @@ public class IntakeConstants {
             MAXIMUM_ANGLE,
             SHOULD_ARM_SIMULATE_GRAVITY
     );
-    static final SimpleMotorSimulation WHEEL_SIMULATION = new SimpleMotorSimulation(
+    static final SimpleMotorSimulation INTAKE_SIMULATION = new SimpleMotorSimulation(
             INTAKE_GEARBOX,
             INTAKE_MOTOR_GEAR_RATIO,
             WHEEL_MOTOR_MOMENT_OF_INERTIA
@@ -165,7 +165,7 @@ public class IntakeConstants {
         config.CurrentLimits.StatorCurrentLimit = 60;
 
         MASTER_INTAKE_MOTOR.applyConfiguration(config);
-        MASTER_INTAKE_MOTOR.setPhysicsSimulation(WHEEL_SIMULATION);
+        MASTER_INTAKE_MOTOR.setPhysicsSimulation(INTAKE_SIMULATION);
 
         MASTER_INTAKE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
         MASTER_INTAKE_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
