@@ -1,16 +1,16 @@
 package frc.trigon.robot.subsystems.hood;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.*;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
-import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
-import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
@@ -18,26 +18,20 @@ import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
 import frc.trigon.robot.subsystems.turret.TurretConstants;
 
 public class HoodConstants {
-    private static final int
-            MOTOR_ID = 19,
-            ENCODER_ID = 19;
-    private static final String
-            MOTOR_NAME = "HoodMotor",
-            ENCODER_NAME = "HoodEncoder";
+    private static final int MOTOR_ID = 17;
+    private static final String MOTOR_NAME = "HoodMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
-    static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME);
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 50;
 
+    static final Rotation2d MINIMUM_ANGLE = Rotation2d.fromDegrees(50);
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
     private static final double
             HOOD_MASS_KILOGRAMS = 0.7,
             HOOD_LENGTH_METERS = 0.17;
-    private static final Rotation2d
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(50),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(87);
+    private static final Rotation2d MAXIMUM_ANGLE = Rotation2d.fromDegrees(87);
     private static final boolean SHOULD_SIMULATE_GRAVITY = true;
     private static final SingleJointedArmSimulation SIMULATION = new SingleJointedArmSimulation(
             GEARBOX,
@@ -68,6 +62,7 @@ public class HoodConstants {
             null
     );
 
+    static final double HOOD_RESET_VOLTAGE = 0.5;
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(87),
@@ -76,7 +71,6 @@ public class HoodConstants {
 
     static {
         configureMotor();
-        configureEncoder();
     }
 
     private static void configureMotor() {
@@ -88,9 +82,7 @@ public class HoodConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
-        config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -119,19 +111,5 @@ public class HoodConstants {
         MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
-    }
-
-    private static void configureEncoder() {
-        final CANcoderConfiguration config = new CANcoderConfiguration();
-
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-
-        ENCODER.applyConfiguration(config);
-        ENCODER.setSimulationInputsFromTalonFX(MOTOR);
-
-        ENCODER.registerSignal(CANcoderSignal.POSITION, 100);
-        ENCODER.registerSignal(CANcoderSignal.VELOCITY, 100);
     }
 }
