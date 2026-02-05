@@ -26,7 +26,10 @@ public class ShooterConstants {
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 6.22853402;
+    public static final double
+            LOWER_GEAR_RATIO_METERS = 1 / ((1 / 1.78) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
+            UPPER_GEAR_RATIO_METERS = 1 / ((1 / 0.53) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+    private static final double GEAR_RATIO = (LOWER_GEAR_RATIO_METERS + UPPER_GEAR_RATIO_METERS) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
 

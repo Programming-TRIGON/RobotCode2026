@@ -2,11 +2,12 @@ package frc.trigon.robot.misc.shootingphysics.shootingvisualization;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
+import frc.trigon.robot.subsystems.shooter.ShooterConstants;
 
 public class FuelShootingVisualizationConstants {
     static final double G_FORCE = 9.81;
     static final double
-            TOP_TRACTION_COEFFICIENT = 0.8,
+            TOP_TRACTION_COEFFICIENT = ShooterConstants.LOWER_GEAR_RATIO_METERS / ShooterConstants.UPPER_GEAR_RATIO_METERS,
             BOTTOM_TRACTION_COEFFICIENT = 1;
     static final double
             GAME_PIECE_MASS_KG = 0.21,

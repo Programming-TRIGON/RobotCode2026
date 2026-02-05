@@ -21,7 +21,7 @@ public class SpindexerConstants {
     static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 25;
+    private static final double GEAR_RATIO = 9;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getMinion(MOTOR_AMOUNT);

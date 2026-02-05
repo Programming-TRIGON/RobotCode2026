@@ -33,7 +33,7 @@ public class TurretConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 52;
+    private static final double GEAR_RATIO = 67.5;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0.5 : 0;
@@ -77,7 +77,7 @@ public class TurretConstants {
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
-            new Translation3d(-0.14542, 0.14542, 0.34578),
+            new Translation3d(-0.1454, 0.1454, 0.30827),
             new Rotation3d(0, 0, 0)
     );
     static final Transform3d

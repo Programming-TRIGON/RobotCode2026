@@ -33,8 +33,9 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
-    private static final double ANGLE_MOTOR_GEAR_RATIO = 40;
-    private static final double INTAKE_MOTOR_GEAR_RATIO = 2.6;
+    private static final double
+            ANGLE_MOTOR_GEAR_RATIO = 62.5,
+            INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
 
     private static final int
@@ -48,7 +49,7 @@ public class IntakeConstants {
             INTAKE_MASS_KILOGRAMS = 3;
     static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(120);
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(100);
     private static final boolean SHOULD_ARM_SIMULATE_GRAVITY = true;
     private static final double WHEEL_MOTOR_MOMENT_OF_INERTIA = 0.003;
     static final SingleJointedArmSimulation INTAKE_ANGLE_SIMULATION = new SingleJointedArmSimulation(
