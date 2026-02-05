@@ -7,6 +7,7 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.objectdetection.objectdetectioncamera.io.PhotonObjectDetectionCameraIO;
 import frc.trigon.robot.misc.objectdetection.objectdetectioncamera.io.SimulationObjectDetectionCameraIO;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
+import frc.trigon.robot.poseestimation.apriltagcamera.DynamicCameraTransform;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -16,12 +17,16 @@ public class ObjectDetectionCamera extends SubsystemBase {
     private final ObjectDetectionCameraInputsAutoLogged objectDetectionCameraInputs = new ObjectDetectionCameraInputsAutoLogged();
     private final ObjectDetectionCameraIO objectDetectionCameraIO;
     private final String hostname;
-    private final Transform3d robotCenterToCamera;
+    private final DynamicCameraTransform dynamicCameraTransform;
 
     public ObjectDetectionCamera(String hostname, Transform3d robotCenterToCamera) {
+        this(hostname, new DynamicCameraTransform(robotCenterToCamera));
+    }
+
+    public ObjectDetectionCamera(String hostname, DynamicCameraTransform dynamicCameraTransform) {
         this.hostname = hostname;
-        this.robotCenterToCamera = robotCenterToCamera;
-        this.objectDetectionCameraIO = generateIO(hostname, robotCenterToCamera);
+        this.dynamicCameraTransform = dynamicCameraTransform;
+        this.objectDetectionCameraIO = generateIO(hostname, dynamicCameraTransform);
     }
 
     @Override
@@ -88,6 +93,7 @@ public class ObjectDetectionCamera extends SubsystemBase {
         final Pose2d robotPoseAtResultTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(objectDetectionCameraInputs.latestResultTimestamp);
         if (robotPoseAtResultTimestamp == null)
             return new Translation2d();
+        final Transform3d robotCenterToCamera = dynamicCameraTransform.get3dRobotCenterToCamera(objectDetectionCameraInputs.latestResultTimestamp);
         final Pose3d cameraPose = new Pose3d(robotPoseAtResultTimestamp).plus(robotCenterToCamera);
         final Pose3d objectRotationStart = cameraPose.plus(new Transform3d(0, 0, 0, objectRotation));
 
@@ -99,11 +105,11 @@ public class ObjectDetectionCamera extends SubsystemBase {
         return objectRotationStart.transformBy(objectRotationStartToGround).getTranslation().toTranslation2d();
     }
 
-    private ObjectDetectionCameraIO generateIO(String hostname, Transform3d robotCenterToCamera) {
+    private ObjectDetectionCameraIO generateIO(String hostname, DynamicCameraTransform dynamicCameraTransform) {
         if (RobotHardwareStats.isReplay())
             return new ObjectDetectionCameraIO();
         if (RobotHardwareStats.isSimulation())
-            return new SimulationObjectDetectionCameraIO(hostname, robotCenterToCamera);
+            return new SimulationObjectDetectionCameraIO(hostname, dynamicCameraTransform);
         return new PhotonObjectDetectionCameraIO(hostname);
     }
 }
