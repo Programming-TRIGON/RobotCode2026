@@ -20,9 +20,9 @@ import frc.trigon.robot.constants.RobotConstants;
 
 public class TurretConstants {
     private static final int
-            MASTER_MOTOR_ID = 13,
-            FOLLOWER_MOTOR_ID = 14,
-            ENCODER_ID = 13;
+            MASTER_MOTOR_ID = 14,
+            FOLLOWER_MOTOR_ID = 15,
+            ENCODER_ID = 14;
     private static final String
             MASTER_MOTOR_NAME = "TurretMasterMotor",
             FOLLOWER_MOTOR_NAME = "TurretFollowerMotor",

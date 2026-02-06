@@ -16,7 +16,7 @@ import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
 public class SpindexerConstants {
-    private static final int MOTOR_ID = 11;
+    private static final int MOTOR_ID = 12;
     private static final String MOTOR_NAME = "SpindexerMotor";
     static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME);
 
