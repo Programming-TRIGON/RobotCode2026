@@ -82,11 +82,11 @@ public class TurretConstants {
     );
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.19, -0.068, 0.21),
+            new Translation3d(0.17783, -0.08186, 0.17777),
             new Rotation3d(0, Math.toRadians(-36), Math.toRadians(-30))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
-                    new Translation3d(0.19, 0.068, 0.21),
+                    new Translation3d(0.17783, 0.08186, 0.17777),
                     new Rotation3d(0, Math.toRadians(-36), Math.toRadians(30))
             );
 
