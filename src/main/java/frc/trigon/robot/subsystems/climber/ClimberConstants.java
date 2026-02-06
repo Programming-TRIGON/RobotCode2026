@@ -16,7 +16,7 @@ import frc.trigon.lib.hardware.simulation.ElevatorSimulation;
 import frc.trigon.lib.utilities.mechanisms.ElevatorMechanism2d;
 
 public class ClimberConstants {
-    private static final int MOTOR_ID = 18;
+    private static final int MOTOR_ID = 19;
     private static final String MOTOR_NAME = "ClimberMasterMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
