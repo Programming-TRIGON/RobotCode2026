@@ -37,11 +37,11 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
+    private static final double
+            ANGLE_MOTOR_GEAR_RATIO = 62.5,
+            INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
-    private static final double
-            ANGLE_MOTOR_GEAR_RATIO = 40,
-            INTAKE_MOTOR_GEAR_RATIO = 2.6;
     private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 60;
 
     private static final int
@@ -55,7 +55,7 @@ public class IntakeConstants {
             INTAKE_MASS_KILOGRAMS = 3;
     static final Rotation2d
             MINIMUM_ANGLE = Rotation2d.fromDegrees(0),
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(120);
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(100);
     private static final boolean SHOULD_ARM_SIMULATE_GRAVITY = true;
     private static final double WHEEL_MOTOR_MOMENT_OF_INERTIA = 0.003;
     static final SingleJointedArmSimulation INTAKE_ANGLE_SIMULATION = new SingleJointedArmSimulation(
@@ -101,12 +101,12 @@ public class IntakeConstants {
     static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
     static final double INTAKE_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d INTAKE_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
-            new Translation3d(0.14985, 0, 0.13525),
+            new Translation3d(0.16425, 0, 0.135),
             new Rotation3d(0, 0, 0)
     );
     static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.19, -0.3, 0.3),
-            new Rotation3d(0, Math.toRadians(20), Math.toRadians(30))
+            new Translation3d(0.33205, -0.29525, 0.199934),
+            new Rotation3d(0, Math.toRadians(8.9), Math.toRadians(19.8))
     );
 
     static {

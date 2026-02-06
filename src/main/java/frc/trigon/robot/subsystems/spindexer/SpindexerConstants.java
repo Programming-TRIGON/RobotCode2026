@@ -21,7 +21,7 @@ public class SpindexerConstants {
     static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 25;
+    private static final double GEAR_RATIO = 9;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getMinion(MOTOR_AMOUNT);
@@ -43,7 +43,7 @@ public class SpindexerConstants {
             new Rotation3d(0, 0, 0)
     );
 
-    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 2;
+    private static final double MAXIMUM_DISPLAYABLE_VELOCITY = 12;
     private static final String MECHANISM_NAME = "SpindexerMechanism";
     static final SpeedMechanism2d MECHANISM = new SpeedMechanism2d(
             MECHANISM_NAME,
@@ -51,6 +51,7 @@ public class SpindexerConstants {
     );
 
     static final double VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND = 0.2;
+    static final double SIMULATION_SLIPPAGE_COMPENSATION_MULTIPLIER = 1 / 4.0;
 
     static {
         final TalonFXSConfiguration config = new TalonFXSConfiguration();
@@ -60,15 +61,15 @@ public class SpindexerConstants {
 
         config.ExternalFeedback.withSensorToMechanismRatio(GEAR_RATIO);
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 1.2 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.3141 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 50;
@@ -84,7 +85,7 @@ public class SpindexerConstants {
     }
 
     public enum SpindexerState {
-        LOAD_TO_TURRET(1),
+        LOAD_TO_TURRET(8),
         STOP(0);
 
         public final double targetVelocityRotationsPerSecond;
