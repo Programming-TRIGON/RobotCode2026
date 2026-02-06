@@ -70,7 +70,8 @@ public class OperatorConstants {
             CONTINUE_CLIMB_TRIGGER = DRIVER_CONTROLLER.rightBumper().or(OPERATOR_CONTROLLER.v());
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
-            SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
+            SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e()),
+            RESET_HOOD_TRIGGER = OPERATOR_CONTROLLER.r();
 
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()

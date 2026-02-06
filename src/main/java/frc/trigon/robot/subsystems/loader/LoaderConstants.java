@@ -53,19 +53,19 @@ public class LoaderConstants {
         config.Audio.BeepOnConfig = false;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.32306;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0.92316;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.020999;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 12.9988301;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 571.455784;
 
         config.CurrentLimits.StatorCurrentLimit = 50;
         config.CurrentLimits.StatorCurrentLimitEnable = true;

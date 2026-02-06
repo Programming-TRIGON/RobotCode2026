@@ -1,7 +1,9 @@
 package frc.trigon.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.signals.AdvancedHallSupportValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -65,15 +67,18 @@ public class SpindexerConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.17708;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0.84495;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.025073;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 14.2020238;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 478.602481;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 50;
+
+        config.Commutation.AdvancedHallSupport = AdvancedHallSupportValue.Enabled;
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);

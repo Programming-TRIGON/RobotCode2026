@@ -20,7 +20,7 @@ public class HoodCommands {
         );
     }
 
-    public static Command resetHoodPosition() {
+    public static Command getResetHoodCommand() {
         return new StartEndCommand(
                 RobotContainer.HOOD::setTargetVoltageToResetVoltage,
                 RobotContainer.HOOD::zeroPosition,

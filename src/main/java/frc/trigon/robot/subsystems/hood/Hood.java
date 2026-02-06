@@ -116,6 +116,7 @@ public class Hood extends MotorSubsystem {
 
     void zeroPosition() {
         motor.setPosition(HoodConstants.RESET_ANGLE.getRotations());
+        motor.stopMotor();
     }
 
     private Pose3d calculateVisualizationPose() {
