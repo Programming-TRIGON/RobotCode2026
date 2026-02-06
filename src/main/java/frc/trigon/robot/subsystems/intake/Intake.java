@@ -127,7 +127,7 @@ public class Intake extends MotorSubsystem {
     }
 
     private void setTargetAngle(Rotation2d targetAngle) {
-        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
+//        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {

@@ -180,10 +180,10 @@ public class Turret extends MotorSubsystem {
     void setTargetSelfRelativeAngle(Rotation2d targetAngle) {
         targetSelfRelativeAngle = limitAngle(targetAngle);
         final double resistSwerveRotationFeedforward = calculateResistSwerveRotationFeedforward();
-        masterMotor.setControl(positionRequest
-                .withPosition(targetSelfRelativeAngle.getRotations())
-                .withFeedForward(resistSwerveRotationFeedforward)
-        );
+//        masterMotor.setControl(positionRequest
+//                .withPosition(targetSelfRelativeAngle.getRotations())
+//                .withFeedForward(resistSwerveRotationFeedforward)
+//        );
     }
 
     private double calculateResistSwerveRotationFeedforward() {

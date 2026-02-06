@@ -14,11 +14,12 @@ import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
+import frc.trigon.robot.constants.RobotConstants;
 
 public class SpindexerConstants {
     private static final int MOTOR_ID = 12;
     private static final String MOTOR_NAME = "SpindexerMotor";
-    static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME);
+    static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
     private static final double GEAR_RATIO = 9;
