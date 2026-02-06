@@ -37,11 +37,12 @@ public class IntakeConstants {
             ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
+    static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     private static final double
             ANGLE_MOTOR_GEAR_RATIO = 40,
             INTAKE_MOTOR_GEAR_RATIO = 2.6;
-    static final boolean FOC_ENABLED = true;
+    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 60;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
@@ -153,7 +154,7 @@ public class IntakeConstants {
         ANGLE_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
-    private static TalonFXConfiguration createIntakeMotorConfig() {
+    private static void configureMasterIntakeMotor() {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -162,13 +163,9 @@ public class IntakeConstants {
         config.Feedback.SensorToMechanismRatio = INTAKE_MOTOR_GEAR_RATIO;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 60;
+        config.CurrentLimits.StatorCurrentLimit = INTAKE_MOTORS_CURRENT_LIMIT_AMPS;
 
-        return config;
-    }
-
-    private static void configureMasterIntakeMotor() {
-        MASTER_INTAKE_MOTOR.applyConfiguration(createIntakeMotorConfig());
+        MASTER_INTAKE_MOTOR.applyConfiguration(config);
         MASTER_INTAKE_MOTOR.setPhysicsSimulation(INTAKE_SIMULATION);
 
         MASTER_INTAKE_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
@@ -178,7 +175,17 @@ public class IntakeConstants {
     }
 
     private static void configureFollowerIntakeMotor() {
-        FOLLOWER_INTAKE_MOTOR.applyConfiguration(createIntakeMotorConfig());
+        final TalonFXConfiguration config = new TalonFXConfiguration();
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        config.Feedback.SensorToMechanismRatio = INTAKE_MOTOR_GEAR_RATIO;
+
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = INTAKE_MOTORS_CURRENT_LIMIT_AMPS;
+
+        FOLLOWER_INTAKE_MOTOR.applyConfiguration(config);
         FOLLOWER_INTAKE_MOTOR.setPhysicsSimulation(INTAKE_SIMULATION);
 
         final Follower followRequest = new Follower(MASTER_INTAKE_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
