@@ -71,7 +71,7 @@ public class Spindexer extends MotorSubsystem {
     public Pose3d calculateComponentPose() {
         final Transform3d yawTransform = new Transform3d(
                 new Translation3d(0, 0, 0),
-                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION)).getRadians())
+                new Rotation3d(0, 0, Rotation2d.fromRotations(motor.getSignal(TalonFXSSignal.POSITION)).getRadians() * SpindexerConstants.SIMULATION_SLIPPAGE_COMPENSATION_MULTIPLIER)
         );
         return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }

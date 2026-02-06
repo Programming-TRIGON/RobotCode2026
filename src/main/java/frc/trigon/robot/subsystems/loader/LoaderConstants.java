@@ -60,11 +60,11 @@ public class LoaderConstants {
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 1.4763 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
 
         config.CurrentLimits.StatorCurrentLimit = 50;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
