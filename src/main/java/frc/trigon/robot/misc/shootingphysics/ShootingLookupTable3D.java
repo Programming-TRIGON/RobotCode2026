@@ -181,11 +181,11 @@ public class ShootingLookupTable3D {
         final int t0 = (int) Math.floor(tangentialIndex);
         final int t1 = Math.min(t0 + 1, tangentialSize - 1);
 
-        final double dw = distanceIndex - d0;
-        final double rw = radialIndex - r0;
-        final double tw = tangentialIndex - t0;
+        final double distanceWeight = distanceIndex - d0;
+        final double radialWeight = radialIndex - r0;
+        final double tangentialWeight = tangentialIndex - t0;
 
-        return interpolateCorners(data, d0, d1, r0, r1, t0, t1, dw, rw, tw);
+        return interpolateCorners(data, d0, d1, r0, r1, t0, t1, distanceWeight, radialWeight, tangentialWeight);
     }
 
     private static double interpolateCorners(
