@@ -7,7 +7,7 @@ import frc.trigon.robot.subsystems.shooter.ShooterConstants;
 public class FuelShootingVisualizationConstants {
     static final double G_FORCE = 9.81;
     static final double
-            TOP_TRACTION_COEFFICIENT = ShooterConstants.LOWER_GEAR_RATIO_METERS / ShooterConstants.UPPER_GEAR_RATIO_METERS,
+            TOP_TRACTION_COEFFICIENT = ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER / ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER,
             BOTTOM_TRACTION_COEFFICIENT = 1;
     static final double
             GAME_PIECE_MASS_KG = 0.21,
