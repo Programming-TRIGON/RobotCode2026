@@ -97,10 +97,10 @@ public class SafeAutonomousDriveCommands {
         final ConstraintsZone driveSlowlyInAllianceZoneConstraintsZone = new ConstraintsZone(
                 isInAllianceZone() ? 0 : 1.5,
                 isInAllianceZone() ?
-                        getDriveSlowlyPathPosition(
+                        Math.min(1.5, getDriveSlowlyPathPosition(
                                 driveInAllianceZonePercentage,
                                 currentRobotPose.getTranslation().getDistance(trenchEntryPose.getTranslation()),
-                                trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2) :
+                                trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2)) :
                         Math.min(2 + getDriveSlowlyPathPosition(
                                 driveInAllianceZonePercentage,
                                 trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2,
