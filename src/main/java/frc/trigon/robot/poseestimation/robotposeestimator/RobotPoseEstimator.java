@@ -36,6 +36,7 @@ public class RobotPoseEstimator implements AutoCloseable {
     private final AprilTagCamera[] aprilTagCameras;
     private final RelativeRobotPoseSource relativeRobotPoseSource;
     private final boolean shouldUseRelativeRobotPoseSource;
+    private boolean hasUpdateFromCameras = false;
 
     /**
      * Constructs a new RobotPoseEstimator and sets the relativeRobotPoseSource.
@@ -121,7 +122,7 @@ public class RobotPoseEstimator implements AutoCloseable {
     }
 
     public boolean hasUpdateFromCameras() {
-        return getCamerasWithResults().length > 0;
+        return hasUpdateFromCameras;
     }
 
     /**
@@ -213,6 +214,8 @@ public class RobotPoseEstimator implements AutoCloseable {
 
     private void updateFromAprilTagCameras() {
         final AprilTagCamera[] newResultCameras = getCamerasWithResults();
+
+        this.hasUpdateFromCameras = newResultCameras.length > 0;
 //        sortCamerasByLatestResultTimestamp(newResultCameras);
 
         for (AprilTagCamera aprilTagCamera : newResultCameras) {
