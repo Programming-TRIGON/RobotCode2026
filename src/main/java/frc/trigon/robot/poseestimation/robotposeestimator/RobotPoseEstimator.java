@@ -49,7 +49,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         this.relativeRobotPoseSource = relativeRobotPoseSource;
         this.shouldUseRelativeRobotPoseSource = true;
 
-        initialize();
+        initializeFieldWidget();
     }
 
     /**
@@ -63,7 +63,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         this.relativeRobotPoseSource = null;
         this.shouldUseRelativeRobotPoseSource = false;
 
-        initialize();
+        initializeFieldWidget();
     }
 
     @Override
@@ -120,6 +120,10 @@ public class RobotPoseEstimator implements AutoCloseable {
         return swerveDriveOdometry.getPoseMeters();
     }
 
+    public boolean hasUpdateFromCameras() {
+        return getCamerasWithResults().length > 0;
+    }
+
     /**
      * Updates the pose estimator with the given swerve wheel positions and gyro rotations.
      * This function accepts an array of swerve wheel positions and an array of gyro rotations because the odometry can be updated at a faster rate than the main loop (which is 50 hertz).
@@ -161,7 +165,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         return getEstimatedRobotPose().transformBy(new Transform2d(predictedX, predictedY, predictedRotation));
     }
 
-    private void initialize() {
+    private void initializeFieldWidget() {
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);
         logTargetPath();

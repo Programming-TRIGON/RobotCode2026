@@ -23,6 +23,7 @@ public class OperatorConstants {
             DRIVER_CONTROLLER_PORT, DRIVER_CONTROLLER_RIGHT_STICK_EXPONENT, DRIVER_CONTROLLER_LEFT_STICK_EXPONENT, DRIVER_CONTROLLER_DEADBAND
     );
     public static final KeyboardController OPERATOR_CONTROLLER = new KeyboardController();
+    private static final double ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS = 3;
     private static final double DOUBLE_TAP_TIMEOUT_SECONDS = 0.5;
 
     public static final double
@@ -46,6 +47,7 @@ public class OperatorConstants {
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
+            CAMERAS_DISCONNECTED_TRIGGER = new Trigger(() -> !RobotContainer.ROBOT_POSE_ESTIMATOR.hasUpdateFromCameras()).debounce(ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS),
             FORWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.right(),
             BACKWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.left(),
             FORWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.up(),

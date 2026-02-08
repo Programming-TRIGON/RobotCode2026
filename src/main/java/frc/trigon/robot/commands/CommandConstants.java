@@ -26,8 +26,11 @@ public class CommandConstants {
             MINIMUM_TRANSLATION_SHIFT_POWER = 0.30,
             MINIMUM_ROTATION_SHIFT_POWER = 0.4;
     private static final double JOYSTICK_ORIENTED_ROTATION_DEADBAND = 0.07;
+    private static final double
+            RUMBLE_WHEN_CAMERAS_DISCONNECTED_DURATION_SECONDS = 0.5,
+            RUMBLE_WHEN_CAMERAS_DISCONNECTED_POWER = 1;
 
-    public static final Command
+    public static final Command //General Commands
             RESET_HEADING_COMMAND = new InstantCommand(RobotContainer.ROBOT_POSE_ESTIMATOR::resetHeading),
             SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND = SwerveCommands.getClosedLoopSelfRelativeDriveCommand(
                     () -> getXPowerFromPov(DRIVER_CONTROLLER.getPov()) / OperatorConstants.POV_DIVIDER / calculateShiftModeValue(MINIMUM_TRANSLATION_SHIFT_POWER),
@@ -57,6 +60,8 @@ public class CommandConstants {
                     (omegaRadiansPerSecond) -> RobotContainer.SWERVE.selfRelativeDrive(new ChassisSpeeds(0, 0, omegaRadiansPerSecond)),
                     RobotContainer.SWERVE
             );
+    public static final Command //Robot-specific commands
+            INDICATE_CAMERAS_DISCONNECTED_COMMAND = new InstantCommand(() -> OperatorConstants.DRIVER_CONTROLLER.rumble(RUMBLE_WHEN_CAMERAS_DISCONNECTED_DURATION_SECONDS, RUMBLE_WHEN_CAMERAS_DISCONNECTED_POWER));
 
     /**
      * Calculates the target drive power from an axis value by dividing it by the shift mode value.
