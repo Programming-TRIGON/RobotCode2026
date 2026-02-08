@@ -44,7 +44,7 @@ public class AutonomousConstants {
             ESTIMATED_CLIMBING_TIME_SECONDS = 3,
             START_CLIMBING_TIME_SECONDS = AUTONOMOUS_TIME_SECONDS - ESTIMATED_CLIMBING_TIME_SECONDS;
     public static final double
-            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
+            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1.3,
             CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
     public static final double START_INTAKING_X = 6.2;
 

@@ -185,7 +185,7 @@ public class SafeAutonomousDriveCommands {
         final double d = percentage * distanceFromInitToCenter;
         double a = Math.min(d / distanceFromInitToEntry, 1);
         double b = Math.max((d - distanceFromInitToEntry) / distanceFromEntryToCenter, 0);
-        return a + b;
+        return Math.max(Math.min( a + b, 1), 0);
     }
 
     public static boolean isRight() {

@@ -97,7 +97,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1
+                        1000
                 ).raceWith(getShootAtHubWhileDrivingCommand())
                         .until(() -> RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose))
                         .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
