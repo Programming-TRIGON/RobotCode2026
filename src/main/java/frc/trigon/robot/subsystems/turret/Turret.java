@@ -21,6 +21,7 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Turret extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
@@ -79,13 +80,7 @@ public class Turret extends MotorSubsystem {
         final Rotation2d targetProfiledSelfRelativeAngle = Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
-        Integer closestTagID = null;
-        for (var entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
-            if (entry.getValue().toPose2d().equals(closestTag.get())) {
-                closestTagID = entry.getKey();
-                break;
-            }
-        }
+        Integer closestTagID = getClosestAprilTagID();
 
         TurretConstants.MECHANISM.update(
                 currentSelfRelativeAngle,
@@ -174,16 +169,12 @@ public class Turret extends MotorSubsystem {
     }
 
     void alignToClosestAprilTag() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
+        final Rotation2d targetFieldRelativeAngle = calculateFieldRelativeAngleToClosestAprilTag();
 
-        if (closestTag == null) {
+        if (targetFieldRelativeAngle == null) {
             return;
         }
-        final Rotation2d targetFieldRelativeAngle = calculateTargetAngleToPose(
-                closestTag.get().getTranslation(),
-                robotPose
-        ).plus(robotPose.getRotation());
+
         setTargetFieldRelativeAngle(targetFieldRelativeAngle);
     }
 
@@ -210,23 +201,53 @@ public class Turret extends MotorSubsystem {
         );
     }
 
+    private Rotation2d calculateFieldRelativeAngleToClosestAprilTag() {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
+
+        if (closestTag == null) {
+            return null;
+        }
+
+        return calculateTargetAngleToPose(
+                closestTag.get().getTranslation(),
+                robotPose
+        ).plus(robotPose.getRotation());
+    }
+
     private FlippablePose2d calculateClosestAprilTagPose(Pose2d robotPose) {
-        double minimumDistance = Double.POSITIVE_INFINITY;
-        FlippablePose2d closestTag = null;
+        double closestTagDistance = Double.POSITIVE_INFINITY;
+        FlippablePose2d closestTagSoFar = null;
 
         for (final Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
-            final FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), false);
-            final Pose2d currentTagPose = tagPose.get();
+            final FlippablePose2d flippableTagPose = new FlippablePose2d(tagPose3d.toPose2d(), false);
+            final Pose2d fieldRelativeTagPose = flippableTagPose.get();
+            final double currentTagDistance = robotPose.getTranslation().getDistance(fieldRelativeTagPose.getTranslation());
 
-            final double distance = robotPose.getTranslation().getDistance(currentTagPose.getTranslation());
-
-            if (distance < minimumDistance) {
-                minimumDistance = distance;
-                closestTag = tagPose;
+            if (currentTagDistance < closestTagDistance) {
+                closestTagDistance = currentTagDistance;
+                closestTagSoFar = flippableTagPose;
             }
         }
 
-        return closestTag;
+        return closestTagSoFar;
+    }
+
+    private Integer getClosestAprilTagID() {
+        Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
+
+        if (closestTag == null) {
+            return null;
+        }
+
+        for (Map.Entry<Integer, Pose3d> entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
+            if (entry.getValue().toPose2d().equals(closestTag.get())) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
     }
 
     private double calculateResistSwerveRotationFeedforward() {
