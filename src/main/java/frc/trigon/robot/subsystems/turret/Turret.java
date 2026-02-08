@@ -77,12 +77,25 @@ public class Turret extends MotorSubsystem {
     public void updateMechanism() {
         final Rotation2d currentSelfRelativeAngle = getCurrentSelfRelativeAngle();
         final Rotation2d targetProfiledSelfRelativeAngle = Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
+        Integer closestTagID = null;
+        for (var entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
+            if (entry.getValue().toPose2d().equals(closestTag.get())) {
+                closestTagID = entry.getKey();
+                break;
+            }
+        }
+
         TurretConstants.MECHANISM.update(
                 currentSelfRelativeAngle,
                 targetProfiledSelfRelativeAngle
         );
+
+        Logger.recordOutput("Poses/Components/ClosestAprilTagPose", closestTag.get());
         Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
 
+        Logger.recordOutput("Turret/ClosestAprilTagID", closestTagID);
         Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", currentSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
         Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
@@ -163,15 +176,14 @@ public class Turret extends MotorSubsystem {
     void alignToClosestAprilTag() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
-
-        if (closestTag == null) {
-            return;
-        }
-
         final Rotation2d targetFieldRelativeAngle = calculateTargetAngleToPose(
                 closestTag.get().getTranslation(),
                 robotPose
         ).plus(robotPose.getRotation());
+
+        if (closestTag == null) {
+            return;
+        }
 
         setTargetFieldRelativeAngle(targetFieldRelativeAngle);
     }
@@ -204,7 +216,7 @@ public class Turret extends MotorSubsystem {
         FlippablePose2d closestTag = null;
 
         for (final Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
-            final FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), true);
+            final FlippablePose2d tagPose = new FlippablePose2d(tagPose3d.toPose2d(), false);
             final Pose2d currentTagPose = tagPose.get();
 
             final double distance = robotPose.getTranslation().getDistance(currentTagPose.getTranslation());
