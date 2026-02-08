@@ -4,9 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.trigon.lib.utilities.Conversions;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
@@ -29,7 +27,7 @@ public class SafeAutonomousDriveCommands {
 
     public static Command getSafeDriveToPoseCommand(
             Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZonePercentage
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneDistance
     ) {
         return new ConditionalCommand(
                 getDriveThroughTrenchCommand(
@@ -37,14 +35,14 @@ public class SafeAutonomousDriveCommands {
                         normalPathConstrains,
                         endVelocity,
                         driveSlowlyInAllianceZoneConstraints,
-                        driveSlowlyInAllianceZonePercentage
+                        driveSlowlyInAllianceZoneDistance
                 ),
                 getDriveSlowlyInAllianceZoneCommand(
                         targetPose,
                         normalPathConstrains,
                         endVelocity,
                         driveSlowlyInAllianceZoneConstraints,
-                        driveSlowlyInAllianceZonePercentage
+                        driveSlowlyInAllianceZoneDistance
                 ),
                 () -> shouldDriveThroughTrench(targetPose.get())
         ).raceWith(new RunCommand(() -> Logger.recordOutput("Autonomous/ShouldDriveThroughTrench", shouldDriveThroughTrench(targetPose.get()))));
@@ -52,7 +50,7 @@ public class SafeAutonomousDriveCommands {
 
     private static Command getDriveThroughTrenchCommand(
             FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZonePercentage
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneDistance
     ) {
         return new DeferredCommand(
                 () -> AutoBuilder.followPath(getPathThroughTrench(
@@ -60,7 +58,7 @@ public class SafeAutonomousDriveCommands {
                                 normalPathConstrains,
                                 endVelocity,
                                 driveSlowlyInAllianceZoneConstraints,
-                                driveSlowlyInAllianceZonePercentage
+                                driveSlowlyInAllianceZoneDistance
                         )
                 ),
                 Set.of(RobotContainer.SWERVE)
@@ -69,7 +67,7 @@ public class SafeAutonomousDriveCommands {
 
     private static PathPlannerPath getPathThroughTrench(
             FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveInAllianceZonePercentage
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveInAllianceZoneDistance
     ) {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
@@ -94,17 +92,21 @@ public class SafeAutonomousDriveCommands {
                 2.8,
                 targetPose.get().getRotation()
         );
+        final double endPose = isInAllianceZone() ? Math.min(1.5,
+                getDriveSlowlyPathPosition(
+                        driveInAllianceZoneDistance,
+                        currentRobotPose.getTranslation().getDistance(trenchEntryPose.getTranslation()),
+                        trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2
+                )
+        ) :
+                Math.min(1.5 + getDriveSlowlyPathPosition(
+                        driveInAllianceZoneDistance,
+                        trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2,
+                        trenchExitPose.getTranslation().getDistance(targetPose.get().getTranslation())), 3);
+        System.out.println("Yashi I'm already doing this pp is dumb " + endPose);
         final ConstraintsZone driveSlowlyInAllianceZoneConstraintsZone = new ConstraintsZone(
                 isInAllianceZone() ? 0 : 1.5,
-                isInAllianceZone() ?
-                        Math.min(1.5, getDriveSlowlyPathPosition(
-                                driveInAllianceZonePercentage,
-                                currentRobotPose.getTranslation().getDistance(trenchEntryPose.getTranslation()),
-                                trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2)) :
-                        Math.min(2 + getDriveSlowlyPathPosition(
-                                driveInAllianceZonePercentage,
-                                trenchEntryPose.getTranslation().getDistance(trenchExitPose.getTranslation()) / 2,
-                                trenchExitPose.getTranslation().getDistance(targetPose.get().getTranslation())), 3),
+                endPose,
                 driveSlowlyInAllianceZoneConstraints
         );
 
@@ -180,12 +182,15 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static double getDriveSlowlyPathPosition(double percentage, double distanceFromInitToEntry, double distanceFromEntryToCenter) {
-        final double distanceFromInitToCenter = distanceFromInitToEntry + distanceFromEntryToCenter;
-        final double d = percentage * distanceFromInitToCenter;
-        double a = Math.min(d / distanceFromInitToEntry, 1);
-        double b = Math.max((d - distanceFromInitToEntry) / distanceFromEntryToCenter, 0);
-        return Math.max(Math.min( a + b, 1), 0);
+    private static double getDriveSlowlyPathPosition(double slowDistance, double distanceFromInitToEntry, double distanceFromEntryToCenter) {
+        double a = Math.min(slowDistance / distanceFromInitToEntry, 1);
+        double b = Math.max((slowDistance - distanceFromInitToEntry) / distanceFromEntryToCenter, 0);
+        System.out.println("Yedidya is gay " + Math.max(a + b, 0));
+        System.out.println(slowDistance);
+        System.out.println(distanceFromInitToEntry);
+        System.out.println(distanceFromEntryToCenter);
+        System.out.println(a + " a" + b + " b");
+        return Math.max(a + b, 0);
     }
 
     public static boolean isRight() {

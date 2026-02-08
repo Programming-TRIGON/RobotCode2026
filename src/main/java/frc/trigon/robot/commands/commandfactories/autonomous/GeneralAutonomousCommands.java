@@ -25,6 +25,7 @@ import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -68,7 +69,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1
+                        0.2
                 ),
                 getShootAtHubWhileDrivingCommand()
         ).withTimeout(timeout);
@@ -82,12 +83,12 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                                shootWhileDriving ? 1 : 0
+                                shootWhileDriving ? 0.2 : 0
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
                 getDriveToFuelCommand().alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
-        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/atDepot", RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION))));
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
@@ -97,7 +98,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1000
+                        0.5
                 ).raceWith(getShootAtHubWhileDrivingCommand())
                         .until(() -> RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose))
                         .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
@@ -128,7 +129,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
-                        shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME : 0
+                        shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_DISTANCE : 0
                 ).until(GeneralAutonomousCommands::shouldRobotStartIntaking),
                 getDriveToFuelCommand().withTimeout(timeout)
         );
