@@ -91,7 +91,7 @@ public class SafeAutonomousDriveCommands {
                 targetTrenchDrivingHolonomicAngle
         );
         final RotationTarget finalRotationTarget = new RotationTarget(
-                3,
+                2.8,
                 targetPose.get().getRotation()
         );
         final ConstraintsZone driveSlowlyInAllianceZoneConstraintsZone = new ConstraintsZone(
@@ -163,14 +163,6 @@ public class SafeAutonomousDriveCommands {
         return lowestTravelDistancePose;
     }
 
-    private static double getDriveSlowlyPathPosition(double percentage, double distanceFromInitToEntry, double distanceFromEntryToCenter) {
-        final double distanceFromInitToCenter = distanceFromInitToEntry + distanceFromEntryToCenter;
-        final double d = percentage * distanceFromInitToCenter;
-        double a = Math.min(d / distanceFromInitToEntry, 1);
-        double b = Math.max((d - distanceFromInitToEntry) / distanceFromEntryToCenter, 0);
-        return a + b;
-    }
-
     private static Command getDriveSlowlyInAllianceZoneCommand(
             Supplier<FlippablePose2d> targetPose,
             PathConstraints normalPathConstrains,
@@ -186,6 +178,14 @@ public class SafeAutonomousDriveCommands {
                 SwerveCommands.getDriveToPoseCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTime).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone),
                 SwerveCommands.getDriveToPoseCommand(targetPose, normalPathConstrains, endVelocity)
         );
+    }
+
+    private static double getDriveSlowlyPathPosition(double percentage, double distanceFromInitToEntry, double distanceFromEntryToCenter) {
+        final double distanceFromInitToCenter = distanceFromInitToEntry + distanceFromEntryToCenter;
+        final double d = percentage * distanceFromInitToCenter;
+        double a = Math.min(d / distanceFromInitToEntry, 1);
+        double b = Math.max((d - distanceFromInitToEntry) / distanceFromEntryToCenter, 0);
+        return a + b;
     }
 
     public static boolean isRight() {

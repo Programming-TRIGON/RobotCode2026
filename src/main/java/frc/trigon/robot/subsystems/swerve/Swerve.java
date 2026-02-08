@@ -59,11 +59,11 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Phoenix6SignalThread.QUEUES_LOCK.lock();
+        Phoenix6SignalThread.SIGNALS_LOCK.lock();
         try {
             updateHardware();
         } finally {
-            Phoenix6SignalThread.QUEUES_LOCK.unlock();
+            Phoenix6SignalThread.SIGNALS_LOCK.unlock();
         }
 
         updatePoseEstimatorStates();

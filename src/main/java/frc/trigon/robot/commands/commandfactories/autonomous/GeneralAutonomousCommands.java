@@ -9,12 +9,16 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandclasses.gamepieceautodrive.GamePieceAutoDriveCommand;
+import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.commands.commandfactories.ShootingCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
+import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.shootingphysics.ShootingState;
+import frc.trigon.robot.subsystems.climber.ClimberCommands;
+import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
@@ -87,16 +91,26 @@ public class GeneralAutonomousCommands {
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
-        return new SequentialCommandGroup(
+        return new ParallelCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         climbPosition,
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1
-                ).raceWith(getShootAtHubWhileDrivingCommand()),
-                new InstantCommand() // TODO: Add climb command
+                ).raceWith(getShootAtHubWhileDrivingCommand())
+                        .until(() -> RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose))
+                        .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
+                getClimbToL1Command()
         );
+    }
+
+    private static Command getClimbToL1Command() {
+        return new SequentialCommandGroup(
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_PREPARE).until(() -> RobotContainer.CLIMBER.atTargetState() && RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose)),
+                new InstantCommand(() -> ClimbCommands.IS_CLIMBING = true),
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_L1)
+        ).until(OperatorConstants.CANCEL_CLIMB_TRIGGER);
     }
 
     private static Command getShootAtHubWhileDrivingCommand() {
@@ -123,7 +137,7 @@ public class GeneralAutonomousCommands {
     private static Command getDriveToFuelCommand() {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(false),
-                SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 1),
+                SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> Flippable.isRedAlliance() ? 0.5 : -0.5),
                 RobotContainer.OBJECT_POSE_ESTIMATOR::hasObjects
         );
     }
