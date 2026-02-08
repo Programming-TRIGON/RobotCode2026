@@ -13,12 +13,12 @@ import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
 
 public class LoaderConstants {
-    private static final int MOTOR_ID = 12;
+    private static final int MOTOR_ID = 13;
     private static final String MOTOR_NAME = "LoaderMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 12.53188528;
+    private static final double GEAR_RATIO = 7.76976888;
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -60,11 +60,11 @@ public class LoaderConstants {
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 1.4763 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 8 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 6 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
 
         config.CurrentLimits.StatorCurrentLimit = 50;
         config.CurrentLimits.StatorCurrentLimitEnable = true;

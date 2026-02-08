@@ -65,9 +65,9 @@ public class OperatorConstants {
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().or(OPERATOR_CONTROLLER.k()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().or(OPERATOR_CONTROLLER.l());
     public static final Trigger //Climb Triggers
-            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c());
-    //          CANCEL_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()).or(OPERATOR_CONTROLLER.x()),
-    //          CONTINUE_CLIMB_TRIGGER = new Trigger(ClimberCommands::IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper()).or(OPERATOR_CONTROLLER.v());
+            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c()),
+            CANCEL_CLIMB_TRIGGER = DRIVER_CONTROLLER.leftBumper().or(OPERATOR_CONTROLLER.x()),
+            CONTINUE_CLIMB_TRIGGER = DRIVER_CONTROLLER.rightBumper().or(OPERATOR_CONTROLLER.v());
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());

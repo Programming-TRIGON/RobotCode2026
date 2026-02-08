@@ -61,6 +61,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         SimulationFieldHandler.update();
+//        AprilTagCameraConstants.VISION_SIMULATION.update(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedOdometryPose());
     }
 
     @Override
