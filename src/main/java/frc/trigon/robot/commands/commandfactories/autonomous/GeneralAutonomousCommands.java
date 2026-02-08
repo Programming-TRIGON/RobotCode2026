@@ -18,6 +18,7 @@ import frc.trigon.robot.misc.shootingphysics.ShootingState;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
 
@@ -31,7 +32,7 @@ public class GeneralAutonomousCommands {
     public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
-                        new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
+                        getDriveToFuelCommand().withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
@@ -47,7 +48,7 @@ public class GeneralAutonomousCommands {
     public static Command getCollectFromNeutralZoneCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
-                        new GamePieceAutoDriveCommand(true).withTimeout(collectionTimeout),
+                        getDriveToFuelCommand().withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
@@ -81,7 +82,7 @@ public class GeneralAutonomousCommands {
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
-                new GamePieceAutoDriveCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
+                getDriveToFuelCommand().alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
@@ -115,7 +116,15 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_TIME : 0
                 ).until(GeneralAutonomousCommands::shouldRobotStartIntaking),
-                new GamePieceAutoDriveCommand(false).withTimeout(timeout)
+                getDriveToFuelCommand().withTimeout(timeout)
+        );
+    }
+
+    private static Command getDriveToFuelCommand() {
+        return GeneralCommands.getContinuousConditionalCommand(
+                new GamePieceAutoDriveCommand(false),
+                SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 1),
+                RobotContainer.OBJECT_POSE_ESTIMATOR::hasObjects
         );
     }
 

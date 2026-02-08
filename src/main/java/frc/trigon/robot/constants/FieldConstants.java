@@ -30,7 +30,7 @@ public class FieldConstants {
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
     public static final FlippablePose2d
-            LEFT_CLIMB_POSITION = new FlippablePose2d(1.45, 4.25, Rotation2d.fromDegrees(0), true),
+            LEFT_CLIMB_POSITION = new FlippablePose2d(1.57, 4.25, Rotation2d.fromDegrees(0), true),
             RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.getBlueObject().getX(), 3.28, Rotation2d.fromDegrees(0), true),
             CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.getBlueObject().getX() + RIGHT_CLIMB_POSITION.getBlueObject().getX()) / 2, LEFT_CLIMB_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
             DEPOT_POSITION = new FlippablePose2d(0.45, 7, Rotation2d.fromDegrees(-90), true),
