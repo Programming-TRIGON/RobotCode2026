@@ -26,7 +26,10 @@ public class ShooterConstants {
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 6.22853402;
+    public static final double
+            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.78) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.53) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+    private static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
 
@@ -72,9 +75,9 @@ public class ShooterConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.2 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0215 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.76477 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.019077 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.75057 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 0;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 0;
