@@ -72,11 +72,11 @@ public class SafeAutonomousDriveCommands {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
         final Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
-        final List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-                new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+        final List<Waypoint> waypoints = getWaypointsThroughTrench(
+                currentRobotPose,
                 trenchEntryPose,
                 trenchExitPose,
-                new Pose2d(targetPose.get().getTranslation(), targetPose.get().getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
+                targetPose.get()
         );
 
         final Rotation2d targetTrenchDrivingHolonomicAngle = getTrenchDrivingHolonomicAngle(targetPose);
@@ -124,6 +124,21 @@ public class SafeAutonomousDriveCommands {
 
         path.preventFlipping = true;
         return path;
+    }
+
+    private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
+        if ((currentRobotPose.getTranslation().getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone()))
+            return PathPlannerPath.waypointsFromPoses(
+                    new Pose2d(currentRobotPose.getTranslation(), trenchExitPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                    trenchExitPose,
+                    new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
+            );
+        return PathPlannerPath.waypointsFromPoses(
+                new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                trenchEntryPose,
+                trenchExitPose,
+                new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
+        );
     }
 
     private static Rotation2d getTrenchDrivingHolonomicAngle(FlippablePose2d targetPose) {
