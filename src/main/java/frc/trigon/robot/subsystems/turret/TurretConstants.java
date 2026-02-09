@@ -83,11 +83,11 @@ public class TurretConstants {
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
             new Translation3d(0.17783, -0.08186, 0.17777),
-            new Rotation3d(0, Math.toRadians(-36), Math.toRadians(-30))
+            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
                     new Translation3d(0.17783, 0.08186, 0.17777),
-                    new Rotation3d(0, Math.toRadians(-36), Math.toRadians(30))
+                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30))
             );
 
     static {
@@ -105,6 +105,8 @@ public class TurretConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
         config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
         config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;

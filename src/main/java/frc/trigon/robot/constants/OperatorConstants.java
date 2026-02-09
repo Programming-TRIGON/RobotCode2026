@@ -83,7 +83,6 @@ public class OperatorConstants {
     public static boolean shouldAutoDeliver() {
         return DriverStation.isTeleop()
                 && isInDeliveryZone()
-                && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 

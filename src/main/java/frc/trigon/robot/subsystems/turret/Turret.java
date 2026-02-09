@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.Phoenix6SignalThread;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
-import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
@@ -141,7 +140,8 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d getCurrentSelfRelativeAngle() {
-        return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
+        return new Rotation2d();
+//        return Rotation2d.fromRotations(encoder.getSignal(CANcoderSignal.POSITION));
     }
 
     public Translation2d calculateClosestDeliveryPosition() {

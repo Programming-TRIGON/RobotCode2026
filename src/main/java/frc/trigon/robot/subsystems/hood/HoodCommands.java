@@ -25,7 +25,7 @@ public class HoodCommands {
                 RobotContainer.HOOD::setTargetVoltageToResetVoltage,
                 RobotContainer.HOOD::zeroPosition,
                 RobotContainer.HOOD
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getAimAtHubCommand() {
