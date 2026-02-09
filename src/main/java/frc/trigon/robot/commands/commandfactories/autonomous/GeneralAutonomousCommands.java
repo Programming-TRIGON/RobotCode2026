@@ -37,8 +37,8 @@ public class GeneralAutonomousCommands {
     public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
-                        getDriveToFuelCommand().withTimeout(collectionTimeout),
-                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                        getDriveToFuelCommand(false).withTimeout(collectionTimeout),
+                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout, true),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
@@ -53,8 +53,8 @@ public class GeneralAutonomousCommands {
     public static Command getCollectFromNeutralZoneCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
-                        getDriveToFuelCommand().withTimeout(collectionTimeout),
-                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout),
+                        getDriveToFuelCommand(false).withTimeout(collectionTimeout),
+                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout, false),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
@@ -83,12 +83,12 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                                shootWhileDriving ? 0.2 : 0
+                                shootWhileDriving ? 1000 : 0
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
-                getDriveToFuelCommand().alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
-        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/atDepot", RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION))));
+                getDriveToFuelCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
@@ -122,7 +122,7 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout) {
+    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION,
@@ -130,14 +130,14 @@ public class GeneralAutonomousCommands {
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_DISTANCE : 0
-                ).until(GeneralAutonomousCommands::shouldRobotStartIntaking),
-                getDriveToFuelCommand().withTimeout(timeout)
+                ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION) : GeneralAutonomousCommands::shouldRobotStartIntaking),
+                getDriveToFuelCommand(false).withTimeout(timeout)
         );
     }
 
-    private static Command getDriveToFuelCommand() {
+    private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
-                new GamePieceAutoDriveCommand(false),
+                new GamePieceAutoDriveCommand(intakeSlowly),
                 SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> Flippable.isRedAlliance() ? 0.5 : -0.5),
                 RobotContainer.OBJECT_POSE_ESTIMATOR::hasObjects
         );
