@@ -213,32 +213,32 @@ public class Turret extends MotorSubsystem {
 
     private FlippablePose2d calculateClosestAprilTagPose(Pose2d robotPose) {
         double closestTagDistanceToRobotMeters = Double.POSITIVE_INFINITY;
-        FlippablePose2d closestTagPose = null;
+        FlippablePose2d closestTagPoseToRobot = null;
 
         for (final Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
             final FlippablePose2d flippableTagPose = new FlippablePose2d(tagPose3d.toPose2d(), false);
             final Pose2d fieldRelativeTagPose = flippableTagPose.get();
-            final double currentTagDistance = robotPose.getTranslation().getDistance(fieldRelativeTagPose.getTranslation());
+            final double currentTagDistanceToRobotMeters = robotPose.getTranslation().getDistance(fieldRelativeTagPose.getTranslation());
 
-            if (currentTagDistance < closestTagDistanceToRobotMeters) {
-                closestTagDistanceToRobotMeters = currentTagDistance;
-                closestTagPose = flippableTagPose;
+            if (currentTagDistanceToRobotMeters < closestTagDistanceToRobotMeters) {
+                closestTagDistanceToRobotMeters = currentTagDistanceToRobotMeters;
+                closestTagPoseToRobot = flippableTagPose;
             }
         }
 
-        return closestTagPose;
+        return closestTagPoseToRobot;
     }
 
     private Integer getClosestAprilTagID() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final FlippablePose2d closestTag = calculateClosestAprilTagPose(robotPose);
+        final FlippablePose2d closestTagPoseToRobot = calculateClosestAprilTagPose(robotPose);
 
-        if (closestTag == null) {
+        if (closestTagPoseToRobot == null) {
             return null;
         }
 
         for (Map.Entry<Integer, Pose3d> entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
-            if (entry.getValue().toPose2d().equals(closestTag.get())) {
+            if (entry.getValue().toPose2d().equals(closestTagPoseToRobot.get())) {
                 return entry.getKey();
             }
         }
