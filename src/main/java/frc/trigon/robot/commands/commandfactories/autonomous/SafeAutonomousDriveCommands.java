@@ -75,7 +75,7 @@ public class SafeAutonomousDriveCommands {
         final List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
                 new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                 trenchEntryPose,
-                new Pose2d(trenchExitPose.getTranslation(), targetPose.get().getTranslation().minus(trenchExitPose.getTranslation()).getAngle()),
+                trenchExitPose,
                 new Pose2d(targetPose.get().getTranslation(), targetPose.get().getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
         );
 
