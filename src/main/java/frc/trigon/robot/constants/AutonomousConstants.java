@@ -16,6 +16,7 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.autonomous.AutonomousGenerator;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.io.IOException;
 
@@ -34,15 +35,14 @@ public class AutonomousConstants {
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
 
-    public static double
+    public static final LoggedNetworkNumber DELIVERY_TIMEOUT_SECONDS = new LoggedNetworkNumber("DeliveryTimeoutSeconds", 6);
+    public static final double
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
-            DEPOT_COLLECTION_TIMEOUT_SECONDS = 6,
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
-            DELIVERY_TIMEOUT_SECONDS = 6,
-            SCORING_TIMEOUT_SECONDS = 3.8,
-            ESTIMATED_CLIMBING_TIME_SECONDS = 3,
-            START_CLIMBING_TIME_SECONDS = AUTONOMOUS_TIME_SECONDS - ESTIMATED_CLIMBING_TIME_SECONDS;
+            SCORING_TIMEOUT_SECONDS = 3.5,
+            ESTIMATED_CLIMBING_TIME_SECONDS = 3;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1.3,
             CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;

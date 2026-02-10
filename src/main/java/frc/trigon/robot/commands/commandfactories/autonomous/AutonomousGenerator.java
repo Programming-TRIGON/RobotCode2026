@@ -57,7 +57,7 @@ public class AutonomousGenerator {
 
         return switch (state) {
             case DELIVERY ->
-                    GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS.get());
             case SCORE ->
                     GeneralAutonomousCommands.getScoreCommand(nextState, AutonomousConstants.SCORING_TIMEOUT_SECONDS);
             case COLLECT_FROM_DEPOT ->

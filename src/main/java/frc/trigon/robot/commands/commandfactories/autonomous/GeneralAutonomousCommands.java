@@ -25,6 +25,7 @@ import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -37,7 +38,12 @@ public class GeneralAutonomousCommands {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
                         getDriveToFuelCommand(false).withTimeout(collectionTimeout),
-                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout, true),
+                        getDriveToFuelInNeutralZoneCommand(
+                                previousState == null,
+                                collectionTimeout,
+                                true,
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION
+                        ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
@@ -53,7 +59,12 @@ public class GeneralAutonomousCommands {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
                         getDriveToFuelCommand(false).withTimeout(collectionTimeout),
-                        getDriveToFuelInNeutralZoneCommand(previousState == null, collectionTimeout, false),
+                        getDriveToFuelInNeutralZoneCommand(
+                                previousState == null,
+                                collectionTimeout,
+                                false,
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION
+                        ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
@@ -87,7 +98,7 @@ public class GeneralAutonomousCommands {
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
                 getDriveToFuelCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
-        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/atDepot", RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION))));
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
@@ -121,15 +132,15 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose) {
+    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
-                        () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION,
+                        () -> targetPose,
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0
-                ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION) : GeneralAutonomousCommands::shouldRobotStartIntaking),
+                ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(targetPose) : GeneralAutonomousCommands::shouldRobotStartIntaking),
                 getDriveToFuelCommand(false).withTimeout(timeout)
         );
     }

@@ -48,6 +48,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
                 AutonomousConstants.GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER.reset();
             }
             updateCommandedHeading();
+            Logger.recordOutput("GamePieceAutoDrive/hasCollectableGamePiece", hasCollectableGamePiecesInView());
         });
     }
 
@@ -309,6 +310,34 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     // =========================================================================
     // VISION LOGIC
     // =========================================================================
+
+    /**
+     * Checks whether there are any collectable game pieces currently visible.
+     * A piece is considered collectable if it's within the allowed collection zone
+     * (not past mid-field for blue alliance, or not behind the alliance wall for red).
+     *
+     * @return true if at least one collectable game piece is in view
+     */
+    public static boolean hasCollectableGamePiecesInView() {
+        List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
+        if (allObjects.isEmpty()) return false;
+
+        for (Translation2d piece : allObjects) {
+            if (!isOutOfBoundsStatic(piece)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Static version of isOutOfBounds for use in static context.
+     */
+    private static boolean isOutOfBoundsStatic(Translation2d piece) {
+        if (Flippable.isRedAlliance())
+            return piece.getX() < GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS;
+        return piece.getX() > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+    }
 
     private GamePieceCluster findBestCluster() {
         List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
