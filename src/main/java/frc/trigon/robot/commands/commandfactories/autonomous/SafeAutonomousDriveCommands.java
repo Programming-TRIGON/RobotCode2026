@@ -65,11 +65,10 @@ public class SafeAutonomousDriveCommands {
                         )
                 ),
                 Set.of(RobotContainer.SWERVE)
-        ).finallyDo(() -> Logger.recordOutput("Autonomous/isThinging", false));
+        );
     }
 
     private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity) {
-        Logger.recordOutput("Autonomous/isThinging", true);
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
         final Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
