@@ -73,7 +73,7 @@ public class Turret extends MotorSubsystem {
         followerMotor.update();
         encoder.update();
 
-        logTurretAngles();
+        updateTurretAngleLogs();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class Turret extends MotorSubsystem {
                 targetProfiledSelfRelativeAngle
         );
 
-        Logger.recordOutput("Poses/Components/ClosestAprilTagPose", calculateClosestAprilTagPose().get());
+        Logger.recordOutput("Poses/Components/ClosestAprilTagPose", calculateClosestAprilTagPose(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()).get());
         Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
     }
 
@@ -193,55 +193,49 @@ public class Turret extends MotorSubsystem {
         );
     }
 
-    private void logTurretAngles() {
+    private void updateTurretAngleLogs() {
         Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", getCurrentSelfRelativeAngle().getDegrees());
         Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
         Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
         Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngle", Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)).getDegrees());
     }
 
-
     private Rotation2d calculateFieldRelativeAngleToClosestAprilTag() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final FlippablePose2d closestTagPoseToRobot = calculateClosestAprilTagPose();
+        final FlippablePose2d closestTagPoseToRobot = calculateClosestAprilTagPose(robotPose);
 
-        if (closestTagPoseToRobot != null) {
-            int closestTagID = 0;
-            for (Map.Entry<Integer, Pose3d> entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
-                if (entry.getValue().toPose2d().equals(closestTagPoseToRobot.get())) {
-                    closestTagID = entry.getKey();
-                    break;
-                }
-            }
-
-            Logger.recordOutput("Turret/ClosestAprilTagID", closestTagID);
-            return calculateTargetAngleToPose(
-                    closestTagPoseToRobot.get().getTranslation(),
-                    robotPose
-            ).plus(robotPose.getRotation());
-        }
-
-        return null;
+        return calculateTargetAngleToPose(
+                closestTagPoseToRobot.get().getTranslation(),
+                robotPose
+        ).plus(robotPose.getRotation());
     }
 
-    private FlippablePose2d calculateClosestAprilTagPose() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        double closestTagDistanceToRobotMeters = Double.POSITIVE_INFINITY;
-        FlippablePose2d closestTagPoseToRobot = null;
 
-        for (final Pose3d tagPose3d : FieldConstants.TAG_ID_TO_POSE.values()) {
+    private FlippablePose2d calculateClosestAprilTagPose(Pose2d robotPose) {
+        double closestTagDistanceToRobotMeters = Double.POSITIVE_INFINITY;
+        FlippablePose2d closestTagPose = null;
+        int closestTagID = 0;
+
+        for (Map.Entry<Integer, Pose3d> entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
+
+            int tagID = entry.getKey();
+            Pose3d tagPose3d = entry.getValue();
+
             final FlippablePose2d flippableTagPose = new FlippablePose2d(tagPose3d.toPose2d(), false);
             final Pose2d fieldRelativeTagPose = flippableTagPose.get();
             final double currentTagDistanceToRobotMeters = robotPose.getTranslation().getDistance(fieldRelativeTagPose.getTranslation());
 
             if (currentTagDistanceToRobotMeters < closestTagDistanceToRobotMeters) {
                 closestTagDistanceToRobotMeters = currentTagDistanceToRobotMeters;
-                closestTagPoseToRobot = flippableTagPose;
+                closestTagPose = flippableTagPose;
+                closestTagID = tagID;
             }
         }
 
-        return closestTagPoseToRobot;
+        Logger.recordOutput("Turret/ClosestAprilTagID", closestTagID);
+        return closestTagPose;
     }
+
 
     private double calculateResistSwerveRotationFeedforward() {
         final double robotRotationalVelocityRadiansPerSecond = RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond();
