@@ -202,13 +202,13 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d calculateFieldRelativeAngleToClosestAprilTag() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final FlippablePose2d closestTagPoseToRobot = calculateClosestAprilTagPose();
+        final FlippablePose2d closestTagPose = calculateClosestAprilTagPose();
 
-        if (closestTagPoseToRobot == null)
+        if (closestTagPose == null)
             return null;
 
         return calculateTargetAngleToPose(
-                closestTagPoseToRobot.get().getTranslation(),
+                closestTagPose.get().getTranslation(),
                 robotPose
         ).plus(robotPose.getRotation());
     }
@@ -220,9 +220,9 @@ public class Turret extends MotorSubsystem {
         FlippablePose2d closestTagPose = null;
         int closestTagID = 0;
 
-        for (Map.Entry<Integer, Pose3d> entry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
-            final int tagID = entry.getKey();
-            final Pose2d tagPose = entry.getValue().toPose2d();
+        for (Map.Entry<Integer, Pose3d> tagEntry : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
+            final int tagID = tagEntry.getKey();
+            final Pose2d tagPose = tagEntry.getValue().toPose2d();
 
             final FlippablePose2d flippableTagPose = new FlippablePose2d(tagPose, false);
             final Pose2d fieldRelativeTagPose = flippableTagPose.get();
