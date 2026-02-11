@@ -122,7 +122,12 @@ public class SafeAutonomousDriveCommands {
                 .minus(currentRobotPose.getTranslation())
                 .getAngle();
 
-        if ((currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone())) {
+        if (
+                (currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone() && !Flippable.isRedAlliance()) ||
+                        (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone() && !Flippable.isRedAlliance()) ||
+                        (currentRobotPose.getX() > trenchEntryPose.getX() && !isInAllianceZone() && Flippable.isRedAlliance()) ||
+                        (currentRobotPose.getX() < trenchEntryPose.getX() && isInAllianceZone() && Flippable.isRedAlliance())
+        ) {
             final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
 
             return PathPlannerPath.waypointsFromPoses(
@@ -151,7 +156,6 @@ public class SafeAutonomousDriveCommands {
 
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
         final Rotation2d targetTrenchDrivingHolonomicAngle = getTrenchDrivingHolonomicAngle(currentPose);
-        Logger.recordOutput("Autonomous/numCheckpoints", waypoints.size());
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
@@ -164,24 +168,6 @@ public class SafeAutonomousDriveCommands {
                 new RotationTarget(2, targetTrenchDrivingHolonomicAngle),
                 new RotationTarget(2.7, targetPose.get().getRotation()),
                 new RotationTarget(3, targetPose.get().getRotation())
-        );
-    }
-
-    private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose, boolean isSecondPath) {
-        Logger.recordOutput("Autonomous/posey", getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose));
-        if ((currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone())) {
-            final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
-            return PathPlannerPath.waypointsFromPoses(
-                    new Pose2d(currentRobotPose.getTranslation(), closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
-                    isSecondPath ? new Pose2d(closestPoseToTarget.getTranslation(), closestPoseToTarget.getRotation().rotateBy(Rotation2d.k180deg)) : closestPoseToTarget,
-                    new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
-            );
-        }
-        return PathPlannerPath.waypointsFromPoses(
-                new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
-                trenchEntryPose,
-                trenchExitPose,
-                new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
         );
     }
 
