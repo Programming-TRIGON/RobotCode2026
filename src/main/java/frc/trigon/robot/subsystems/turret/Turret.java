@@ -204,16 +204,18 @@ public class Turret extends MotorSubsystem {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final FlippablePose2d closestTagPoseToRobot = calculateClosestAprilTagPose();
 
+        if (closestTagPoseToRobot == null)
+            return null;
+
         return calculateTargetAngleToPose(
                 closestTagPoseToRobot.get().getTranslation(),
                 robotPose
         ).plus(robotPose.getRotation());
     }
 
-
     private FlippablePose2d calculateClosestAprilTagPose() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        
+
         double closestTagDistanceToRobotMeters = Double.POSITIVE_INFINITY;
         FlippablePose2d closestTagPose = null;
         int closestTagID = 0;
