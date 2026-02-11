@@ -8,6 +8,7 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
+import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
@@ -378,9 +379,10 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     private boolean isOutOfBounds(Translation2d piece) {
+        final double x = piece.getX();
         if (Flippable.isRedAlliance())
-            return piece.getX() < GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS;
-        return piece.getX() > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+            return x < (FieldConstants.FIELD_LENGTH_METERS - GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS) || x > (FieldConstants.FIELD_LENGTH_METERS);
+        return x > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
     }
 
     private double calculateClusterScore(int count, double distance) {
