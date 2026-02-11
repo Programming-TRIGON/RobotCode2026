@@ -195,9 +195,12 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      * lock it in the unsafe position.
      */
     private boolean shouldDrive() {
+        // FIX: Check if we actually have a valid cluster in the reference
+        if (currentTargetCluster.get() == null) return false;
+
         Translation2d error = getTranslationError();
-        if (error == null)
-            return false;
+        if (error == null) return false;
+
         return !(error.getNorm() <= AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS);
     }
 

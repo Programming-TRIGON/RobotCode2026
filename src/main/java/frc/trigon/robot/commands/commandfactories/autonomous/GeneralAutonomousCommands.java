@@ -97,6 +97,7 @@ public class GeneralAutonomousCommands {
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
+                new WaitCommand(0.1),
                 getDriveToFuelCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/atDepot", RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION))));
     }

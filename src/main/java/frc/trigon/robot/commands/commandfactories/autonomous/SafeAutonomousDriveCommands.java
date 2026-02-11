@@ -65,7 +65,7 @@ public class SafeAutonomousDriveCommands {
 
     private static Command getDriveThroughTrenchFromNeutralZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
         return new SequentialCommandGroup(
-                getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity).until(SafeAutonomousDriveCommands::isInAllianceZone),
+                getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS()).until(SafeAutonomousDriveCommands::isInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone),
                 getDriveSlowlyInAllianceZoneCommand(() -> targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone)
         );
@@ -83,7 +83,11 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
+    private static int num = 0;
+
     private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints pathConstraints, double endVelocity) {
+        num++;
+        Logger.recordOutput("Autonomous/numPaths", num);
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
         final Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
@@ -111,8 +115,43 @@ public class SafeAutonomousDriveCommands {
         return path;
     }
 
+    private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
+        // 1. Calculate the general direction of travel (Heading)
+        // This is the angle from the robot's current position to the final target.
+        Rotation2d travelHeading = targetPose.getTranslation()
+                .minus(currentRobotPose.getTranslation())
+                .getAngle();
+
+        if ((currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone())) {
+            final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
+
+            return PathPlannerPath.waypointsFromPoses(
+                    new Pose2d(currentRobotPose.getTranslation(), closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+
+                    // --- FIX STARTS HERE ---
+                    // Instead of using closestPoseToTarget.getRotation() (which is static)
+                    // or isSecondPath (which is a patch), use the dynamic travelHeading.
+                    new Pose2d(closestPoseToTarget.getTranslation(), travelHeading),
+                    // --- FIX ENDS HERE ---
+
+                    new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
+            );
+        }
+
+        return PathPlannerPath.waypointsFromPoses(
+                new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+
+                // Apply the same logic here if 'trenchEntryPose' has a fixed rotation that might conflict
+                new Pose2d(trenchEntryPose.getTranslation(), travelHeading),
+                new Pose2d(trenchExitPose.getTranslation(), travelHeading),
+
+                new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
+        );
+    }
+
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
         final Rotation2d targetTrenchDrivingHolonomicAngle = getTrenchDrivingHolonomicAngle(currentPose);
+        Logger.recordOutput("Autonomous/numCheckpoints", waypoints.size());
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
@@ -128,13 +167,16 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
-        if ((currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone()))
+    private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose, boolean isSecondPath) {
+        Logger.recordOutput("Autonomous/posey", getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose));
+        if ((currentRobotPose.getX() > trenchEntryPose.getX() && isInAllianceZone()) || (currentRobotPose.getTranslation().getX() < trenchEntryPose.getX() && !isInAllianceZone())) {
+            final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
             return PathPlannerPath.waypointsFromPoses(
-                    new Pose2d(currentRobotPose.getTranslation(), getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose).getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
-                    getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose),
+                    new Pose2d(currentRobotPose.getTranslation(), closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                    isSecondPath ? new Pose2d(closestPoseToTarget.getTranslation(), closestPoseToTarget.getRotation().rotateBy(Rotation2d.k180deg)) : closestPoseToTarget,
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
             );
+        }
         return PathPlannerPath.waypointsFromPoses(
                 new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                 trenchEntryPose,
