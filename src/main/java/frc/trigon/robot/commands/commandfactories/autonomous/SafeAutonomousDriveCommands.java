@@ -132,13 +132,7 @@ public class SafeAutonomousDriveCommands {
 
             return PathPlannerPath.waypointsFromPoses(
                     new Pose2d(currentRobotPose.getTranslation(), closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
-
-                    // --- FIX STARTS HERE ---
-                    // Instead of using closestPoseToTarget.getRotation() (which is static)
-                    // or isSecondPath (which is a patch), use the dynamic travelHeading.
                     new Pose2d(closestPoseToTarget.getTranslation(), getHeading(travelHeading)),
-                    // --- FIX ENDS HERE ---
-
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
             );
         }
