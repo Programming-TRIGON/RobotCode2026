@@ -136,7 +136,7 @@ public class SafeAutonomousDriveCommands {
                     // --- FIX STARTS HERE ---
                     // Instead of using closestPoseToTarget.getRotation() (which is static)
                     // or isSecondPath (which is a patch), use the dynamic travelHeading.
-                    new Pose2d(closestPoseToTarget.getTranslation(), travelHeading),
+                    new Pose2d(closestPoseToTarget.getTranslation(), getHeading(travelHeading)),
                     // --- FIX ENDS HERE ---
 
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
@@ -147,11 +147,26 @@ public class SafeAutonomousDriveCommands {
                 new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
 
                 // Apply the same logic here if 'trenchEntryPose' has a fixed rotation that might conflict
-                new Pose2d(trenchEntryPose.getTranslation(), travelHeading),
-                new Pose2d(trenchExitPose.getTranslation(), travelHeading),
+                new Pose2d(trenchEntryPose.getTranslation(), getHeading(travelHeading)),
+                new Pose2d(trenchExitPose.getTranslation(), getHeading(travelHeading)),
 
                 new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
         );
+    }
+
+    private static Rotation2d getHeading(Rotation2d travelHeading) {
+        double lowestAngleDifference = Double.MAX_VALUE;
+        Rotation2d bestHeading = travelHeading;
+        List<Integer> possibleHeadingsDegrees = List.of(0, 180, -180);
+        for (int possibleHeadingDegrees : possibleHeadingsDegrees) {
+            Rotation2d possibleHeading = Rotation2d.fromDegrees(possibleHeadingDegrees);
+            double angleDifference = Math.abs(travelHeading.minus(possibleHeading).getDegrees());
+            if (angleDifference < lowestAngleDifference) {
+                lowestAngleDifference = angleDifference;
+                bestHeading = possibleHeading;
+            }
+        }
+        return bestHeading;
     }
 
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
