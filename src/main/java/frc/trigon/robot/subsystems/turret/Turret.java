@@ -12,6 +12,7 @@ import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderSignal;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
+import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MechanismCameraTransformCalculator;
@@ -20,6 +21,7 @@ import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Turret extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
@@ -70,22 +72,22 @@ public class Turret extends MotorSubsystem {
     public void updatePeriodically() {
         followerMotor.update();
         encoder.update();
+
+        logTurretStats();
     }
 
     @Override
     public void updateMechanism() {
         final Rotation2d currentSelfRelativeAngle = getCurrentSelfRelativeAngle();
         final Rotation2d targetProfiledSelfRelativeAngle = Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
+
         TurretConstants.MECHANISM.update(
                 currentSelfRelativeAngle,
                 targetProfiledSelfRelativeAngle
         );
-        Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
 
-        Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", currentSelfRelativeAngle.getDegrees());
-        Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
-        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
-        Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngle", targetProfiledSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Poses/Components/ClosestAprilTagPose", calculateClosestAprilTagPose().get());
+        Logger.recordOutput("Poses/Components/TurretPose", calculateVisualizationPose());
     }
 
     @Override
@@ -160,7 +162,12 @@ public class Turret extends MotorSubsystem {
     }
 
     void alignToClosestAprilTag() {
-        // TODO: add logic
+        final Rotation2d targetFieldRelativeAngle = calculateFieldRelativeAngleToClosestAprilTag();
+
+        if (targetFieldRelativeAngle == null)
+            return;
+
+        setTargetFieldRelativeAngle(targetFieldRelativeAngle);
     }
 
     void alignForDelivery() {
@@ -185,6 +192,53 @@ public class Turret extends MotorSubsystem {
                 .withFeedForward(resistSwerveRotationFeedforward)
         );
     }
+
+    private void logTurretStats() {
+        Logger.recordOutput("Turret/CurrentSelfRelativeAngleDegrees", getCurrentSelfRelativeAngle().getDegrees());
+        Logger.recordOutput("Turret/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
+        Logger.recordOutput("Turret/TargetSelfRelativeAngleDegrees", targetSelfRelativeAngle.getDegrees());
+        Logger.recordOutput("Turret/TargetProfiledSelfRelativeAngleDegrees", Rotation2d.fromRotations(masterMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)).getDegrees());
+    }
+
+    private Rotation2d calculateFieldRelativeAngleToClosestAprilTag() {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final FlippablePose2d closestTagToRobotPose = calculateClosestAprilTagPose();
+
+        if (closestTagToRobotPose == null)
+            return null;
+
+        return calculateTargetAngleToPose(
+                closestTagToRobotPose.get().getTranslation(),
+                robotPose
+        ).plus(robotPose.getRotation());
+    }
+
+    private FlippablePose2d calculateClosestAprilTagPose() {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+
+        double closestTagDistanceToRobotMeters = Double.POSITIVE_INFINITY;
+        FlippablePose2d closestTagPose = null;
+        int closestTagID = 0;
+
+        for (Map.Entry<Integer, Pose3d> tagIdToPose : FieldConstants.TAG_ID_TO_POSE.entrySet()) {
+            final int tagID = tagIdToPose.getKey();
+            final Pose2d tagPose = tagIdToPose.getValue().toPose2d();
+
+            final FlippablePose2d flippableTagPose = new FlippablePose2d(tagPose, false);
+            final Pose2d fieldRelativeTagPose = flippableTagPose.get();
+            final double currentTagDistanceToRobotMeters = robotPose.getTranslation().getDistance(fieldRelativeTagPose.getTranslation());
+
+            if (currentTagDistanceToRobotMeters < closestTagDistanceToRobotMeters) {
+                closestTagDistanceToRobotMeters = currentTagDistanceToRobotMeters;
+                closestTagPose = flippableTagPose;
+                closestTagID = tagID;
+            }
+        }
+
+        Logger.recordOutput("Turret/ClosestAprilTagID", closestTagID);
+        return closestTagPose;
+    }
+
 
     private double calculateResistSwerveRotationFeedforward() {
         final double robotRotationalVelocityRadiansPerSecond = RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond();

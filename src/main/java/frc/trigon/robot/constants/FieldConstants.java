@@ -20,7 +20,7 @@ public class FieldConstants {
             FIELD_LENGTH_METERS = FlippingUtil.fieldSizeX;
 
     private static final List<Integer> I_HATE_YOU = List.of(
-            //Tags to ignore
+            1, 6, 7, 12, 13, 14, 15, 16, 17, 22, 23, 28, 29, 30, 31, 32
     );
     private static final boolean SHOULD_USE_HOME_TAG_LAYOUT = false;
     public static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = createAprilTagFieldLayout();
