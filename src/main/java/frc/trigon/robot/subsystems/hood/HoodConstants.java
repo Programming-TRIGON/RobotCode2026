@@ -66,10 +66,10 @@ public class HoodConstants {
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(0.5);
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(87),
-            DELIVERY_ANGLE = Rotation2d.fromDegrees(50),
+            DELIVERY_ANGLE = Rotation2d.fromDegrees(56),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
     static final double HOOD_RESET_VOLTAGE = 0.5;
-    static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(86);
+    static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(87);
 
     static {
         configureMotor();
@@ -105,7 +105,7 @@ public class HoodConstants {
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 40;
-
+        
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);
 

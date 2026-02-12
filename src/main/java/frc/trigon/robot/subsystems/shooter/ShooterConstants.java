@@ -27,8 +27,8 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     public static final double
-            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.78) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
-            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.53) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 2.0) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.59) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
     private static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
@@ -53,7 +53,7 @@ public class ShooterConstants {
 
     static final double EJECTION_VELOCITY_METERS_PER_SECOND = 3;
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
-    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.05;
+    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.2;
     static final double
             DELIVERY_VELOCITY_SLOPE = 0.9,
             DELIVERY_VELOCITY_INTERCEPT_POINT = 2;

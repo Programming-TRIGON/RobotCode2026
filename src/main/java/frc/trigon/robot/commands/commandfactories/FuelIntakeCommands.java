@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 public class FuelIntakeCommands {
     public static final LoggedNetworkBoolean
             SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("/SmartDashboard/ShouldKeepIntakeOpen", true),
-            SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", true);
+            SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", false);
 
     public static final double
             X_ASSIST_POWER = 0.0,
@@ -28,19 +28,19 @@ public class FuelIntakeCommands {
     public static Command getToggleDefaultIntakeStateCommand() {
         return new InstantCommand(
                 () -> SHOULD_KEEP_INTAKE_OPEN.set(!SHOULD_KEEP_INTAKE_OPEN.get())
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getEnableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(true)
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getDisableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(false)
-        );
+        ).ignoringDisable(true);
     }
 
     private static Command getIntakeAssistCommand() {

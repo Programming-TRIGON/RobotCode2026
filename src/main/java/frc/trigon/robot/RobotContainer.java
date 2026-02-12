@@ -77,7 +77,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-//        configureSysIDBindings(SHOOTER);
+//        configureSysIDBindings(SWERVE);
     }
 
     private void bindDefaultCommands() {
@@ -101,8 +101,8 @@ public class RobotContainer {
         OperatorConstants.ENABLE_INTAKE_ASSIST_TRIGGER.onTrue(FuelIntakeCommands.getEnableIntakeAssistCommand());
         OperatorConstants.DISABLE_INTAKE_ASSIST_TRIGGER.onTrue(FuelIntakeCommands.getDisableIntakeAssistCommand());
 
-//        OperatorConstants.AUTO_SHOOT_AT_HUB_TRIGGER.whileTrue(ShootingCommands.getShootAtHubCommand());
-//        OperatorConstants.AUTO_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand());
+        OperatorConstants.AUTO_SHOOT_AT_HUB_TRIGGER.whileTrue(ShootingCommands.getShootAtHubCommand());
+        OperatorConstants.AUTO_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getDeliveryCommand());
         OperatorConstants.FIXED_HUB_SHOOTING_TRIGGER.whileTrue(ShootingCommands.getFixedHubShootingCommand());
         OperatorConstants.FIXED_DELIVERY_TRIGGER.whileTrue(ShootingCommands.getFixedDeliveryCommand());
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_HUB_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_HUB));
@@ -114,6 +114,7 @@ public class RobotContainer {
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
         OperatorConstants.RESET_HOOD_TRIGGER.whileTrue(HoodCommands.getResetHoodCommand());
         OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
+//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(CommandConstants.WHEEL_RADIUS_CHARACTERIZATION_COMMAND);
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

@@ -27,8 +27,8 @@ public class ShootingCalculationsConstants {
             );
 
     static final double
-            HOOD_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0,
-            SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0,
+            HOOD_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.06,
+            SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.06,
             TURRET_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.06 : 0;
 
     static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "shooting_lut.bin";

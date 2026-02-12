@@ -16,7 +16,7 @@ public class CameraConstants {
     );
 
     private static final StandardDeviations APRIL_TAG_CAMERA_STANDARD_DEVIATIONS = new StandardDeviations(
-            0.02,
+            0.015,
             0.01
     );
     public static final AprilTagCamera
