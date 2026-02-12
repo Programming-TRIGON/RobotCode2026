@@ -3,10 +3,13 @@ package frc.trigon.robot.commands.commandclasses.gamepieceautodrive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.autonomous.SafeAutonomousDriveCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
@@ -28,7 +31,9 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     // (cluster == null for a cycle) don't send null to the swerve and release
     // heading control, letting the robot spin freely.
     private volatile FlippableRotation2d lastValidHeading = null;
-    /** When true, drive speed ramps down and rotation is rate-limited near the piece. */
+    /**
+     * When true, drive speed ramps down and rotation is rate-limited near the piece.
+     */
     private final boolean slowIntake;
 
     public GamePieceAutoDriveCommand(boolean slowIntake) {
@@ -115,20 +120,20 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     /**
      * Prevents the intake from hitting the wall by blocking headings that
      * would swing the intake tip past the effective wall.
-     *
+     * <p>
      * ── Geometry (intake at BACK, i.e. 180° in robot frame) ──
      * The intake tip is (ROBOT_HALF_WIDTH + INTAKE_REACH) behind the robot
      * center.  In world frame:
-     *     tipX = robotX  –  intakeLength * cos(heading)
-     *
+     * tipX = robotX  –  intakeLength * cos(heading)
+     * <p>
      * Require tipX >= effectiveWallX:
-     *     cos(heading)  <=  (robotX – effectiveWallX) / intakeLength  =  cosMax
-     *
+     * cos(heading)  <=  (robotX – effectiveWallX) / intakeLength  =  cosMax
+     * <p>
      * cos(θ) <= cosMax is satisfied when |θ| >= acos(cosMax).
      * So the FORBIDDEN zone is  |heading| < acos(cosMax)  (near 0°, where the
      * intake points toward the wall).
      * The ALLOWED zone is everything else (near ±180°, intake away from wall).
-     *
+     * <p>
      * If the heading is in the forbidden zone it is pushed to the nearest
      * boundary (± acos(cosMax)), which keeps it as close to the desired
      * approach as possible while staying safe.
@@ -247,13 +252,13 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
 
     /**
      * Cluster centroid clamped in X so the robot is safe at ANY heading.
-     *
+     * <p>
      * Uses the worst-case heading (0° = intake pointing directly at the wall,
      * because the intake is at the back).  This is the global maximum of minX
      * across all headings, so it guarantees safety regardless of what heading
      * the robot passes through while rotating.  Only pieces near the wall are
      * affected; pieces further out are unclamped.
-     *
+     * <p>
      * If the robot has overshot (is closer than the clamped target), the
      * target is behind it and the PID drives it back automatically.
      */
@@ -274,14 +279,14 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     /**
      * Minimum robot-centre X that keeps the body and intake clear of the
      * effective wall, for a given heading.
-     *
+     * <p>
      * ── Body ──
      * Square, half-width ROBOT_HALF_WIDTH.  The farthest any corner extends
      * in –X from centre = halfWidth × (|cos θ| + |sin θ|).
-     *
+     * <p>
      * ── Intake (at BACK = 180° in robot frame) ──
      * Tip is intakeLength behind centre.  In world frame:
-     *     tipX = robotX – intakeLength × cos(θ)
+     * tipX = robotX – intakeLength × cos(θ)
      * The tip extends toward –X (the wall) when cos(θ) > 0, i.e. |θ| < 90°.
      * The backward (toward-wall) extent is therefore max(0, intakeLength × cos(θ)).
      */
@@ -318,7 +323,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     /**
      * Checks whether there are any collectable game pieces currently visible.
      * A piece is considered collectable if it's within the allowed collection zone
-     * (not past mid-field for blue alliance, or not behind the alliance wall for red).
+     * (not past mid-field for blue alliance, or not behind the alliance wall for red)
+     * AND if it adheres to the Alliance Zone/Neutral Zone logic relative to the robot.
      *
      * @return true if at least one collectable game piece is in view
      */
@@ -327,7 +333,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         if (allObjects.isEmpty()) return false;
 
         for (Translation2d piece : allObjects) {
-            if (!isOutOfBoundsStatic(piece)) {
+            if (!isOutOfBounds(piece)) {
                 return true;
             }
         }
@@ -335,12 +341,43 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     /**
-     * Static version of isOutOfBounds for use in static context.
+     * Determines if a game piece is out of bounds based on global field limits
+     * AND the robot's current zone (Alliance vs Neutral).
      */
-    private static boolean isOutOfBoundsStatic(Translation2d piece) {
+    private static boolean isOutOfBounds(Translation2d piece) {
+        // 1. Check Global Field Limits
+        final double minX;
+        final double maxX;
+
+        if (Flippable.isRedAlliance()) {
+            // Red Alliance: Objects are valid from the far right wall (FieldLength) down to the center line.
+            minX = FieldConstants.FIELD_LENGTH_METERS - GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+            maxX = FieldConstants.FIELD_LENGTH_METERS;
+        } else {
+            // Blue Alliance: Objects are valid from the far left wall (0) up to the center line.
+            minX = GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS;
+            maxX = GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+        }
+
+        if (piece.getX() < minX || piece.getX() > maxX) {
+            return true;
+        }
+
+        // 2. Zone-Specific Logic (Alliance vs Neutral)
+        // The robot should only collect pieces located in the same zone type (Alliance or Neutral) as itself.
+        final boolean isRobotInAllianceZone = SafeAutonomousDriveCommands.isInAllianceZone();
+        final boolean isPieceInAllianceZone = isPointInAllianceZone(piece);
+
+        return isRobotInAllianceZone != isPieceInAllianceZone;
+    }
+
+    /**
+     * Helper to determine if a specific point is within the Alliance Zone.
+     */
+    private static boolean isPointInAllianceZone(Translation2d point) {
         if (Flippable.isRedAlliance())
-            return piece.getX() < GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS;
-        return piece.getX() > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
+            return point.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
+        return point.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 
     private GamePieceCluster findBestCluster() {
@@ -376,13 +413,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
                 neighbors.add(other);
         }
         return neighbors;
-    }
-
-    private boolean isOutOfBounds(Translation2d piece) {
-        final double x = piece.getX();
-        if (Flippable.isRedAlliance())
-            return x < (FieldConstants.FIELD_LENGTH_METERS - GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS) || x > (FieldConstants.FIELD_LENGTH_METERS);
-        return x > GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
     }
 
     private double calculateClusterScore(int count, double distance) {
