@@ -2,11 +2,12 @@ package frc.trigon.robot.subsystems.swerve;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.trigon.robot.RobotContainer;
 import frc.trigon.lib.commands.InitExecuteCommand;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
+import frc.trigon.robot.RobotContainer;
 
 import java.util.Set;
 import java.util.function.DoubleSupplier;
@@ -25,6 +26,21 @@ public class SwerveCommands {
         return new InitExecuteCommand(
                 () -> RobotContainer.SWERVE.initializeDrive(true),
                 () -> RobotContainer.SWERVE.fieldRelativeDrive(xSupplier.getAsDouble(), ySupplier.getAsDouble(), thetaSupplier.getAsDouble()),
+                RobotContainer.SWERVE
+        );
+    }
+
+    /**
+     * Creates a command that drives the swerve with the given powers, relative to the field's frame of reference, in closed loop mode.
+     *
+     * @param translationSupplier the target translation powers
+     * @param rotationSupplier    the target rotation power, CCW+
+     * @return the command
+     */
+    public static Command getClosedLoopFieldRelativeDriveCommand(Supplier<Translation2d> translationSupplier, DoubleSupplier rotationSupplier) {
+        return new InitExecuteCommand(
+                () -> RobotContainer.SWERVE.initializeDrive(true),
+                () -> RobotContainer.SWERVE.fieldRelativeDrive(translationSupplier.get(), rotationSupplier.getAsDouble()),
                 RobotContainer.SWERVE
         );
     }
