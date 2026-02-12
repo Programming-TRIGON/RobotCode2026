@@ -139,7 +139,7 @@ public class GeneralAutonomousCommands {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> targetPose,
-                        AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
+                        AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS,
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0
@@ -151,7 +151,7 @@ public class GeneralAutonomousCommands {
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(intakeSlowly),
-                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> 0.5 : () -> -0.5),
+                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> 0.2 : () -> -0.2),
                 GamePieceAutoDriveCommand::hasCollectableGamePiecesInView
         );
     }
