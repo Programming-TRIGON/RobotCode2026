@@ -45,7 +45,7 @@ public class SafeAutonomousDriveCommands {
                         driveSlowlyInAllianceZoneTimeSeconds
                 ),
                 () -> shouldDriveThroughTrench(targetPose.get())
-        ).raceWith(new RunCommand(() -> Logger.recordOutput("Autonomous/ShouldDriveThroughTrench", shouldDriveThroughTrench(targetPose.get()))));
+        ).raceWith(new RunCommand(() -> Logger.recordOutput("Autonomous/ShouldDriveThroughTrench", shouldDriveThroughTrench(targetPose.get())))).onlyIf(() -> targetPose.get() != null);
     }
 
     private static Command getDriveThroughTrenchCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
@@ -53,14 +53,14 @@ public class SafeAutonomousDriveCommands {
                 getDriveThroughTrenchFromAllianceZoneCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds),
                 getDriveThroughTrenchFromNeutralZoneCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds),
                 SafeAutonomousDriveCommands::isInAllianceZone
-        );
+        ).onlyIf(() -> targetPose != null);
     }
 
     private static Command getDriveThroughTrenchFromAllianceZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
         return new SequentialCommandGroup(
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity)
-        );
+        ).onlyIf(() -> targetPose != null);
     }
 
     private static Command getDriveThroughTrenchFromNeutralZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
@@ -68,7 +68,7 @@ public class SafeAutonomousDriveCommands {
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS()).until(SafeAutonomousDriveCommands::isInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone),
                 getDriveSlowlyInAllianceZoneCommand(() -> targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(SafeAutonomousDriveCommands::isInAllianceZone)
-        );
+        ).onlyIf(() -> targetPose != null);
     }
 
     private static Command getDriveThroughTrenchCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity) {
@@ -80,12 +80,20 @@ public class SafeAutonomousDriveCommands {
                         )
                 ),
                 Set.of(RobotContainer.SWERVE)
-        );
+        ).onlyIf(() -> targetPose != null);
     }
 
     private static int num = 0;
 
     private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints pathConstraints, double endVelocity) {
+        if (targetPose == null)
+            return new PathPlannerPath(
+                    PathPlannerPath.waypointsFromPoses(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()),
+                    pathConstraints,
+                    null,
+                    new GoalEndState(endVelocity, RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation())
+            );
+
         num++;
         Logger.recordOutput("Autonomous/numPaths", num);
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
@@ -116,8 +124,6 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
-        // 1. Calculate the general direction of travel (Heading)
-        // This is the angle from the robot's current position to the final target.
         Rotation2d travelHeading = targetPose.getTranslation()
                 .minus(currentRobotPose.getTranslation())
                 .getAngle();
@@ -165,7 +171,8 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static Rotation2d getHeading(Rotation2d travelHeading) {;
+    private static Rotation2d getHeading(Rotation2d travelHeading) {
+        ;
         double lowestAngleDifference = Double.MAX_VALUE;
         Rotation2d bestHeading = travelHeading;
         List<Integer> possibleHeadingsDegrees = List.of(0, 180, -180);
@@ -199,9 +206,13 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static FlippablePose2d getLowestTravelDistancePose(FlippablePose2d targetPose, FlippablePose2d... poses) {
+        if (targetPose == null)
+            return null;
         FlippablePose2d lowestTravelDistancePose = null;
         double lowestTravelDistance = Double.MAX_VALUE;
         for (FlippablePose2d candidatePose : poses) {
+            if (candidatePose == null)
+                continue;
             final double distanceFromRobot = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getDistance(candidatePose.get().getTranslation());
             final double distanceToTarget = candidatePose.get().getTranslation().getDistance(targetPose.get().getTranslation());
             final double travelDistance = distanceToTarget + distanceFromRobot;

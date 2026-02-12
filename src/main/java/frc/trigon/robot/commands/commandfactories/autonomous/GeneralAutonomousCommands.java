@@ -107,16 +107,16 @@ public class GeneralAutonomousCommands {
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
         return new ParallelCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
-                        climbPosition,
-                        AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
-                        0,
-                        AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1000
-                ).raceWith(getShootAtHubWhileDrivingCommand())
+                                climbPosition,
+                                AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
+                                0,
+                                AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
+                                1000
+                        ).raceWith(getShootAtHubWhileDrivingCommand())
                         .until(() -> RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose))
                         .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
                 getClimbToL1Command()
-        );
+        ).onlyIf(() -> climbPosition.get() != null);
     }
 
     private static Command getClimbToL1Command() {
