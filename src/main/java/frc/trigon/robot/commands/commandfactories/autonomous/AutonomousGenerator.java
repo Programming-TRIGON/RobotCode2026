@@ -11,6 +11,7 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MatchTracker;
+import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
@@ -37,7 +38,8 @@ public class AutonomousGenerator {
     public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
                 getAutonomousStateSequenceCommand().until(AutonomousGenerator::shouldStartDrivingToClimb),
-                GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose).onlyIf(AutonomousGenerator::shouldClimb)
+                GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose).onlyIf(AutonomousGenerator::shouldClimb),
+                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, () -> 0)
         ).alongWith(getLogCommand());
     }
 
@@ -57,7 +59,7 @@ public class AutonomousGenerator {
 
         return switch (state) {
             case DELIVERY ->
-                    GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS.get());
+                    GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS::get);
             case SCORE ->
                     GeneralAutonomousCommands.getScoreCommand(nextState, AutonomousConstants.SCORING_TIMEOUT_SECONDS);
             case COLLECT_FROM_DEPOT ->

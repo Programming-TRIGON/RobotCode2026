@@ -34,15 +34,16 @@ import java.util.function.Supplier;
  * A class that contains command factories for preparation commands and commands used during the 20-second autonomous period at the start of each match.
  */
 public class GeneralAutonomousCommands {
-    public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, double collectionTimeout) {
+    public static Command getDeliveryCommand(AutonomousGenerator.AutonomousState previousState, Supplier<Double> collectionTimeout) {
         return new ParallelDeadlineGroup(
                 new ConditionalCommand(
-                        getDriveToFuelCommand(false).withTimeout(collectionTimeout),
+                        getDriveToFuelCommand(true).withTimeout(collectionTimeout.get()),
                         getDriveToFuelInNeutralZoneCommand(
                                 previousState == null,
-                                collectionTimeout,
+                                collectionTimeout.get(),
                                 true,
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION,
+                                true
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
@@ -63,7 +64,8 @@ public class GeneralAutonomousCommands {
                                 previousState == null,
                                 collectionTimeout,
                                 false,
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION,
+                                false
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
@@ -133,7 +135,7 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose) {
+    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> targetPose,
@@ -142,15 +144,15 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0
                 ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(targetPose) : GeneralAutonomousCommands::shouldRobotStartIntaking),
-                getDriveToFuelCommand(false).withTimeout(timeout)
+                getDriveToFuelCommand(intakeSlowly).withTimeout(timeout)
         );
     }
 
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(intakeSlowly),
-                SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> Flippable.isRedAlliance() ? 0.5 : -0.5),
-                RobotContainer.OBJECT_POSE_ESTIMATOR::hasObjects
+                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> 0.5 : () -> -0.5),
+                GamePieceAutoDriveCommand::hasCollectableGamePiecesInView
         );
     }
 

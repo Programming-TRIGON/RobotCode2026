@@ -140,7 +140,6 @@ public class SafeAutonomousDriveCommands {
         return PathPlannerPath.waypointsFromPoses(
                 new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
 
-                // Apply the same logic here if 'trenchEntryPose' has a fixed rotation that might conflict
                 new Pose2d(trenchEntryPose.getTranslation(), getHeading(travelHeading)),
                 new Pose2d(trenchExitPose.getTranslation(), getHeading(travelHeading)),
 
@@ -148,23 +147,9 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static Rotation2d getHeading(Rotation2d travelHeading) {
-        double lowestAngleDifference = Double.MAX_VALUE;
-        Rotation2d bestHeading = travelHeading;
-        List<Integer> possibleHeadingsDegrees = List.of(0, 180, -180);
-        for (int possibleHeadingDegrees : possibleHeadingsDegrees) {
-            Rotation2d possibleHeading = Rotation2d.fromDegrees(possibleHeadingDegrees);
-            double angleDifference = Math.abs(travelHeading.minus(possibleHeading).getDegrees());
-            if (angleDifference < lowestAngleDifference) {
-                lowestAngleDifference = angleDifference;
-                bestHeading = possibleHeading;
-            }
-        }
-        return bestHeading;
-    }
-
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
-        final Rotation2d targetTrenchDrivingHolonomicAngle = getTrenchDrivingHolonomicAngle(currentPose);
+        final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(currentPose.getRotation());
+        Logger.recordOutput("Autonomous/TargetTrenchDrivingHolonomicAngle", targetTrenchDrivingHolonomicAngle.getDegrees());
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
@@ -180,10 +165,19 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static Rotation2d getTrenchDrivingHolonomicAngle(Pose2d currentRobotPose) {
-        if (currentRobotPose.getRotation().getDegrees() > 90 || currentRobotPose.getRotation().getDegrees() < -90)
-            return Rotation2d.k180deg;
-        return Rotation2d.kZero;
+    private static Rotation2d getHeading(Rotation2d travelHeading) {;
+        double lowestAngleDifference = Double.MAX_VALUE;
+        Rotation2d bestHeading = travelHeading;
+        List<Integer> possibleHeadingsDegrees = List.of(0, 180, -180);
+        for (int possibleHeadingDegrees : possibleHeadingsDegrees) {
+            Rotation2d possibleHeading = Rotation2d.fromDegrees(possibleHeadingDegrees);
+            double angleDifference = Math.abs(travelHeading.minus(possibleHeading).getDegrees());
+            if (angleDifference < lowestAngleDifference) {
+                lowestAngleDifference = angleDifference;
+                bestHeading = possibleHeading;
+            }
+        }
+        return bestHeading;
     }
 
     private static FlippablePose2d getTrenchExitPose(FlippablePose2d targetPose) {
@@ -256,6 +250,8 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static boolean shouldDriveThroughTrench(FlippablePose2d targetPose) {
+        if (targetPose == null)
+            return false;
         return (!isInAllianceZone() && isPoseInAllianceZone(targetPose.get())) || (isInAllianceZone() && !isPoseInAllianceZone(targetPose.get()));
     }
 
@@ -264,6 +260,8 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static boolean isPoseInAllianceZone(Pose2d pose) {
+        if (pose == null)
+            return false;
         if (Flippable.isRedAlliance())
             return pose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
         return pose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
