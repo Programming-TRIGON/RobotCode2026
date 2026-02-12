@@ -72,11 +72,10 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
 
     private void updateCommandedHeading() {
         GamePieceCluster cluster = currentTargetCluster.get();
-        if (cluster == null) {
+        if (cluster == null)
             // Don't null out — keep last heading so the swerve maintains
             // orientation during brief vision gaps instead of spinning freely.
             return;
-        }
 
         FlippableRotation2d target = new FlippableRotation2d(cluster.getApproachHeading(), false);
 
@@ -96,12 +95,10 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
 
         double maxDeltaDeg = GamePieceAutoDriveConstants.MAX_INTAKE_ROTATION_RATE_DEG_PER_SEC * 0.02;
         double deltaDeg = Math.IEEEremainder(target.get().getDegrees() - prev.get().getDegrees(), 360.0);
-        if (Math.abs(deltaDeg) > maxDeltaDeg) {
+        if (Math.abs(deltaDeg) > maxDeltaDeg)
             deltaDeg = Math.signum(deltaDeg) * maxDeltaDeg;
-        }
 
-        FlippableRotation2d result = new FlippableRotation2d(
-                Rotation2d.fromDegrees(prev.get().getDegrees() + deltaDeg), false);
+        FlippableRotation2d result = new FlippableRotation2d(Rotation2d.fromDegrees(prev.get().getDegrees() + deltaDeg), false);
         commandedHeading.set(result);
         lastValidHeading = result;
     }
@@ -112,7 +109,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     private FlippableRotation2d getTargetHeading() {
         FlippableRotation2d heading = commandedHeading.get();
-        if (heading == null) heading = lastValidHeading;
+        if (heading == null)
+            heading = lastValidHeading;
         Logger.recordOutput("GamePieceAutoDrive/RawApproachHeadingDeg", heading == null ? 99999999 : heading.get().getDegrees());
         return clampHeadingForWall(heading);
     }
@@ -139,34 +137,33 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      * approach as possible while staying safe.
      */
     private FlippableRotation2d clampHeadingForWall(FlippableRotation2d heading) {
-        if (heading == null) return null;
+        if (heading == null)
+            return null;
 
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        double intakeLength = GamePieceAutoDriveConstants.ROBOT_HALF_WIDTH
-                + GamePieceAutoDriveConstants.INTAKE_REACH;
+        double intakeLength = GamePieceAutoDriveConstants.ROBOT_HALF_WIDTH + GamePieceAutoDriveConstants.INTAKE_REACH;
 
         double cosMax = (robotPose.getX() - getEffectiveWallX()) / intakeLength;
 
         // Robot is far enough that even heading = 0° (intake straight at wall)
         // keeps the tip clear.  No clamping needed.
-        if (cosMax >= 1.0) return heading;
+        if (cosMax >= 1.0)
+            return heading;
 
         // Robot is so close that NO heading is safe.  Face 180° (intake
         // maximally away from wall) as best-effort emergency.
-        if (cosMax < -1.0) {
+        if (cosMax < -1.0)
             return new FlippableRotation2d(Rotation2d.fromDegrees(180), false);
-        }
 
         // Normal case: forbidden zone is |heading| < minAbsAngle.
         double minAbsAngleDeg = Math.toDegrees(Math.acos(cosMax));
         double headingDeg = Math.IEEEremainder(heading.get().getDegrees(), 360.0);
 
-        if (Math.abs(headingDeg) < minAbsAngleDeg) {
+        if (Math.abs(headingDeg) < minAbsAngleDeg)
             // In the forbidden zone — push to the nearest allowed boundary.
             // signum preserves which side of 0° we were on so the robot doesn't
             // snap across; exact 0° defaults to +minAbsAngle.
             headingDeg = (headingDeg >= 0) ? minAbsAngleDeg : -minAbsAngleDeg;
-        }
 
         return new FlippableRotation2d(Rotation2d.fromDegrees(headingDeg), false);
     }
@@ -176,18 +173,22 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     // =========================================================================
 
     private double getXControllerOutput() {
-        if (!shouldDrive()) return 0.0;
+        if (!shouldDrive())
+            return 0.0;
         Translation2d error = getTranslationError();
-        if (error == null) return 0.0;
+        if (error == null)
+            return 0.0;
         double output = AutonomousConstants.GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER.calculate(-error.getX());
         Logger.recordOutput("GamePieceAutoDrive/X", output * getIntakeSpeedScale());
         return output * getIntakeSpeedScale();
     }
 
     private double getYControllerOutput() {
-        if (!shouldDrive()) return 0.0;
+        if (!shouldDrive())
+            return 0.0;
         Translation2d error = getTranslationError();
-        if (error == null) return 0.0;
+        if (error == null)
+            return 0.0;
         double output = AutonomousConstants.GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER.calculate(-error.getY());
         Logger.recordOutput("GamePieceAutoDrive/Y", output * getIntakeSpeedScale());
         return output * getIntakeSpeedScale();
@@ -202,10 +203,12 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     private boolean shouldDrive() {
         // FIX: Check if we actually have a valid cluster in the reference
-        if (currentTargetCluster.get() == null) return false;
+        if (currentTargetCluster.get() == null)
+            return false;
 
         Translation2d error = getTranslationError();
-        if (error == null) return false;
+        if (error == null)
+            return false;
 
         return !(error.getNorm() <= AutonomousConstants.AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS);
     }
@@ -216,24 +219,25 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      * is enabled.
      */
     private double getIntakeSpeedScale() {
-        if (!slowIntake) return 1.0;
+        if (!slowIntake)
+            return 1.0;
 
         Translation2d error = getTranslationError();
-        if (error == null) return 1.0;
+        if (error == null)
+            return 1.0;
 
         double dist = error.getNorm();
         double slowdownDist = GamePieceAutoDriveConstants.INTAKE_SLOWDOWN_DISTANCE_METERS;
-        if (dist >= slowdownDist) return 1.0;
+        if (dist >= slowdownDist)
+            return 1.0;
 
         double t = dist / slowdownDist;
-        return GamePieceAutoDriveConstants.INTAKE_DRIVE_SPEED_SCALE
-                + t * (1.0 - GamePieceAutoDriveConstants.INTAKE_DRIVE_SPEED_SCALE);
+        return GamePieceAutoDriveConstants.INTAKE_DRIVE_SPEED_SCALE + t * (1.0 - GamePieceAutoDriveConstants.INTAKE_DRIVE_SPEED_SCALE);
     }
 
     private boolean isWithinIntakeDistance() {
         Translation2d error = getTranslationError();
-        return error != null
-                && error.getNorm() < GamePieceAutoDriveConstants.INTAKE_SLOWDOWN_DISTANCE_METERS;
+        return error != null && error.getNorm() < GamePieceAutoDriveConstants.INTAKE_SLOWDOWN_DISTANCE_METERS;
     }
 
     // =========================================================================
@@ -246,8 +250,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      * than WALL_SAFETY_MARGIN_METERS to the actual wall.
      */
     private static double getEffectiveWallX() {
-        return GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS
-                + 0.05;
+        return GamePieceAutoDriveConstants.ALLIANCE_WALL_X_METERS + 0.05;
     }
 
     /**
@@ -264,15 +267,15 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     private Translation2d getEffectiveTarget() {
         GamePieceCluster cluster = currentTargetCluster.get();
-        if (cluster == null) return null;
+        if (cluster == null)
+            return null;
 
         Translation2d target = cluster.getCentroid();
         // Worst case heading for intake-at-back is 0° (intake straight at wall).
         double minX = getMinSafeRobotX(Rotation2d.fromDegrees(0));
 
-        if (target.getX() < minX) {
+        if (target.getX() < minX)
             target = new Translation2d(minX, target.getY());
-        }
         return target;
     }
 
@@ -309,7 +312,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     private Translation2d getTranslationError() {
         Translation2d effectiveTarget = getEffectiveTarget();
-        if (effectiveTarget == null) return null;
+        if (effectiveTarget == null)
+            return null;
 
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         Translation2d fieldRelativeError = effectiveTarget.minus(robotPose.getTranslation());
@@ -330,12 +334,12 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      */
     public static boolean hasCollectableGamePiecesInView() {
         List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
-        if (allObjects.isEmpty()) return false;
+        if (allObjects.isEmpty())
+            return false;
 
         for (Translation2d piece : allObjects) {
-            if (!isOutOfBounds(piece)) {
+            if (!isOutOfBounds(piece))
                 return true;
-            }
         }
         return false;
     }
@@ -359,40 +363,33 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
             maxX = GamePieceAutoDriveConstants.MAX_COLLECTION_X_METERS;
         }
 
-        if (piece.getX() < minX || piece.getX() > maxX) {
+        if (piece.getX() < minX || piece.getX() > maxX)
             return true;
-        }
 
         // 2. Zone-Specific Logic (Alliance vs Neutral)
         // The robot should only collect pieces located in the same zone type (Alliance or Neutral) as itself.
         final boolean isRobotInAllianceZone = SafeAutonomousDriveCommands.isInAllianceZone();
-        final boolean isPieceInAllianceZone = isPointInAllianceZone(piece);
+        final boolean isPieceInAllianceZone = SafeAutonomousDriveCommands.isPoseInAllianceZone(piece);
 
         return isRobotInAllianceZone != isPieceInAllianceZone;
-    }
-
-    /**
-     * Helper to determine if a specific point is within the Alliance Zone.
-     */
-    private static boolean isPointInAllianceZone(Translation2d point) {
-        if (Flippable.isRedAlliance())
-            return point.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
-        return point.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 
     private GamePieceCluster findBestCluster() {
         List<Translation2d> allObjects = OBJECT_POSE_ESTIMATOR.getObjectsOnField();
         Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        if (allObjects.isEmpty()) return null;
+        if (allObjects.isEmpty())
+            return null;
 
         GamePieceCluster bestCluster = null;
         double maxScore = -Double.MAX_VALUE;
 
         for (Translation2d seed : allObjects) {
-            if (isOutOfBounds(seed)) continue;
+            if (isOutOfBounds(seed))
+                continue;
 
             List<Translation2d> clusterPieces = getNeighbors(seed, allObjects);
-            if (clusterPieces.isEmpty()) continue;
+            if (clusterPieces.isEmpty())
+                continue;
 
             GamePieceCluster cluster = new GamePieceCluster(clusterPieces, robotPose);
             double score = calculateClusterScore(clusterPieces.size(), cluster.getDistanceToRobot());
@@ -408,7 +405,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     private List<Translation2d> getNeighbors(Translation2d seed, List<Translation2d> allObjects) {
         List<Translation2d> neighbors = new ArrayList<>();
         for (Translation2d other : allObjects) {
-            if (isOutOfBounds(other)) continue;
+            if (isOutOfBounds(other))
+                continue;
             if (seed.getDistance(other) <= GamePieceAutoDriveConstants.CLUSTER_RADIUS_METERS)
                 neighbors.add(other);
         }
