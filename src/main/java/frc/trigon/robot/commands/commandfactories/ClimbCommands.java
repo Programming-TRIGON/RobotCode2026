@@ -10,7 +10,7 @@ import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class ClimbCommands {
-    public static LoggedNetworkBoolean IS_CLIMBING = new LoggedNetworkBoolean("IsClimbing", false);
+    public static final LoggedNetworkBoolean IS_CLIMBING = new LoggedNetworkBoolean("IsClimbing", false);
 
     public static Command getClimbToL1Command() {
         return new SequentialCommandGroup(
