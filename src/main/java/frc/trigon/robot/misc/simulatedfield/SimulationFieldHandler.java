@@ -43,10 +43,14 @@ public class SimulationFieldHandler {
                 if (HELD_FUEL.size() >= SimulatedGamePieceConstants.MAXIMUM_HELD_FUEL)
                     return;
 
-                HELD_FUEL.add(fuel);
-                fuel.resetIndexing();
+                addHeldFuel(fuel);
             }
         }
+    }
+
+    public static void addHeldFuel(SimulatedGamePiece fuel) {
+        HELD_FUEL.add(fuel);
+        fuel.resetIndexing();
     }
 
     /**

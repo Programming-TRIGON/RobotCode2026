@@ -36,7 +36,7 @@ public class TurretConstants {
     private static final double GEAR_RATIO = 67.5;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
-    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0.5 : 0;
+    static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -65,11 +65,11 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(179.5),
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(-179.5),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(370),
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(-10),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d
-            NORMAL_TOLERANCE = Rotation2d.fromDegrees(2),
+            NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
             WIDE_TOLERANCE = Rotation2d.fromDegrees(15);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
@@ -108,15 +108,15 @@ public class TurretConstants {
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
-        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
+        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Continuous;
         config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 75 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.3 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.02 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 6.2 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 0;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;
 
@@ -128,7 +128,7 @@ public class TurretConstants {
         config.Slot1.kA = 0;
         config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.5 : 5;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 5;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 90 : 5;
         config.MotionMagic.MotionMagicJerk = 0;
 

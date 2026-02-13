@@ -6,7 +6,7 @@ import frc.trigon.robot.subsystems.climber.ClimberCommands;
 import frc.trigon.robot.subsystems.climber.ClimberConstants;
 
 public class ClimbCommands {
-    private static boolean IS_CLIMBING = false;
+    public static boolean IS_CLIMBING = false;
 
     public static Command getClimbToL1Command() {
         return new SequentialCommandGroup(

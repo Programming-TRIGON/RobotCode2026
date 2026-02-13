@@ -8,15 +8,15 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.LocalADStarAK;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.autonomous.AutonomousGenerator;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.io.IOException;
 
@@ -24,27 +24,45 @@ import java.io.IOException;
  * A class that contains the constants and configurations for everything related to the 15-second autonomous period at the start of the match.
  */
 public class AutonomousConstants {
-    public static final String DEFAULT_AUTO_NAME = "DefaultAutoName";
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
-    public static final double FEEDFORWARD_SCALAR = 0.5;//TODO: Calibrate
-    public static final PathConstraints DRIVE_TO_SCORING_LOCATION_CONSTRAINTS = new PathConstraints(2.5, 4.5, Units.degreesToRadians(450), Units.degreesToRadians(900));
+    public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
+    public static final PathConstraints
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(4, 7, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 2, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(4, 7, Units.degreesToRadians(200), Units.degreesToRadians(200));
+    public static final double
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
+            SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
+
+    public static final LoggedNetworkNumber DELIVERY_TIMEOUT_SECONDS = new LoggedNetworkNumber("DeliveryTimeoutSeconds", 6);
+    public static final double
+            TOTAL_MATCH_TIME_SECONDS = 160,
+            AUTONOMOUS_TIME_SECONDS = 20,
+            DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
+            SCORING_TIMEOUT_SECONDS = 3.5,
+            ESTIMATED_CLIMBING_TIME_SECONDS = 3;
+    public static final double
+            ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
+            CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
+    public static final double START_INTAKING_X = 6.2;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-            new PIDConstants(0, 0, 0) :
+            new PIDConstants(9, 0, 0) :
             new PIDConstants(0, 0, 0),
             AUTO_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-                    new PIDConstants(0, 0, 0) :
+                    new PIDConstants(2, 0, 0) :
                     new PIDConstants(0, 0, 0);
-
 
     public static final PIDController GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
             new PIDController(0.5, 0, 0) :
             new PIDController(0.3, 0, 0.03);
-    public static final ProfiledPIDController GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
-            new ProfiledPIDController(0.5, 0, 0, new TrapezoidProfile.Constraints(2.8, 5)) :
-            new ProfiledPIDController(2.4, 0, 0, new TrapezoidProfile.Constraints(2.65, 5.5));
-    public static final double AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS = 2;
+    public static final PIDController GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
+            new PIDController(0.5, 0, 0) :
+            new PIDController(1, 0, 0);
+    public static final double AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS = 0.01;
 
     private static final PPHolonomicDriveController AUTO_PATH_FOLLOWING_CONTROLLER = new PPHolonomicDriveController(
             AUTO_TRANSLATION_PID_CONSTANTS,
@@ -58,7 +76,7 @@ public class AutonomousConstants {
         Pathfinding.setPathfinder(new LocalADStarAK());
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         configureAutoBuilder();
-        registerCommands();
+        AutonomousGenerator.init();
     }
 
     private static void configureAutoBuilder() {
@@ -80,9 +98,5 @@ public class AutonomousConstants {
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static void registerCommands() {
-        //TODO: Implement
     }
 }

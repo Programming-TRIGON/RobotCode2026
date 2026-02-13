@@ -2,11 +2,12 @@ package frc.trigon.robot.subsystems.swerve;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.trigon.robot.RobotContainer;
 import frc.trigon.lib.commands.InitExecuteCommand;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
+import frc.trigon.robot.RobotContainer;
 
 import java.util.Set;
 import java.util.function.DoubleSupplier;
@@ -129,25 +130,29 @@ public class SwerveCommands {
     }
 
     public static Command getDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, PathConstraints constraints) {
-        return new DeferredCommand(() -> getCurrentDriveToPoseCommand(targetPose.get(), constraints), Set.of(RobotContainer.SWERVE));
+        return getDriveToPoseCommand(targetPose, constraints, 0.0);
     }
 
     public static Command getDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, PathConstraints constraints, double endVelocity) {
         return new DeferredCommand(() -> getCurrentDriveToPoseCommand(targetPose.get(), constraints, endVelocity), Set.of(RobotContainer.SWERVE));
     }
 
-    private static Command getCurrentDriveToPoseCommand(FlippablePose2d targetPose, PathConstraints constraints) {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
-                AutoBuilder.pathfindToPose(targetPose.get(), constraints),
-                getPIDToPoseCommand(targetPose)
-        );
+    public static Command getFollowPathCommand(Supplier<PathPlannerPath> path) {
+        return new DeferredCommand(() -> getFollowPathCommand(path.get()), Set.of(RobotContainer.SWERVE));
     }
 
     private static Command getCurrentDriveToPoseCommand(FlippablePose2d targetPose, PathConstraints constraints, double endVelocity) {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
-                AutoBuilder.pathfindToPose(targetPose.get(), constraints, endVelocity)
+                AutoBuilder.pathfindToPose(targetPose.get(), constraints, endVelocity),
+                getPIDToPoseCommand(targetPose).onlyIf(() -> endVelocity < 1e-3)
+        );
+    }
+
+    private static Command getFollowPathCommand(PathPlannerPath path) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
+                AutoBuilder.followPath(path)
         );
     }
 

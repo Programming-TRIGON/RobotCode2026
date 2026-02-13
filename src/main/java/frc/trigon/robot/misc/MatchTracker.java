@@ -5,7 +5,6 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public final class MatchTracker {
-    @AutoLogOutput(key = "IsHubActive")
     public static boolean isHubActive() {
         if (!DriverStation.isTeleop())
             return true;
@@ -19,7 +18,6 @@ public final class MatchTracker {
         return isRedAlliance ? isRedHubActive : !isRedHubActive;
     }
 
-    @AutoLogOutput(key = "MatchTimeSeconds")
     public static double getMatchTimeSeconds() {
         return DriverStation.getMatchTime();
     }
