@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandfactories.AutonomousCommands;
+import frc.trigon.robot.commands.commandfactories.autonomous.GeneralAutonomousCommands;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.function.Supplier;
@@ -44,7 +44,7 @@ public class LEDAutoSetupCommand extends SequentialCommandGroup {
 
     private Command getUpdateAutoStartPoseCommand() {
         return new InstantCommand(() -> {
-            this.autoStartPose = AutonomousCommands.getAutoStartPose(autoName.get());
+            this.autoStartPose = GeneralAutonomousCommands.getAutoStartPose(autoName.get());
             Logger.recordOutput("PathPlanner/AutoStartPose", autoStartPose);
         });
     }

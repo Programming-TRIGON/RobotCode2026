@@ -17,6 +17,7 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
+import frc.trigon.robot.misc.MatchTracker;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimatorConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.swerve.swervemodule.SwerveModule;
@@ -58,15 +59,18 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Phoenix6SignalThread.QUEUES_LOCK.lock();
+        Phoenix6SignalThread.SIGNALS_LOCK.lock();
         try {
             updateHardware();
         } finally {
-            Phoenix6SignalThread.QUEUES_LOCK.unlock();
+            Phoenix6SignalThread.SIGNALS_LOCK.unlock();
         }
 
         updatePoseEstimatorStates();
         RobotContainer.ROBOT_POSE_ESTIMATOR.periodic();
+
+        Logger.recordOutput("MatchTimeSeconds", MatchTracker.getMatchTimeSeconds());
+        Logger.recordOutput("IsHubActive", MatchTracker.isHubActive());
     }
 
     @Override

@@ -13,10 +13,10 @@ public class FuelIntakeCommands {
             SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("/SmartDashboard/ShouldKeepIntakeOpen", true),
             SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", true);
 
-    public static final double
-            X_ASSIST_POWER = 0.0,
-            Y_ASSIST_POWER = 0.5,
-            THETA_ASSIST_POWER = 0.0;
+    public static final boolean
+            SHOULD_ASSIST_X = false,
+            SHOULD_ASSIST_Y = true,
+            SHOULD_ASSIST_THETA = false;
 
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
@@ -45,9 +45,9 @@ public class FuelIntakeCommands {
 
     private static Command getIntakeAssistCommand() {
         return new IntakeAssistCommand(
-                X_ASSIST_POWER,
-                Y_ASSIST_POWER,
-                THETA_ASSIST_POWER
+                SHOULD_ASSIST_X,
+                SHOULD_ASSIST_Y,
+                SHOULD_ASSIST_THETA
         );
     }
 }

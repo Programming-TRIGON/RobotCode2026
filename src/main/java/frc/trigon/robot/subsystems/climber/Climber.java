@@ -13,6 +13,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.Conversions;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends MotorSubsystem {
@@ -77,6 +78,7 @@ public class Climber extends MotorSubsystem {
                 targetState == ClimberConstants.ClimberState.CLIMB_L1;
     }
 
+    @AutoLogOutput(key = "Climber/AtTargetState")
     public boolean atTargetState() {
         return atState(targetState);
     }
@@ -125,6 +127,7 @@ public class Climber extends MotorSubsystem {
         return Conversions.distanceToRotations(positionMeters, ClimberConstants.DRUM_DIAMETER_METERS);
     }
 
+    @AutoLogOutput(key = "Climber/PositionMeters")
     private double getPositionMeters() {
         return rotationsToMeters(getPositionRotations());
     }

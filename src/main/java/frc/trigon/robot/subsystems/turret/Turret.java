@@ -137,9 +137,24 @@ public class Turret extends MotorSubsystem {
         return getCurrentSelfRelativeAngle().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
     }
 
+    public boolean atTargetShootingCalculationsAngle(boolean useWideTolerance) {
+        return atFieldRelativeAngle(shootingCalculations.getTargetShootingState().targetFieldRelativeYaw(), useWideTolerance);
+    }
+
     public boolean atTargetAngle(boolean useWideTolerance) {
-        return Math.abs(targetSelfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians())
-                < (useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians());
+        return atSelfRelativeAngle(targetSelfRelativeAngle, useWideTolerance);
+    }
+
+    public boolean atFieldRelativeAngle(Rotation2d fieldRelativeAngle, boolean useWideTolerance) {
+        final double differenceRadians = Math.abs(fieldRelativeAngle.minus(getCurrentFieldRelativeAngle()).getRadians());
+        final double toleranceRadians = useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians();
+        return differenceRadians < toleranceRadians;
+    }
+
+    public boolean atSelfRelativeAngle(Rotation2d selfRelativeAngle, boolean useWideTolerance) {
+        final double differenceRadians = Math.abs(selfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians());
+        final double toleranceRadians = useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians();
+        return differenceRadians < toleranceRadians;
     }
 
     public Rotation2d getCurrentSelfRelativeAngle() {
