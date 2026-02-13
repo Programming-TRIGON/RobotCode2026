@@ -25,7 +25,6 @@ import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -101,7 +100,7 @@ public class GeneralAutonomousCommands {
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
                 new WaitCommand(0.1),
                 getDriveToFuelCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
-        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/atDepot", RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION))));
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     public static Command getClimbCommand(Supplier<FlippablePose2d> climbPosition) {
@@ -113,15 +112,15 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                                 1000
                         ).raceWith(getShootAtHubWhileDrivingCommand())
-                        .until(() -> RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose))
+                        .until(() -> RobotContainer.SWERVE.atPose(climbPosition.get()))
                         .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
-                getClimbToL1Command()
+                getClimbToL1Command(climbPosition)
         ).onlyIf(() -> climbPosition.get() != null);
     }
 
-    private static Command getClimbToL1Command() {
+    private static Command getClimbToL1Command(Supplier<FlippablePose2d> climbPosition) {
         return new SequentialCommandGroup(
-                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_PREPARE).until(() -> RobotContainer.CLIMBER.atTargetState() && RobotContainer.SWERVE.atPose(AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose)),
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_PREPARE).until(() -> RobotContainer.CLIMBER.atTargetState() && RobotContainer.SWERVE.atPose(climbPosition.get())),
                 new InstantCommand(() -> ClimbCommands.IS_CLIMBING = true),
                 ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_L1)
         ).until(OperatorConstants.CANCEL_CLIMB_TRIGGER);
@@ -174,7 +173,9 @@ public class GeneralAutonomousCommands {
 
     private static boolean shouldRobotStartIntaking() {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return Flippable.isRedAlliance() ? currentRobotPose.getX() < (FieldConstants.FIELD_LENGTH_METERS - AutonomousConstants.START_INTAKING_X) : currentRobotPose.getX() > AutonomousConstants.START_INTAKING_X;
+        if (Flippable.isRedAlliance())
+            return currentRobotPose.getX() < (FieldConstants.FIELD_LENGTH_METERS - AutonomousConstants.START_INTAKING_X);
+        return currentRobotPose.getX() > AutonomousConstants.START_INTAKING_X;
     }
 
     private static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {

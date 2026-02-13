@@ -1,6 +1,5 @@
 package frc.trigon.robot.commands.commandfactories.autonomous;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,12 +13,11 @@ import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class SafeAutonomousDriveCommands {
-    public static Command getSafeDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains) {
-        return getSafeDriveToPoseCommand(targetPose, normalPathConstrains, 0);
+    public static Command getSafeDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstraints) {
+        return getSafeDriveToPoseCommand(targetPose, normalPathConstraints, 0);
     }
 
     public static Command getSafeDriveToPoseCommand(Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity) {
@@ -155,7 +153,6 @@ public class SafeAutonomousDriveCommands {
 
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
         final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(currentPose.getRotation());
-        Logger.recordOutput("Autonomous/TargetTrenchDrivingHolonomicAngle", targetTrenchDrivingHolonomicAngle.getDegrees());
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),

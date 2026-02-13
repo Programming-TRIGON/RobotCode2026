@@ -96,15 +96,13 @@ public class GamePieceCluster {
     }
 
     private Rotation2d resolveAmbiguity(Rotation2d axisAngle, Rotation2d angleToCentroid) {
-        if (Math.abs(axisAngle.minus(angleToCentroid).getDegrees()) > 90.0) {
+        if (Math.abs(axisAngle.minus(angleToCentroid).getDegrees()) > 90.0)
             return axisAngle.rotateBy(Rotation2d.fromDegrees(180));
-        }
         return axisAngle;
     }
 
     private Rotation2d blendHeadings(Rotation2d centerHeading, Rotation2d axisHeading) {
-        double blendFactor = (GamePieceAutoDriveConstants.BLEND_START_DISTANCE_METERS - distanceToRobot)
-                / (GamePieceAutoDriveConstants.BLEND_START_DISTANCE_METERS - GamePieceAutoDriveConstants.BLEND_END_DISTANCE_METERS);
+        double blendFactor = (GamePieceAutoDriveConstants.BLEND_START_DISTANCE_METERS - distanceToRobot) / (GamePieceAutoDriveConstants.BLEND_START_DISTANCE_METERS - GamePieceAutoDriveConstants.BLEND_END_DISTANCE_METERS);
 
         blendFactor = Math.max(0.0, Math.min(1.0, blendFactor)); // Clamp [0, 1]
 
