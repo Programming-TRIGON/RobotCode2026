@@ -39,6 +39,7 @@ import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.Swerve;
 import frc.trigon.robot.subsystems.turret.Turret;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 public class RobotContainer {
     public static final RobotPoseEstimator ROBOT_POSE_ESTIMATOR = new RobotPoseEstimator(
@@ -74,7 +75,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-//        configureSysIDBindings(SWERVE);
+//        configureSysIDBindings(TURRET);
     }
 
     private void bindDefaultCommands() {
@@ -84,7 +85,7 @@ public class RobotContainer {
         LOADER.setDefaultCommand(LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP));
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
-//        TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
+        TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
 //        CLIMBER.setDefaultCommand(ClimbCommands.getClimberDefaultCommand());
     }
 
@@ -110,7 +111,8 @@ public class RobotContainer {
 
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
         OperatorConstants.RESET_HOOD_TRIGGER.whileTrue(HoodCommands.getResetHoodCommand());
-        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
+//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
+        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(TurretCommands.getDebuggingCommand());
 //        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(CommandConstants.WHEEL_RADIUS_CHARACTERIZATION_COMMAND);
     }
 
