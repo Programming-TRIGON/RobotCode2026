@@ -44,7 +44,7 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void sysIDDrive(double targetVoltage) {
-        SwerveModuleState[] rotationStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(new ChassisSpeeds(0, 0, 1));
+        final SwerveModuleState[] rotationStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(new ChassisSpeeds(0, 0, 1));
         for (int i = 0; i < 4; i++) {
             swerveModules[i].setTargetDriveVoltage(targetVoltage);
             swerveModules[i].setTargetSteerAngle(rotationStates[i].angle);
@@ -59,11 +59,11 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Phoenix6SignalThread.SIGNALS_LOCK.lock();
+        Phoenix6SignalThread.QUEUES_LOCK.lock();
         try {
             updateHardware();
         } finally {
-            Phoenix6SignalThread.SIGNALS_LOCK.unlock();
+            Phoenix6SignalThread.QUEUES_LOCK.unlock();
         }
 
         updatePoseEstimatorStates();
@@ -369,9 +369,9 @@ public class Swerve extends MotorSubsystem {
         for (SwerveModule currentModule : swerveModules)
             currentModule.updatePeriodically();
 
-        phoenix6SignalThread.updateLatestTimestamps();
         RobotContainer.TURRET.updateLatestThreadedPositions();
         RobotContainer.INTAKE.updateLatestThreadedPositions();
+        phoenix6SignalThread.updateLatestTimestamps();
     }
 
     @AutoLogOutput(key = "Swerve/CurrentStates")

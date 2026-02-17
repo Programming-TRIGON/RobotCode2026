@@ -33,7 +33,7 @@ public class TurretConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 67.5;
+    private static final double GEAR_RATIO = 71.72;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -60,13 +60,13 @@ public class TurretConstants {
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(1).per(Units.Seconds),
-            Units.Volts.of(3),
+            Units.Volts.of(4),
             null
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(370),
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(-10),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(70),
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(-223),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d
             NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
@@ -82,12 +82,12 @@ public class TurretConstants {
     );
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.17783, -0.08186, 0.17777),
-            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30))
+            new Translation3d(0.1421, -0.06585, 0.25111),
+            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-36))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
-                    new Translation3d(0.17783, 0.08186, 0.17777),
-                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30))
+                    new Translation3d(0.1421, 0.06585, 0.25111),
+                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(36))
             );
 
     static {
@@ -104,36 +104,43 @@ public class TurretConstants {
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+
+        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        config.Feedback.VelocityFilterTimeConstant = 0;
 
-        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Continuous;
-        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0.007;
+//        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
+//        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 55;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 3.5;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.24311;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0391;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;
 
-        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
-        config.Slot1.kI = config.Slot0.kI;
-        config.Slot1.kD = 2;
-        config.Slot1.kS = config.Slot0.kS;
-        config.Slot1.kV = 0;
-        config.Slot1.kA = 0;
-        config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+//        config.Slot1.kP = RobotHardwareStats.isSimulation() ? 100 : 0;
+//        config.Slot1.kI = config.Slot0.kI;
+//        config.Slot1.kD = 2;
+//        config.Slot1.kS = config.Slot0.kS;
+//        config.Slot1.kV = 0;
+//        config.Slot1.kA = 0;
+//        config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 5;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 90 : 5;
-        config.MotionMagic.MotionMagicJerk = 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 1.49270441;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 90 : 10;
+        config.MotionMagic.MotionMagicJerk = RobotHardwareStats.isSimulation() ? 0 : config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT_AMPS;
+
+        config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAXIMUM_ANGLE.getRotations();
+        config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = MINIMUM_ANGLE.getRotations();
 
         MASTER_MOTOR.applyConfiguration(config);
         MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
@@ -142,6 +149,7 @@ public class TurretConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 250);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_POSITION, 250);
         MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
@@ -169,8 +177,8 @@ public class TurretConstants {
     private static void configureEncoder() {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        config.MagnetSensor.MagnetOffset = -0.368896484375;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

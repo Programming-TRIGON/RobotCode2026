@@ -53,7 +53,7 @@ public class ShooterConstants {
 
     static final double EJECTION_VELOCITY_METERS_PER_SECOND = 3;
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.4;
-    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.2;
+    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.07;
     static final double
             DELIVERY_VELOCITY_SLOPE = 0.9,
             DELIVERY_VELOCITY_INTERCEPT_POINT = 2;
@@ -72,15 +72,15 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 0;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 2;
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 1;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.43122;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.75057 : 0.78479;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0.036171;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.37002;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.84 : 0.8526300096511841;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0.032603;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 14.9194351;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 332.363939;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 13.9109468;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 368.064289;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 

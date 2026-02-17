@@ -86,7 +86,7 @@ public class VisualizeFuelShootingCommand extends Command {
 
     private void initializeSpin(double fuelExitVelocityMetersPerSecond) {
         final double spinConstant = (FuelShootingVisualizationConstants.BOTTOM_TRACTION_COEFFICIENT - FuelShootingVisualizationConstants.TOP_TRACTION_COEFFICIENT) / (FuelShootingVisualizationConstants.BOTTOM_TRACTION_COEFFICIENT + FuelShootingVisualizationConstants.TOP_TRACTION_COEFFICIENT);
-        currentSpinRadiansPerSecond = (2 * spinConstant * fuelExitVelocityMetersPerSecond) / (FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS);
+        currentSpinRadiansPerSecond = (spinConstant * fuelExitVelocityMetersPerSecond) / (FuelShootingVisualizationConstants.GAME_PIECE_RADIUS_METERS);
     }
 
     private void stepSimulation() {
@@ -121,9 +121,24 @@ public class VisualizeFuelShootingCommand extends Command {
         if (gamePieceVelocityMagnitude < 1e-6)
             return new Translation3d();
 
+        final Translation3d horizontalVelocity = new Translation3d(
+                currentGamePieceVelocity.getX(),
+                currentGamePieceVelocity.getY(),
+                0
+        );
+        final double horizontalNorm = horizontalVelocity.getNorm();
+        if (horizontalNorm < 1e-6)
+            return new Translation3d();
+
+        final Translation3d spinAxis = new Translation3d(
+                horizontalVelocity.getY() / horizontalNorm,
+                -horizontalVelocity.getX() / horizontalNorm,
+                0
+        );
+
         final double magnusVelocityMagnitude = calculateMagnusVelocityMagnitude(gamePieceVelocityMagnitude);
 
-        final Vector<N3> magnusDirection = FuelShootingVisualizationConstants.MAGNUS_SPIN_AXIS.cross(currentGamePieceVelocity);
+        final Vector<N3> magnusDirection = spinAxis.cross(currentGamePieceVelocity);
         final double magnusDirectionNorm = magnusDirection.norm();
         if (magnusDirectionNorm < 1e-6) return new Translation3d();
 

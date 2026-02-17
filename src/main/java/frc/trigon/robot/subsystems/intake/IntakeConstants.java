@@ -106,7 +106,7 @@ public class IntakeConstants {
     );
     static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
             new Translation3d(0.33205, -0.29525, 0.199934),
-            new Rotation3d(0, Math.toRadians(8.9), Math.toRadians(19.8))
+            new Rotation3d(0, Math.toRadians(12), Math.toRadians(19.8))
     );
 
     static {
@@ -199,7 +199,7 @@ public class IntakeConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
+        config.MagnetSensor.MagnetOffset = 0.318115234375;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);

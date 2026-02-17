@@ -17,8 +17,8 @@ public class ShootingCalculationsConstants {
                     new Translation3d(-0.07279, 0.1454, 0.45624),
                     new Rotation3d(0, Math.toRadians(90), 0)
             );
-    private static final double X_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.12305;
-    private static final double Z_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.02394;
+    private static final double X_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.11808;
+    private static final double Z_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.04101;
     static final Transform3d
             TURRET_TO_HOOD = ROBOT_RELATIVE_HOOD_ORIGIN_AT_ZEROED_TURRET.minus(ROBOT_RELATIVE_TURRET_ORIGIN),
             HOOD_TO_FUEL_EXIT_POSITION = new Transform3d(
@@ -29,7 +29,7 @@ public class ShootingCalculationsConstants {
     static final double
             HOOD_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.06,
             SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.06,
-            TURRET_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.06 : 0;
+            TURRET_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.06 : 0.11;
 
     static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "shooting_lut.bin";
 }
