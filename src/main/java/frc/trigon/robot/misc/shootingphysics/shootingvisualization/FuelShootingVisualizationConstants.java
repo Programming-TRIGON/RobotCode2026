@@ -14,7 +14,7 @@ public class FuelShootingVisualizationConstants {
             GAME_PIECE_AREA = Math.PI * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS,
             MOMENT_OF_INERTIA = 2.0 / 5.0 * GAME_PIECE_MASS_KG * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS;
     static final double
-            AIR_DENSITY = 1.205,
+            AIR_DENSITY = 1.225,
             DRAG_COEFFICIENT = 0.55,
             MAGNUS_LIFT_FACTOR = 0.25,
             SPIN_DECAY_COEFFICIENT = 0.01;
