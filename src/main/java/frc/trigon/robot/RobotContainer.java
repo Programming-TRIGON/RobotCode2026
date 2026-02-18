@@ -99,6 +99,7 @@ public class RobotContainer {
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
         OperatorConstants.SHOOTING_SAFE_DRIVE_TRIGGER.whileTrue(new ShootingSafeDriveCommand());
         OperatorConstants.CAMERAS_DISCONNECTED_TRIGGER.onTrue(CommandConstants.INDICATE_CAMERAS_DISCONNECTED_COMMAND);
+        OperatorConstants.INDICATE_ALLIANCE_SHIFT_TRIGGER.onTrue(CommandConstants.INDICATE_ALLIANCE_SHIFT_COMMAND);
 
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommands.getIntakeCommand());
         OperatorConstants.TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER.onTrue(FuelIntakeCommands.getToggleDefaultIntakeStateCommand());
