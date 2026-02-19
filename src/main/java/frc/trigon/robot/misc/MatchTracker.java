@@ -30,7 +30,6 @@ public final class MatchTracker {
         return isRedAlliance == isRedHubActive;
     }
 
-    @AutoLogOutput(key = "MatchTimeSeconds")
     public static double getMatchTimeSeconds() {
         return DriverStation.getMatchTime();
     }

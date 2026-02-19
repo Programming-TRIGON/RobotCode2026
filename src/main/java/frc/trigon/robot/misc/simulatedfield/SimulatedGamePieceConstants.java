@@ -1,7 +1,9 @@
 package frc.trigon.robot.misc.simulatedfield;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation3d;
 import frc.trigon.robot.constants.FieldConstants;
 
@@ -45,6 +47,11 @@ public class SimulatedGamePieceConstants {
             STARTING_FUEL_Y_POSITION_METERS = 1.724406,
             STARTING_FUEL_SPACING_METERS = 0.16;
 
+    private static final int
+            DEPOT_FUEL_ROWS = 6,
+            DEPOT_FUEL_COLUMNS = 4;
+    private static final Translation2d DEPOT_CENTER_POSITION = new Translation2d(0.31, 5.96);
+
     public static final double
             EJECTION_FROM_HUB_MINIMUM_VELOCITY_METERS_PER_SECOND = 4,
             EJECTION_FROM_HUB_MAXIMUM_VELOCITY_METERS_PER_SECOND = 15;
@@ -60,6 +67,28 @@ public class SimulatedGamePieceConstants {
                 new SimulatedGamePiece(
                         STARTING_FUEL_X_POSITION_METERS + (i * STARTING_FUEL_SPACING_METERS),
                         STARTING_FUEL_Y_POSITION_METERS + (j * STARTING_FUEL_SPACING_METERS)
+                );
+            }
+        }
+
+        for (int i = 0; i <8; i++) {
+            final SimulatedGamePiece currentHeldFuel = new SimulatedGamePiece(0, 0);
+            SimulationFieldHandler.addHeldFuel(currentHeldFuel);
+        }
+
+        initializeDepotFuel(DEPOT_CENTER_POSITION.getX(), DEPOT_CENTER_POSITION.getY());
+        initializeDepotFuel(FieldConstants.FIELD_LENGTH_METERS - DEPOT_CENTER_POSITION.getX(), FieldConstants.FIELD_WIDTH_METERS - DEPOT_CENTER_POSITION.getY());
+    }
+
+    private static void initializeDepotFuel(double depotCenterX, double depotCenterY) {
+        double startX = depotCenterX - (DEPOT_FUEL_COLUMNS - 1) * STARTING_FUEL_SPACING_METERS / 2.0;
+        double startY = depotCenterY - (DEPOT_FUEL_ROWS - 1) * STARTING_FUEL_SPACING_METERS / 2.0;
+
+        for (int row = 0; row < DEPOT_FUEL_ROWS; row++) {
+            for (int col = 0; col < DEPOT_FUEL_COLUMNS; col++) {
+                new SimulatedGamePiece(
+                        startX + col * STARTING_FUEL_SPACING_METERS,
+                        startY + row * STARTING_FUEL_SPACING_METERS
                 );
             }
         }

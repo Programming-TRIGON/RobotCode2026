@@ -29,7 +29,7 @@ public class ClimberConstants {
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
     private static final double
-            CLIMBER_MASS_KILOGRAMS = 1,
+            CLIMBER_MASS_KILOGRAMS = 0.7,
             DRUM_RADIUS_METERS = 0.04,
             MINIMUM_CLIMBER_HEIGHT_METERS = 0,
             MAXIMUM_CLIMBER_HEIGHT_METERS = 1;
