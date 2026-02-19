@@ -9,7 +9,7 @@ public final class MatchTracker {
 
     @AutoLogOutput(key = "Assists/ShouldIndicateAllianceShift")
     public static boolean shouldIndicateAllianceShift() {
-        return isHubActive(getMatchTimeSeconds() - TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS);
+        return DriverStation.isDSAttached() && isHubActive(getMatchTimeSeconds() - TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS);
     }
 
     @AutoLogOutput(key = "IsHubActive")
