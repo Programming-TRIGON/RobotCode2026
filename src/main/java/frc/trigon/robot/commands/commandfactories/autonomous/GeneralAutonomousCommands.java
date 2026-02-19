@@ -120,8 +120,8 @@ public class GeneralAutonomousCommands {
 
     private static Command getClimbToL1Command(Supplier<FlippablePose2d> climbPosition) {
         return new SequentialCommandGroup(
-                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_PREPARE).until(() -> RobotContainer.CLIMBER.atTargetState() && RobotContainer.SWERVE.atPose(climbPosition.get())),
-                new InstantCommand(() -> ClimbCommands.IS_CLIMBING = true),
+                ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.PREPARE_CLIMB).until(() -> RobotContainer.CLIMBER.atTargetState() && RobotContainer.SWERVE.atPose(climbPosition.get())),
+                new InstantCommand(() -> ClimbCommands.IS_CLIMBING.set(true)),
                 ClimberCommands.getSetTargetStateCommand(ClimberConstants.ClimberState.CLIMB_L1)
         ).until(OperatorConstants.CANCEL_CLIMB_TRIGGER);
     }
