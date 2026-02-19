@@ -28,19 +28,19 @@ public class FuelIntakeCommands {
     public static Command getToggleDefaultIntakeStateCommand() {
         return new InstantCommand(
                 () -> SHOULD_KEEP_INTAKE_OPEN.set(!SHOULD_KEEP_INTAKE_OPEN.get())
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getEnableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(true)
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getDisableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(false)
-        );
+        ).ignoringDisable(true);
     }
 
     private static Command getIntakeAssistCommand() {

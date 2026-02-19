@@ -36,6 +36,7 @@ public class RobotPoseEstimator implements AutoCloseable {
     private final AprilTagCamera[] aprilTagCameras;
     private final RelativeRobotPoseSource relativeRobotPoseSource;
     private final boolean shouldUseRelativeRobotPoseSource;
+    private boolean hasUpdateFromCameras = false;
 
     /**
      * Constructs a new RobotPoseEstimator and sets the relativeRobotPoseSource.
@@ -49,7 +50,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         this.relativeRobotPoseSource = relativeRobotPoseSource;
         this.shouldUseRelativeRobotPoseSource = true;
 
-        initialize();
+        initializeFieldWidget();
     }
 
     /**
@@ -63,7 +64,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         this.relativeRobotPoseSource = null;
         this.shouldUseRelativeRobotPoseSource = false;
 
-        initialize();
+        initializeFieldWidget();
     }
 
     @Override
@@ -120,6 +121,10 @@ public class RobotPoseEstimator implements AutoCloseable {
         return swerveDriveOdometry.getPoseMeters();
     }
 
+    public boolean hasUpdateFromCameras() {
+        return hasUpdateFromCameras;
+    }
+
     /**
      * Updates the pose estimator with the given swerve wheel positions and gyro rotations.
      * This function accepts an array of swerve wheel positions and an array of gyro rotations because the odometry can be updated at a faster rate than the main loop (which is 50 hertz).
@@ -161,7 +166,7 @@ public class RobotPoseEstimator implements AutoCloseable {
         return getEstimatedRobotPose().transformBy(new Transform2d(predictedX, predictedY, predictedRotation));
     }
 
-    private void initialize() {
+    private void initializeFieldWidget() {
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);
         logTargetPath();
@@ -209,6 +214,8 @@ public class RobotPoseEstimator implements AutoCloseable {
 
     private void updateFromAprilTagCameras() {
         final AprilTagCamera[] newResultCameras = getCamerasWithResults();
+
+        this.hasUpdateFromCameras = newResultCameras.length > 0;
 //        sortCamerasByLatestResultTimestamp(newResultCameras);
 
         for (AprilTagCamera aprilTagCamera : newResultCameras) {

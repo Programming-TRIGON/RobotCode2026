@@ -9,6 +9,7 @@ import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
 
 import java.util.function.DoubleUnaryOperator;
@@ -23,6 +24,8 @@ public class OperatorConstants {
             DRIVER_CONTROLLER_PORT, DRIVER_CONTROLLER_RIGHT_STICK_EXPONENT, DRIVER_CONTROLLER_LEFT_STICK_EXPONENT, DRIVER_CONTROLLER_DEADBAND
     );
     public static final KeyboardController OPERATOR_CONTROLLER = new KeyboardController();
+    private static final double ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS = 3;
+    private static final double DOUBLE_TAP_TIMEOUT_SECONDS = 0.5;
 
     public static final double
             POV_DIVIDER = 2,
@@ -41,10 +44,13 @@ public class OperatorConstants {
             );
 
     public static final Trigger //General Triggers
-            RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y(),
+            RESET_HEADING_TRIGGER = DRIVER_CONTROLLER.y().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
+            SHOOTING_SAFE_DRIVE_TRIGGER = DRIVER_CONTROLLER.leftStick(),
+            CAMERAS_DISCONNECTED_TRIGGER = new Trigger(() -> !RobotContainer.ROBOT_POSE_ESTIMATOR.hasUpdateFromCameras()).debounce(ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS),
+            INDICATE_ALLIANCE_SHIFT_TRIGGER = new Trigger(MatchTracker::shouldIndicateAllianceShift),
             FORWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.right(),
             BACKWARD_QUASISTATIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.left(),
             FORWARD_DYNAMIC_CHARACTERIZATION_TRIGGER = OPERATOR_CONTROLLER.up(),
@@ -52,8 +58,8 @@ public class OperatorConstants {
     public static final Trigger //Intake Triggers
             INTAKE_TRIGGER = DRIVER_CONTROLLER.leftTrigger(),
             TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER = DRIVER_CONTROLLER.b().or(OPERATOR_CONTROLLER.u()),
-            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o(),
-            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p());
+            ENABLE_INTAKE_ASSIST_TRIGGER = OPERATOR_CONTROLLER.o().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
+            DISABLE_INTAKE_ASSIST_TRIGGER = DRIVER_CONTROLLER.a().or(OPERATOR_CONTROLLER.p().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS));
     public static final Trigger //Shooting Triggers
             DISABLE_AUTO_SHOOT_TRIGGER = DRIVER_CONTROLLER.rightStick().or(OPERATOR_CONTROLLER.a()),
             AUTO_SHOOT_AT_HUB_TRIGGER = new Trigger(OperatorConstants::shouldAutoShootAtHub),
@@ -65,9 +71,9 @@ public class OperatorConstants {
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER = DRIVER_CONTROLLER.povDown().or(OPERATOR_CONTROLLER.k()),
             SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER = DRIVER_CONTROLLER.povRight().or(OPERATOR_CONTROLLER.l());
     public static final Trigger //Climb Triggers
-            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c()),
-            CANCEL_CLIMB_TRIGGER = DRIVER_CONTROLLER.leftBumper().or(OPERATOR_CONTROLLER.x()),
-            CONTINUE_CLIMB_TRIGGER = DRIVER_CONTROLLER.rightBumper().or(OPERATOR_CONTROLLER.v());
+            OPEN_CLIMBER_TRIGGER = DRIVER_CONTROLLER.back().or(OPERATOR_CONTROLLER.c()).multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
+            CANCEL_CLIMB_TRIGGER = new Trigger(ClimbCommands.IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()).or(OPERATOR_CONTROLLER.x()),
+            CONTINUE_CLIMB_TRIGGER = new Trigger(ClimbCommands.IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper()).or(OPERATOR_CONTROLLER.v());
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());

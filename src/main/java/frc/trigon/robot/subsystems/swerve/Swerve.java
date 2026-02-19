@@ -59,11 +59,11 @@ public class Swerve extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        Phoenix6SignalThread.SIGNALS_LOCK.lock();
+        Phoenix6SignalThread.QUEUES_LOCK.lock();
         try {
             updateHardware();
         } finally {
-            Phoenix6SignalThread.SIGNALS_LOCK.unlock();
+            Phoenix6SignalThread.QUEUES_LOCK.unlock();
         }
 
         updatePoseEstimatorStates();
@@ -229,6 +229,17 @@ public class Swerve extends MotorSubsystem {
      */
     void fieldRelativeDrive(double xPower, double yPower, double thetaPower) {
         final ChassisSpeeds speeds = selfRelativeSpeedsFromFieldRelativePowers(xPower, yPower, thetaPower);
+        selfRelativeDrive(speeds);
+    }
+
+    /**
+     * Drives the swerve with the given powers, relative to the field's frame of reference.
+     *
+     * @param translationPowers the translation powers
+     * @param rotationPower     the rotation power
+     */
+    void fieldRelativeDrive(Translation2d translationPowers, double rotationPower) {
+        final ChassisSpeeds speeds = selfRelativeSpeedsFromFieldRelativePowers(translationPowers.getX(), translationPowers.getY(), rotationPower);
         selfRelativeDrive(speeds);
     }
 
