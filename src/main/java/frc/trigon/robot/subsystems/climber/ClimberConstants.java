@@ -134,9 +134,9 @@ public class ClimberConstants {
 
     public enum ClimberState {
         REST(0, false),
-        CLIMB_PREPARE(0.8, false),
+        PREPARE_CLIMB(0.8, false),
         CLIMB_L1(0.5, true),
-        CLIMB_DOWN(0.8, true);
+        RELEASE_CLIMB(0.8, true);
 
         final double targetPositionMeters;
         final boolean affectedByRobotWeight;

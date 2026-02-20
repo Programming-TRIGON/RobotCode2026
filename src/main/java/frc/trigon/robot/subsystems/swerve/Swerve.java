@@ -233,6 +233,17 @@ public class Swerve extends MotorSubsystem {
     }
 
     /**
+     * Drives the swerve with the given powers, relative to the field's frame of reference.
+     *
+     * @param translationPowers the translation powers
+     * @param rotationPower     the rotation power
+     */
+    void fieldRelativeDrive(Translation2d translationPowers, double rotationPower) {
+        final ChassisSpeeds speeds = selfRelativeSpeedsFromFieldRelativePowers(translationPowers.getX(), translationPowers.getY(), rotationPower);
+        selfRelativeDrive(speeds);
+    }
+
+    /**
      * Drives the swerve with the given powers, relative to the robot's frame of reference.
      *
      * @param xPower     the x power
