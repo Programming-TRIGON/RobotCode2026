@@ -11,6 +11,7 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
@@ -69,9 +70,10 @@ public class Hood extends MotorSubsystem {
 
     @Override
     public void sysIDDrive(double targetVoltage) {
-        motor.setControl(voltageRequest.withOutput(targetVoltage));
+        motor.setControl(voltageRequest.withOutput(targetVoltage).withIgnoreSoftwareLimits(false));
     }
 
+    @AutoLogOutput(key = "Shooting/Conditions/HoodAtTargetAngle")
     public boolean atTargetAngle() {
         return atAngle(targetAngle);
     }
@@ -111,7 +113,7 @@ public class Hood extends MotorSubsystem {
     }
 
     void setTargetVoltageToResetVoltage() {
-        motor.setControl(voltageRequest.withOutput(HoodConstants.HOOD_RESET_VOLTAGE));
+        motor.setControl(voltageRequest.withOutput(HoodConstants.HOOD_RESET_VOLTAGE).withIgnoreSoftwareLimits(true));
     }
 
     void zeroPosition() {

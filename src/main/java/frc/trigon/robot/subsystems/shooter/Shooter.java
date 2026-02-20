@@ -18,7 +18,7 @@ public class Shooter extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = ShooterConstants.MASTER_MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
-    private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED);
+    private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(ShooterConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private double targetVelocityMetersPerSecond = 0;
     private boolean isAimingAtHub = true;
 
@@ -71,6 +71,7 @@ public class Shooter extends MotorSubsystem {
         Logger.recordOutput("Shooter/TargetProfiledVelocityMetersPerSecond", targetProfiledVelocityMetersPerSecond);
     }
 
+    @AutoLogOutput(key = "Shooting/Conditions/ShooterAtTargetVelocity")
     public boolean atTargetVelocity() {
         return Math.abs(getCurrentVelocityMetersPerSecond() - targetVelocityMetersPerSecond) < ShooterConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
@@ -82,6 +83,10 @@ public class Shooter extends MotorSubsystem {
 
     public double getCurrentVelocityMetersPerSecond() {
         return motor.getSignal(TalonFXSignal.VELOCITY);
+    }
+
+    public double getTargetVelocityMetersPerSecond() {
+        return targetVelocityMetersPerSecond;
     }
 
     void aimAtHub() {

@@ -27,9 +27,9 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     public static final double
-            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 2.0) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
-            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.59) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
-    private static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
+            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.61) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.47495) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+    public static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
 
@@ -39,7 +39,7 @@ public class ShooterConstants {
     static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, GEAR_RATIO, MOMENT_OF_INERTIA);
 
     static final SysIdRoutine.Config SYS_ID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(2.5).per(Units.Second),
+            Units.Volts.of(1).per(Units.Second),
             Units.Volts.of(7),
             null
     );
@@ -52,10 +52,10 @@ public class ShooterConstants {
     );
 
     static final double EJECTION_VELOCITY_METERS_PER_SECOND = 3;
-    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.4;
-    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1.07;
+    static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
+    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1;
     static final double
-            DELIVERY_VELOCITY_SLOPE = 0.9,
+            DELIVERY_VELOCITY_SLOPE = 1.10,
             DELIVERY_VELOCITY_INTERCEPT_POINT = 2;
 
     static {
@@ -72,17 +72,18 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 2;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 1;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 3;
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.37002;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.84 : 0.8526300096511841;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0.032603;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.38272;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.84 : 0.67868;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0.054867;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 13.9109468;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 368.064289;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 17.6813815;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 218.7107;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.Feedback.VelocityFilterTimeConstant = 0.03;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;
@@ -92,10 +93,10 @@ public class ShooterConstants {
 
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 250);
     }
 
     private static void configureFollowerMotor() {
@@ -112,11 +113,11 @@ public class ShooterConstants {
 
         FOLLOWER_MOTOR.applyConfiguration(config);
 
-        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         FOLLOWER_MOTOR.registerSignal(TalonFXSignal.SUPPLY_CURRENT, 100);
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 250);
 
-        final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
+        final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER).withUpdateFreqHz(1000);
         FOLLOWER_MOTOR.setControl(followRequest);
     }
 }

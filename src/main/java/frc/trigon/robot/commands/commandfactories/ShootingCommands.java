@@ -14,6 +14,7 @@ import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.Supplier;
 
@@ -102,15 +103,18 @@ public class ShootingCommands {
 
     private static Command getLoadFuelCommand() {
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
+                SpindexerCommands.getLoadToShooterCommand(),
+                LoaderCommands.getLoadToShooterCommand()
         );
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {
         if (isShootingAtHub) {
+            final boolean turretAtShootingCalculationsAngle = RobotContainer.TURRET.atTargetShootingCalculationsAngle(false);
+            Logger.recordOutput("Shooting/Conditions/TurretAtSmallToleranceAngle", turretAtShootingCalculationsAngle);
+
             return canShootAtHub() && RobotContainer.SHOOTER.atTargetVelocity() && RobotContainer.HOOD.atTargetAngle() &&
-                    RobotContainer.TURRET.atTargetShootingCalculationsAngle(false);
+                    turretAtShootingCalculationsAngle;
         }
         return RobotContainer.SHOOTER.atTargetVelocity()
                 && RobotContainer.HOOD.atTargetAngle()

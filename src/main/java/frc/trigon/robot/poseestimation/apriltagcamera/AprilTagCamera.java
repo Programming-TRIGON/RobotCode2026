@@ -156,7 +156,7 @@ public class AprilTagCamera {
      * @return the standard deviation
      */
     private double calculateStandardDeviation(double exponent, double distance, int numberOfVisibleTags) {
-        return exponent * (distance * distance) / numberOfVisibleTags;
+        return exponent * (distance * distance) / (numberOfVisibleTags * numberOfVisibleTags);
     }
 
     private void logCameraInfo() {

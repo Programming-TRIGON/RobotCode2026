@@ -8,13 +8,15 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfxs.TalonFXSSignal;
+import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 
 public class Spindexer extends MotorSubsystem {
+    private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXSMotor motor = SpindexerConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
     private final MotionMagicVelocityVoltage velocityRequest = new MotionMagicVelocityVoltage(0).withEnableFOC(SpindexerConstants.FOC_ENABLED);
-    private double targetVelocityRotationsPerSecond;
+    private double targetVelocityMetersPerSecond;
 
     public Spindexer() {
         setName("Spindexer");
@@ -24,14 +26,14 @@ public class Spindexer extends MotorSubsystem {
     public void updateLog(SysIdRoutineLog log) {
         log.motor("SpindexerMotor")
                 .angularPosition(Units.Rotations.of(motor.getSignal(TalonFXSSignal.POSITION)))
-                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityRotationsPerSecond()))
+                .angularVelocity(Units.RotationsPerSecond.of(getCurrentVelocityMetersPerSecond()))
                 .voltage(Units.Volts.of(motor.getSignal(TalonFXSSignal.MOTOR_VOLTAGE)));
     }
 
     @Override
     public void updateMechanism() {
         SpindexerConstants.MECHANISM.update(
-                getCurrentVelocityRotationsPerSecond(),
+                getCurrentVelocityMetersPerSecond(),
                 motor.getSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE)
         );
 
@@ -56,16 +58,16 @@ public class Spindexer extends MotorSubsystem {
     @Override
     public void stop() {
         motor.stopMotor();
-        targetVelocityRotationsPerSecond = 0;
+        targetVelocityMetersPerSecond = 0;
     }
 
     public boolean atTargetState(SpindexerConstants.SpindexerState targetState) {
-        return atVelocity(targetState.targetVelocityRotationsPerSecond);
+        return atVelocity(targetState.targetVelocityMetersPerSecond);
     }
 
-    public boolean atVelocity(double velocityRotationsPerSecond) {
-        return Math.abs(getCurrentVelocityRotationsPerSecond() - velocityRotationsPerSecond)
-                <= SpindexerConstants.VELOCITY_TOLERANCE_ROTATIONS_PER_SECOND;
+    public boolean atVelocity(double velocityMetersPerSecond) {
+        return Math.abs(getCurrentVelocityMetersPerSecond() - velocityMetersPerSecond)
+                <= SpindexerConstants.VELOCITY_TOLERANCE_METERS_PER_SECOND;
     }
 
     public Pose3d calculateComponentPose() {
@@ -76,16 +78,22 @@ public class Spindexer extends MotorSubsystem {
         return SpindexerConstants.VISUALIZATION_ORIGIN_POSE.transformBy(yawTransform);
     }
 
+    void loadToShooter() {
+        final double targetShooterVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        final double targetLoadingVelocity = targetShooterVelocityFromShootingCalculations * SpindexerConstants.LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT;
+        setTargetVelocity(targetLoadingVelocity);
+    }
+
     void setTargetState(SpindexerConstants.SpindexerState targetState) {
-        setTargetVelocity(targetState.targetVelocityRotationsPerSecond);
+        setTargetVelocity(targetState.targetVelocityMetersPerSecond);
     }
 
-    void setTargetVelocity(double targetVelocityRotationsPerSecond) {
-        this.targetVelocityRotationsPerSecond = targetVelocityRotationsPerSecond;
-        motor.setControl(velocityRequest.withVelocity(targetVelocityRotationsPerSecond));
+    void setTargetVelocity(double targetVelocityMetersPerSecond) {
+        this.targetVelocityMetersPerSecond = targetVelocityMetersPerSecond;
+        motor.setControl(velocityRequest.withVelocity(targetVelocityMetersPerSecond));
     }
 
-    private double getCurrentVelocityRotationsPerSecond() {
+    private double getCurrentVelocityMetersPerSecond() {
         return motor.getSignal(TalonFXSSignal.VELOCITY);
     }
 }

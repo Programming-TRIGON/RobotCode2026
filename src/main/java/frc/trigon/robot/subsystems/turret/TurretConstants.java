@@ -65,8 +65,8 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(70),
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(-223),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(85.957031),
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(-263.144531),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d
             NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
@@ -74,6 +74,7 @@ public class TurretConstants {
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
     static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
+    static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.12;
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
@@ -83,11 +84,11 @@ public class TurretConstants {
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
             new Translation3d(0.1421, -0.06585, 0.25111),
-            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-36))
+            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
                     new Translation3d(0.1421, 0.06585, 0.25111),
-                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(36))
+                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30))
             );
 
     static {
@@ -107,17 +108,17 @@ public class TurretConstants {
 
         config.Feedback.RotorToSensorRatio = GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        config.Feedback.VelocityFilterTimeConstant = 0;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
+        config.Feedback.VelocityFilterTimeConstant = 0.01;
 
 //        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
 //        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 55;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 120;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 3.5;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.24311;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0391;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.6;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.23229;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0362;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;

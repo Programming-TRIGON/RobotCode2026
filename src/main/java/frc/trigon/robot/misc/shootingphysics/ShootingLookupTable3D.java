@@ -1,5 +1,9 @@
 package frc.trigon.robot.misc.shootingphysics;
 
+import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.subsystems.shooter.ShooterConstants;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import java.io.*;
 
 /**
@@ -61,14 +65,31 @@ public class ShootingLookupTable3D {
         return isLoaded && velocityData != null && velocityData.length > 0;
     }
 
+    private static LoggedNetworkNumber vel = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Velocity", 8);
+    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.28);
+    private static LoggedNetworkNumber pit = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Pitch", 87);
+    private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0.05);
+
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
+//        return calcActualVel(vel.get());
         validateLoaded();
-        return interpolate(velocityData, distance, radialVelocity, Math.abs(tangentialVelocity));
+        return calcActualVel(interpolate(velocityData, distance, radialVelocity, Math.abs(tangentialVelocity)));
+    }
+
+    private static double calcActualVel(double velWanted) {
+        return velConst.get() * velWanted;
     }
 
     public static double calculatePitch(final double distance, final double radialVelocity, final double tangentialVelocity) {
+//        return Math.toRadians(calcActualPit(pit.get()));
         validateLoaded();
-        return interpolate(pitchData, distance, radialVelocity, Math.abs(tangentialVelocity));
+        return calcActualPit(interpolate(pitchData, distance, radialVelocity, Math.abs(tangentialVelocity)));
+    }
+
+    private static double calcActualPit(double pitWanted) {
+        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
+        final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
+        return (Math.toRadians(pitConst.get()) * velDifference) + pitWanted;
     }
 
     public static double calculateYaw(final double distance, final double radialVelocity, final double tangentialVelocity) {

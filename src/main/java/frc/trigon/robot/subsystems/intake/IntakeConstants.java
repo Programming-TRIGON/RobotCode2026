@@ -27,8 +27,8 @@ public class IntakeConstants {
             ANGLE_MOTOR_ID = 11,
             ANGLE_ENCODER_ID = 11;
     private static final String
-            MASTER_INTAKE_MOTOR_NAME = "MasterIntakeMotor",
-            FOLLOWER_INTAKE_MOTOR_NAME = "FollowerIntakeMotor",
+            MASTER_INTAKE_MOTOR_NAME = "IntakeMasterMotor",
+            FOLLOWER_INTAKE_MOTOR_NAME = "IntakeFollowerMotor",
             ANGLE_MOTOR_NAME = "IntakeAngleMotor",
             ANGLE_ENCODER_NAME = "IntakeAngleEncoder";
     static final TalonFXMotor

@@ -8,9 +8,11 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,8 +20,8 @@ import java.util.List;
 
 public class FieldConstants {
     public static final double
-            FIELD_WIDTH_METERS = FlippingUtil.fieldSizeY,
-            FIELD_LENGTH_METERS = FlippingUtil.fieldSizeX;
+            FIELD_WIDTH_METERS = 8.069326,
+            FIELD_LENGTH_METERS = 16.540988;
 
     private static final List<Integer> I_HATE_YOU = List.of(
             1, 6, 7, 12, 13, 14, 15, 16, 17, 22, 23, 28, 29, 30, 31, 32
@@ -48,12 +50,18 @@ public class FieldConstants {
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
     public static final FlippableTranslation2d
-            HUB_POSITION = new FlippableTranslation2d(4.7, FIELD_WIDTH_METERS / 2, true),
+            HUB_POSITION = new FlippableTranslation2d(TAG_ID_TO_POSE.get(26).getX() + (Units.inchesToMeters(47) / 2), FIELD_WIDTH_METERS / 2, true),
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
             DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1;
+
+    static {
+        Logger.recordOutput("IMPORTANT/HUB_POSE_BLUE", HUB_POSITION.getBlueObject());
+        Logger.recordOutput("IMPORTANT/HUB_POSE_RED", FlippingUtil.flipFieldPosition(HUB_POSITION.getBlueObject()));
+        Logger.recordOutput("IMPORTANT/TAG_Y", TAG_ID_TO_POSE.get(26).getY());
+    }
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {

@@ -6,7 +6,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -155,10 +155,12 @@ public class RobotPoseEstimator implements AutoCloseable {
      */
     public Pose2d getPredictedRobotPose(double seconds) {
         final ChassisSpeeds robotVelocity = RobotContainer.SWERVE.getSelfRelativeChassisSpeeds();
-        final double predictedX = robotVelocity.vxMetersPerSecond * seconds;
-        final double predictedY = robotVelocity.vyMetersPerSecond * seconds;
-        final Rotation2d predictedRotation = Rotation2d.fromRadians(robotVelocity.omegaRadiansPerSecond * seconds);
-        return getEstimatedRobotPose().transformBy(new Transform2d(predictedX, predictedY, predictedRotation));
+        final Twist2d robotVelocityTwist = new Twist2d(
+                robotVelocity.vxMetersPerSecond * seconds,
+                robotVelocity.vyMetersPerSecond * seconds,
+                robotVelocity.omegaRadiansPerSecond * seconds
+        );
+        return getEstimatedRobotPose().exp(robotVelocityTwist);
     }
 
     private void initialize() {
