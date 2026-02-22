@@ -36,7 +36,7 @@ public class AutonomousGenerator {
         configureAutonomousChooser(THIRD_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FOURTH_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FIFTH_AUTONOMOUS_CHOOSER);
-        configureClimbPositionChooser(CLIMB_POSITION_CHOOSER);
+        configureClimbPositionChooser();
     }
 
     public static Command getAutonomousCommand() {
@@ -49,31 +49,44 @@ public class AutonomousGenerator {
 
     private static Command getAutonomousStateSequenceCommand() {
         return new SequentialCommandGroup(
-                getCommandFromState(FIRST_AUTONOMOUS_CHOOSER.get(), null, SECOND_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(SECOND_AUTONOMOUS_CHOOSER.get(), FIRST_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(THIRD_AUTONOMOUS_CHOOSER.get(), SECOND_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(FOURTH_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(FIFTH_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get())
+                getCommandFromState(1),
+                getCommandFromState(2),
+                getCommandFromState(3),
+                getCommandFromState(4),
+                getCommandFromState(5)
         );
     }
 
-    private static Command getCommandFromState(AutonomousState state, AutonomousState previousState, AutonomousState... nextStates) {
+    private static Command getCommandFromState(int index) {
+        AutonomousState state = getStateFromIndex(index);
+
         if (state == null)
             return Commands.none();
 
         return switch (state) {
             case DELIVERY ->
-                    GeneralAutonomousCommands.getDeliveryCommand(previousState, () -> getDeliveryTimeout(nextStates == null ? new AutonomousState[]{} : nextStates));
+                    GeneralAutonomousCommands.getDeliveryCommand(getStateFromIndex(index - 1), () -> getDeliveryTimeout(getStateFromIndex(index + 1) == null ? null : getStateFromIndex(index + 1), getStateFromIndex(index + 2), getStateFromIndex(index + 3), getStateFromIndex(index + 4)));
             case SCORE ->
-                    GeneralAutonomousCommands.getScoreCommand(nextStates == null ? null : nextStates[0], AutonomousConstants.SCORING_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getScoreCommand(getStateFromIndex(index + 1) == null ? null : getStateFromIndex(index + 1), AutonomousConstants.SCORING_TIMEOUT_SECONDS);
             case COLLECT_FROM_DEPOT ->
                     GeneralAutonomousCommands.getCollectFromDepotCommand(true, AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
             case COLLECT_FROM_NEUTRAL_ZONE ->
-                    GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(previousState, AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(getStateFromIndex(index - 1), AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
         };
     }
 
-    private static double getDeliveryTimeout(AutonomousState[] nextStates) {
+    private static AutonomousState getStateFromIndex(int index) {
+        return switch (index) {
+            case 0 -> FIRST_AUTONOMOUS_CHOOSER.get();
+            case 1 -> SECOND_AUTONOMOUS_CHOOSER.get();
+            case 2 -> THIRD_AUTONOMOUS_CHOOSER.get();
+            case 3 -> FOURTH_AUTONOMOUS_CHOOSER.get();
+            case 4 -> FIFTH_AUTONOMOUS_CHOOSER.get();
+            default -> null;
+        };
+    }
+
+    private static double getDeliveryTimeout(AutonomousState... nextStates) {
         double timeToLeave = 0;
         for (AutonomousState nextState : nextStates) {
             switch (nextState) {
@@ -84,10 +97,17 @@ public class AutonomousGenerator {
         }
 
         if (shouldClimb())
-            timeToLeave += calculateTimeToLeaveForClimbSeconds(nextStates.length == 0 ? AutonomousState.DELIVERY.expectedRobotPose.get().get() : nextStates[nextStates.length - 1].expectedRobotPose.get().get()) + 0.5;
+            timeToLeave += calculateTimeToLeaveForClimbSeconds(getLastValidPoseOrDefault(nextStates)) + 0.5;
 
-        // implement logic to deal with earlier states time
-        return 0;
+        return timeToLeave;
+    }
+
+    private static Translation2d getLastValidPoseOrDefault(AutonomousState[] nextStates) {
+        for (int i = nextStates.length - 1; i >= 0; i--)
+            if (nextStates[i] != null)
+                return nextStates[i].expectedRobotPose.get().get();
+
+        return AutonomousState.DELIVERY.expectedRobotPose.get().get();
     }
 
     private static Command getLogCommand() {
@@ -129,11 +149,11 @@ public class AutonomousGenerator {
         chooser.addDefaultOption("Nothing", null);
     }
 
-    private static void configureClimbPositionChooser(LoggedDashboardChooser<AutonomousClimbPosition> chooser) {
-        chooser.addOption("RightL1", AutonomousClimbPosition.RIGHT_L1);
-        chooser.addOption("LeftL1", AutonomousClimbPosition.LEFT_L1);
-        chooser.addOption("CenterL1", AutonomousClimbPosition.CENTER_L1);
-        chooser.addDefaultOption("NoClimb", AutonomousClimbPosition.NO_CLIMB);
+    private static void configureClimbPositionChooser() {
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("RightL1", AutonomousClimbPosition.RIGHT_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("LeftL1", AutonomousClimbPosition.LEFT_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("CenterL1", AutonomousClimbPosition.CENTER_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addDefaultOption("NoClimb", AutonomousClimbPosition.NO_CLIMB);
     }
 
     public enum AutonomousState {

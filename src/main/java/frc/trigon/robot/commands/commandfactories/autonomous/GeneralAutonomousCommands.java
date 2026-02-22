@@ -21,7 +21,6 @@ import frc.trigon.robot.misc.shootingphysics.ShootingState;
 import frc.trigon.robot.subsystems.climber.ClimberCommands;
 import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
-import frc.trigon.robot.subsystems.hood.HoodConstants;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
