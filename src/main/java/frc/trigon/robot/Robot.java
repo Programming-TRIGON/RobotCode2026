@@ -26,8 +26,7 @@ public class Robot extends LoggedRobot {
     private final CommandScheduler commandScheduler = CommandScheduler.getInstance();
     private Command autonomousCommand;
     private final RobotContainer robotContainer;
-
-    private final StringPublisher dsStatePub =
+    private final StringPublisher driverStationStatePublisher =
             NetworkTableInstance.getDefault()
                     .getTable("DSBridge")
                     .getStringTopic("matchState")
@@ -49,7 +48,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        dsStatePub.set("auto");
+        driverStationStatePublisher.set("auto");
 
         autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -59,7 +58,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        dsStatePub.set("teleop");
+        driverStationStatePublisher.set("teleop");
 
         if (autonomousCommand != null)
             autonomousCommand.cancel();
@@ -78,7 +77,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        dsStatePub.set("disabled");
+        driverStationStatePublisher.set("disabled");
     }
 
     @Override
