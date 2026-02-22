@@ -27,7 +27,6 @@ import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -131,10 +130,10 @@ public class GeneralAutonomousCommands {
 
     private static Command getShootAtHubWhileDrivingCommand() {
         return GeneralCommands.getContinuousConditionalCommand(
-                getPrepareForShootingWithoutHoodCommand().alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/magniv", "UNDER_DA_TRENCH"))),
+                getPrepareForShootingWithoutHoodCommand(),
                 GeneralCommands.getContinuousConditionalCommand(
-                        ShootingCommands.getShootAtHubCommand().alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/magniv", "HUB"))),
-                        getPrepareForShootingCommand().alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/magniv", "OVER_DA_TRENCH"))),
+                        ShootingCommands.getShootAtHubCommand(),
+                        getPrepareForShootingCommand(),
                         SafeAutonomousDriveCommands::isInAllianceZone
                 ),
                 GeneralAutonomousCommands::isInTrench
@@ -143,8 +142,8 @@ public class GeneralAutonomousCommands {
 
     public static boolean isInTrench() {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        double entryXFromAllianceZone = (isAngleCloserTo180(currentRobotPose.getRotation()) && !Flippable.isRedAlliance()) || (!isAngleCloserTo180(currentRobotPose.getRotation()) && Flippable.isRedAlliance()) ? 4.25 : 4.1;
-        double entryXFromNeutralZone = (isAngleCloserTo180(currentRobotPose.getRotation()) && !Flippable.isRedAlliance()) || (!isAngleCloserTo180(currentRobotPose.getRotation()) && Flippable.isRedAlliance()) ? 5.4 : 5.6;
+        double entryXFromAllianceZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 4.25 : 4.1;
+        double entryXFromNeutralZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 5.4 : 5.6;
         entryXFromAllianceZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromAllianceZone : entryXFromAllianceZone;
         entryXFromNeutralZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromNeutralZone : entryXFromNeutralZone;
         return currentRobotPose.getX() > entryXFromAllianceZone && currentRobotPose.getX() < entryXFromNeutralZone
@@ -186,7 +185,7 @@ public class GeneralAutonomousCommands {
     }
 
     private static Command getPrepareForShootingWithoutHoodCommand() {
-        return HoodCommands.getSetTargetAngleCommand(() -> Rotation2d.fromDegrees(87));
+        return HoodCommands.getRestCommand();
     }
 
     private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState) {
