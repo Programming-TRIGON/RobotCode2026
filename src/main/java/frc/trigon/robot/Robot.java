@@ -5,6 +5,8 @@
 
 package frc.trigon.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,6 +27,12 @@ public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private final RobotContainer robotContainer;
 
+    private final StringPublisher dsStatePub =
+            NetworkTableInstance.getDefault()
+                    .getTable("DSBridge")
+                    .getStringTopic("matchState")
+                    .publish();
+
     Robot() {
         RobotConstants.init();
         configLogger();
@@ -41,6 +49,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        dsStatePub.set("auto");
+
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null)
@@ -49,6 +59,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
+        dsStatePub.set("teleop");
+
         if (autonomousCommand != null)
             autonomousCommand.cancel();
     }
@@ -62,6 +74,11 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         SimulationFieldHandler.update();
 //        AprilTagCameraConstants.VISION_SIMULATION.update(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedOdometryPose());
+    }
+
+    @Override
+    public void disabledInit() {
+        dsStatePub.set("disabled");
     }
 
     @Override
