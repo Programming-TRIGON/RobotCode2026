@@ -99,6 +99,7 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
         Logger.recordOutput("Autonomous/IsInAllianceZone", SafeAutonomousDriveCommands.isInAllianceZone());
+        Logger.recordOutput("Autonomous/IsInTrench", GeneralAutonomousCommands.isInTrench());
     }
 
     private static boolean shouldStartDrivingToClimb() {
