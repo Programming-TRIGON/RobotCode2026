@@ -66,9 +66,9 @@ public class ShootingLookupTable3D {
     }
 
     private static LoggedNetworkNumber vel = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Velocity", 8);
-    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.28);
+    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.30);
     private static LoggedNetworkNumber pit = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Pitch", 87);
-    private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0.05);
+    private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0.15);
 
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
 //        return calcActualVel(vel.get());

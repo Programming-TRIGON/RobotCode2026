@@ -65,8 +65,8 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(85.957031),
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(-263.144531),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(10),
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(-350),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d
             NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
@@ -78,16 +78,16 @@ public class TurretConstants {
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
-            new Translation3d(-0.1454, 0.1454, 0.30827),
+            new Translation3d(-0.1454, 0.1454, 0.28423),
             new Rotation3d(0, 0, 0)
     );
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.1421, -0.06585, 0.25111),
+            new Translation3d(0.14853, -0.06965, 0.2511),
             new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30))
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
-                    new Translation3d(0.1421, 0.06585, 0.25111),
+                    new Translation3d(0.14853, 0.06965, 0.2511),
                     new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30))
             );
 
@@ -179,7 +179,7 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -0.368896484375;
+        config.MagnetSensor.MagnetOffset = 0.14501953125;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ENCODER.applyConfiguration(config);

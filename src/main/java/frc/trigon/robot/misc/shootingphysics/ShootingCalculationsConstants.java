@@ -10,7 +10,7 @@ import frc.trigon.lib.utilities.FilesHandler;
 public class ShootingCalculationsConstants {
     static final Pose3d
             ROBOT_RELATIVE_TURRET_ORIGIN = new Pose3d(
-            new Translation3d(-0.1454, 0.1454, 0.30827),
+            new Translation3d(-0.1454, 0.1454, 0.28423),
             new Rotation3d(0, 0, 0)
     ),
             ROBOT_RELATIVE_HOOD_ORIGIN_AT_ZEROED_TURRET = new Pose3d(

@@ -28,7 +28,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
             new PIDController(2.4, 0, 0),
             yPIDController = RobotHardwareStats.isSimulation() ?
                     new PIDController(0.3, 0, 0) :
-                    new PIDController(0.25, 0, 0),
+                    new PIDController(0.2, 0, 0),
             thetaPIDController = RobotHardwareStats.isSimulation() ?
                     new PIDController(0.1, 0, 0) :
                     new PIDController(2.4, 0, 0);

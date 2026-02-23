@@ -66,7 +66,7 @@ public class FieldConstants {
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
             return SHOULD_USE_HOME_TAG_LAYOUT ?
-                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "field_calibration.json") :
+                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "2026-frc-welded-home.json") :
                     AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         } catch (IOException e) {
             throw new RuntimeException(e);
