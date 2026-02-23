@@ -2,6 +2,7 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
@@ -20,6 +21,7 @@ import frc.trigon.robot.misc.shootingphysics.ShootingState;
 import frc.trigon.robot.subsystems.climber.ClimberCommands;
 import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
+import frc.trigon.robot.subsystems.hood.HoodConstants;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
@@ -128,10 +130,28 @@ public class GeneralAutonomousCommands {
 
     private static Command getShootAtHubWhileDrivingCommand() {
         return GeneralCommands.getContinuousConditionalCommand(
-                ShootingCommands.getShootAtHubCommand(),
-                getPrepareForShootingCommand(),
-                SafeAutonomousDriveCommands::isInAllianceZone
+                getPrepareForShootingWithoutHoodCommand(),
+                GeneralCommands.getContinuousConditionalCommand(
+                        ShootingCommands.getShootAtHubCommand(),
+                        getPrepareForShootingCommand(),
+                        SafeAutonomousDriveCommands::isInAllianceZone
+                ),
+                GeneralAutonomousCommands::isInTrench
         );
+    }
+
+    public static boolean isInTrench() {
+        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        double entryXFromAllianceZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 4.25 : 4.1;
+        double entryXFromNeutralZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 5.4 : 5.6;
+        entryXFromAllianceZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromAllianceZone : entryXFromAllianceZone;
+        entryXFromNeutralZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromNeutralZone : entryXFromNeutralZone;
+        return currentRobotPose.getX() > entryXFromAllianceZone && currentRobotPose.getX() < entryXFromNeutralZone
+                || currentRobotPose.getX() < entryXFromAllianceZone && currentRobotPose.getX() > entryXFromNeutralZone;
+    }
+
+    private static boolean isAngleCloserTo180(Rotation2d angle) {
+        return Math.abs(angle.getDegrees()) > 90;
     }
 
     private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
@@ -162,6 +182,10 @@ public class GeneralAutonomousCommands {
                         new Translation2d()
                 )
         );
+    }
+
+    private static Command getPrepareForShootingWithoutHoodCommand() {
+        return HoodCommands.getRestCommand();
     }
 
     private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState) {

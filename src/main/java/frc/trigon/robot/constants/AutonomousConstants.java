@@ -40,8 +40,8 @@ public class AutonomousConstants {
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.8,
-            SCORING_TIMEOUT_SECONDS = 3.5,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
+            SCORING_TIMEOUT_SECONDS = 3.7,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
