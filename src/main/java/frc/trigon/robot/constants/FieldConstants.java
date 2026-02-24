@@ -4,13 +4,11 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
+import frc.trigon.robot.RobotContainer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -72,5 +70,10 @@ public class FieldConstants {
                 tagIDToPose.put(aprilTag.ID, aprilTag.pose.transformBy(TAG_OFFSET));
 
         return tagIDToPose;
+    }
+
+    public static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < ALLIANCE_ZONE_LENGTH;
     }
 }

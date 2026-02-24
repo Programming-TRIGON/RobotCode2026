@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
@@ -11,6 +12,7 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -31,6 +33,8 @@ public class OperatorConstants {
             POV_DIVIDER = 2,
             TRANSLATION_STICK_SPEED_DIVIDER = 1,
             ROTATION_STICK_SPEED_DIVIDER = 1;
+
+    private static final double AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS = 10;
 
     public static final double MINIMUM_VELOCITY_TOWARDS_GAME_PIECE_FOR_INTAKE_ASSIST_METERS_PER_SECOND = 1;
     private static final double
@@ -78,9 +82,12 @@ public class OperatorConstants {
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
 
+    private static boolean WAS_IN_ALLIANCE_ZONE = false;
+    private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = 0;
+
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()
-                && isInAllianceZone()
+                && isAutoShootClauseActive()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
@@ -92,13 +99,26 @@ public class OperatorConstants {
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
-    public static boolean isInAllianceZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
+    public static boolean isAutoShootClauseActive() {
+        final boolean isAutoShootClauseJustActivated = justEnteredAllianceZone() || isIntaking();
+        if (isAutoShootClauseJustActivated)
+            LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = Timer.getTimestamp();
+
+        return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
     }
 
-    public static boolean isInDeliveryZone() {
+    private static boolean isInDeliveryZone() {
         final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
         return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+    }
+
+    private static boolean justEnteredAllianceZone() {
+        final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
+        WAS_IN_ALLIANCE_ZONE = FieldConstants.isInAllianceZone();
+        return wasInAllianceZone != WAS_IN_ALLIANCE_ZONE;
+    }
+
+    private static boolean isIntaking() {
+        return RobotContainer.INTAKE.atState(IntakeConstants.IntakeState.INTAKE);
     }
 }
