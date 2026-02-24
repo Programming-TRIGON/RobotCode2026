@@ -115,7 +115,7 @@ public class OperatorConstants {
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
         WAS_IN_ALLIANCE_ZONE = FieldConstants.isInAllianceZone();
-        return wasInAllianceZone != WAS_IN_ALLIANCE_ZONE;
+        return WAS_IN_ALLIANCE_ZONE && !wasInAllianceZone;
     }
 
     private static boolean isIntaking() {

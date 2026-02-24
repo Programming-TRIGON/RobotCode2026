@@ -1,16 +1,10 @@
 package frc.trigon.robot.commands.commandfactories;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
-import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.CommandConstants;
-import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
-import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 import java.util.function.BooleanSupplier;
 
@@ -19,8 +13,6 @@ import java.util.function.BooleanSupplier;
  * These are different from {@link CommandConstants} because they create new commands that use some form of logic instead of only constructing an existing command with parameters.
  */
 public class GeneralCommands {
-    public static final LoggedNetworkBoolean IS_IN_ALLIANCE_ZONE = new LoggedNetworkBoolean("IsInAllianceZone", false);
-    public static double LAST_ENTERED_ALLIANCE_ZONE_TIMESTAMP = 0;
 
     public static Command getFieldRelativeDriveCommand() {
         return SwerveCommands.getClosedLoopFieldRelativeDriveCommand(
@@ -70,20 +62,5 @@ public class GeneralCommands {
      */
     public static Command runWhen(Command command, BooleanSupplier condition, double debounceTimeSeconds) {
         return runWhen(new WaitCommand(debounceTimeSeconds).andThen(command.onlyIf(condition)), condition);
-    }
-
-    public static Command getUpdateEnterAllianceZoneCheckCommand() {
-        return new RunCommand(
-                () -> {
-                    final Pose2d robotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-                    if (!IS_IN_ALLIANCE_ZONE.get() && robotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH)
-                        LAST_ENTERED_ALLIANCE_ZONE_TIMESTAMP = Timer.getTimestamp();
-                }
-        );
-    }
-
-    private static void updateIsInAllianceZone() {
-        final Pose2d robotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        IS_IN_ALLIANCE_ZONE.set(robotPose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH);
     }
 }
