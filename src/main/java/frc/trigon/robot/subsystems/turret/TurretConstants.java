@@ -33,7 +33,9 @@ public class TurretConstants {
     static final CANcoderEncoder ENCODER = new CANcoderEncoder(ENCODER_ID, ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 71.72;
+    private static final double
+            GEAR_RATIO = 71.72,
+            ENCODER_GEAR_RATIO = 113.3;
     private static final double CURRENT_LIMIT_AMPS = 100;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -65,8 +67,8 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(10),
-            MINIMUM_ANGLE = Rotation2d.fromDegrees(-350),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(40),
+            MINIMUM_ANGLE = Rotation2d.fromDegrees(-380),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d
             NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
@@ -106,7 +108,8 @@ public class TurretConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = GEAR_RATIO;
+        config.Feedback.RotorToSensorRatio = ENCODER_GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = GEAR_RATIO / ENCODER_GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
         config.Feedback.VelocityFilterTimeConstant = 0.01;
@@ -179,8 +182,8 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0.14501953125;
-        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+        config.MagnetSensor.MagnetOffset = 0.6484375;
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.2;
 
         ENCODER.applyConfiguration(config);
         ENCODER.setSimulationInputsFromTalonFX(MASTER_MOTOR);

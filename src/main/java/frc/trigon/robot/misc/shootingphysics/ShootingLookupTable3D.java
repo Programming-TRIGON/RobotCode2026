@@ -2,6 +2,7 @@ package frc.trigon.robot.misc.shootingphysics;
 
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.subsystems.shooter.ShooterConstants;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.io.*;
@@ -89,6 +90,8 @@ public class ShootingLookupTable3D {
     private static double calcActualPit(double pitWanted) {
         final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
         final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
+        Logger.recordOutput("Shooting/VelocityDifference", velDifference);
+        Logger.recordOutput("Shooting/AngleAdditionDegrees", Math.toDegrees(Math.toRadians(pitConst.get()) * velDifference));
         return (Math.toRadians(pitConst.get()) * velDifference) + pitWanted;
     }
 
