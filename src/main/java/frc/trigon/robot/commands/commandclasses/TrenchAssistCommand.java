@@ -10,6 +10,7 @@ import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.commandfactories.autonomous.SafeAutonomousDriveCommands;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
@@ -46,7 +47,7 @@ public class TrenchAssistCommand extends SequentialCommandGroup {
 
     private static double calculateLateralAssistPower() {
         final Pose2d robotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        final double trenchYPositionMeters = isOnRightHalf() ?
+        final double trenchYPositionMeters = SafeAutonomousDriveCommands.isRight() ?
                 FieldConstants.FIELD_WIDTH_METERS - FieldConstants.LEFT_TRENCH_Y_POSITION_METERS :
                 FieldConstants.LEFT_TRENCH_Y_POSITION_METERS;
 
@@ -67,10 +68,5 @@ public class TrenchAssistCommand extends SequentialCommandGroup {
         }
 
         return new FlippableRotation2d(closestCanPassTrenchAngle, true);
-    }
-
-    private static boolean isOnRightHalf() {
-        final Pose2d robotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return robotPose.getY() < FieldConstants.FIELD_WIDTH_METERS / 2;
     }
 }
