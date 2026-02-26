@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
@@ -94,7 +95,8 @@ public class AutonomousGenerator {
             switch (nextState) {
                 case SCORE -> timeToLeave -= AutonomousConstants.SCORING_TIMEOUT_SECONDS;
                 case COLLECT_FROM_DEPOT -> timeToLeave -= AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS;
-                case COLLECT_FROM_NEUTRAL_ZONE -> timeToLeave -= AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS;
+                case COLLECT_FROM_NEUTRAL_ZONE ->
+                        timeToLeave -= AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS;
             }
         }
 
@@ -107,9 +109,18 @@ public class AutonomousGenerator {
     private static Translation2d getLastValidPoseOrDefault(AutonomousState[] nextStates) {
         for (int i = nextStates.length - 1; i >= 0; i--)
             if (nextStates[i] != null)
-                return nextStates[i].expectedRobotPose.get().get();
+                return getExpectedEndPose(nextStates, i).get();
 
-        return AutonomousState.DELIVERY.expectedRobotPose.get().get();
+        return (SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION).get();
+    }
+
+    private static Flippable<Translation2d> getExpectedEndPose(AutonomousState[] states, int validIndex) {
+        return switch (states[validIndex]) {
+            case DELIVERY -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION;
+            case COLLECT_FROM_NEUTRAL_ZONE -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION.getTranslation() : FieldConstants.LEFT_INTAKE_POSITION.getTranslation();
+            case COLLECT_FROM_DEPOT -> FieldConstants.DEPOT_POSITION.getTranslation();
+            case SCORE -> GeneralAutonomousCommands.getScoringPose(states.length > validIndex + 1 ? states[validIndex + 1] : null).getTranslation();
+        };
     }
 
     private static Command getLogCommand() {
@@ -159,17 +170,15 @@ public class AutonomousGenerator {
     }
 
     public enum AutonomousState {
-        DELIVERY(false, () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION),
-        SCORE(true, () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.getTranslation() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.getTranslation()),
-        COLLECT_FROM_DEPOT(true, FieldConstants.DEPOT_POSITION::getTranslation),
-        COLLECT_FROM_NEUTRAL_ZONE(false, () -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION.getTranslation() : FieldConstants.LEFT_INTAKE_POSITION.getTranslation());
+        DELIVERY(false),
+        SCORE(true),
+        COLLECT_FROM_DEPOT(true),
+        COLLECT_FROM_NEUTRAL_ZONE(false);
 
         final boolean isInAllianceZone;
-        final Supplier<FlippableTranslation2d> expectedRobotPose;
 
-        AutonomousState(boolean isInAllianceZone, Supplier<FlippableTranslation2d> expectedRobotPose) {
+        AutonomousState(boolean isInAllianceZone) {
             this.isInAllianceZone = isInAllianceZone;
-            this.expectedRobotPose = expectedRobotPose;
         }
     }
 
