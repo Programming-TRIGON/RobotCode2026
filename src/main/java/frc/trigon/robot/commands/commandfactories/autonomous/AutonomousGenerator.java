@@ -65,9 +65,9 @@ public class AutonomousGenerator {
 
         return switch (state) {
             case DELIVERY ->
-                    GeneralAutonomousCommands.getDeliveryCommand(getStateFromIndex(index - 1), () -> getDeliveryTimeout(getStateFromIndex(index + 1) == null ? null : getStateFromIndex(index + 1), getStateFromIndex(index + 2), getStateFromIndex(index + 3), getStateFromIndex(index + 4)));
+                    GeneralAutonomousCommands.getDeliveryCommand(getStateFromIndex(index - 1), () -> getDeliveryTimeout(getStateFromIndex(index + 1), getStateFromIndex(index + 2), getStateFromIndex(index + 3), getStateFromIndex(index + 4)));
             case SCORE ->
-                    GeneralAutonomousCommands.getScoreCommand(getStateFromIndex(index + 1) == null ? null : getStateFromIndex(index + 1), AutonomousConstants.SCORING_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getScoreCommand(getStateFromIndex(index + 1), AutonomousConstants.SCORING_TIMEOUT_SECONDS);
             case COLLECT_FROM_DEPOT ->
                     GeneralAutonomousCommands.getCollectFromDepotCommand(true, AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
             case COLLECT_FROM_NEUTRAL_ZONE ->
@@ -87,17 +87,19 @@ public class AutonomousGenerator {
     }
 
     private static double getDeliveryTimeout(AutonomousState... nextStates) {
-        double timeToLeave = 0;
+        double timeToLeave = 20;
         for (AutonomousState nextState : nextStates) {
+            if (nextState == null)
+                break;
             switch (nextState) {
-                case SCORE -> timeToLeave += AutonomousConstants.SCORING_TIMEOUT_SECONDS;
-                case COLLECT_FROM_DEPOT -> timeToLeave += AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS;
-                case COLLECT_FROM_NEUTRAL_ZONE -> timeToLeave += AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS;
+                case SCORE -> timeToLeave -= AutonomousConstants.SCORING_TIMEOUT_SECONDS;
+                case COLLECT_FROM_DEPOT -> timeToLeave -= AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS;
+                case COLLECT_FROM_NEUTRAL_ZONE -> timeToLeave -= AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS;
             }
         }
 
         if (shouldClimb())
-            timeToLeave += calculateTimeToLeaveForClimbSeconds(getLastValidPoseOrDefault(nextStates)) + 0.5;
+            timeToLeave -= calculateTimeToLeaveForClimbSeconds(getLastValidPoseOrDefault(nextStates)) + 0.5;
 
         return timeToLeave;
     }
