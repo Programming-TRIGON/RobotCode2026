@@ -83,7 +83,7 @@ public class OperatorConstants {
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
 
     private static boolean WAS_IN_ALLIANCE_ZONE = false;
-    private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = 0;
+    private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = -AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
 
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()
@@ -99,11 +99,12 @@ public class OperatorConstants {
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
-    public static boolean isAutoShootClauseActive() {
-        final boolean isAutoShootClauseJustActivated = justEnteredAllianceZone() || isIntaking();
-        if (isAutoShootClauseJustActivated)
+    public static void updateAutoShootClause() {
+        if (justEnteredAllianceZone() || isIntaking())
             LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = Timer.getTimestamp();
+    }
 
+    private static boolean isAutoShootClauseActive() {
         return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
     }
 
