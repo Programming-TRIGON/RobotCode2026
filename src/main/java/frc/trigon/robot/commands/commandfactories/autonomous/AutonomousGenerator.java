@@ -49,11 +49,11 @@ public class AutonomousGenerator {
 
     private static Command getAutonomousStateSequenceCommand() {
         return new SequentialCommandGroup(
+                getCommandFromState(0),
                 getCommandFromState(1),
                 getCommandFromState(2),
                 getCommandFromState(3),
-                getCommandFromState(4),
-                getCommandFromState(5)
+                getCommandFromState(4)
         );
     }
 
