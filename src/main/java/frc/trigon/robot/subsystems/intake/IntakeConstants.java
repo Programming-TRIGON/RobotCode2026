@@ -42,7 +42,7 @@ public class IntakeConstants {
             INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
-    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 60;
+    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 30;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,

@@ -34,9 +34,9 @@ public class TurretConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double
-            GEAR_RATIO = 71.72,
-            ENCODER_GEAR_RATIO = 113.3;
-    private static final double CURRENT_LIMIT_AMPS = 100;
+            GEAR_RATIO = (5) * (30 / 20.0) * (34 / 32.0) * (9),
+            ENCODER_GEAR_RATIO = 112.20977533;
+    private static final double CURRENT_LIMIT_AMPS = 55;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
 
@@ -111,15 +111,15 @@ public class TurretConstants {
         config.Feedback.RotorToSensorRatio = ENCODER_GEAR_RATIO;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO / ENCODER_GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         config.Feedback.VelocityFilterTimeConstant = 0.01;
 
 //        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
 //        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 120;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 70;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.6;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.5;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.23229;
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0362;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;

@@ -1,8 +1,5 @@
 package frc.trigon.robot.misc.shootingphysics;
 
-import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.subsystems.shooter.ShooterConstants;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.io.*;
@@ -67,9 +64,9 @@ public class ShootingLookupTable3D {
     }
 
     private static LoggedNetworkNumber vel = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Velocity", 8);
-    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.30);
+    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.22);
     private static LoggedNetworkNumber pit = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Pitch", 87);
-    private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0.15);
+    private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0);
 
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
 //        return calcActualVel(vel.get());
@@ -88,11 +85,12 @@ public class ShootingLookupTable3D {
     }
 
     private static double calcActualPit(double pitWanted) {
-        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
-        final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
-        Logger.recordOutput("Shooting/VelocityDifference", velDifference);
-        Logger.recordOutput("Shooting/AngleAdditionDegrees", Math.toDegrees(Math.toRadians(pitConst.get()) * velDifference));
-        return (Math.toRadians(pitConst.get()) * velDifference) + pitWanted;
+//        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
+//        final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
+//        Logger.recordOutput("Shooting/VelocityDifference", velDifference);
+//        Logger.recordOutput("Shooting/AngleAdditionDegrees", Math.toDegrees(Math.toRadians(pitConst.get()) * velDifference));
+//        return (Math.toRadians(pitConst.get()) * velDifference) + pitWanted;
+        return Math.toRadians(pitConst.get()) + pitWanted;
     }
 
     public static double calculateYaw(final double distance, final double radialVelocity, final double tangentialVelocity) {

@@ -218,13 +218,13 @@ public class RobotPoseEstimator implements AutoCloseable {
         final AprilTagCamera[] newResultCameras = getCamerasWithResults();
 
         this.hasUpdateFromCameras = newResultCameras.length > 0;
-//        sortCamerasByLatestResultTimestamp(newResultCameras);
+        sortCamerasByLatestResultTimestamp(newResultCameras);
 
         for (AprilTagCamera aprilTagCamera : newResultCameras) {
             swerveDrivePoseEstimator.addVisionMeasurement(
                     aprilTagCamera.getEstimatedRobotPose(),
                     aprilTagCamera.getLatestResultTimestampSeconds(),
-                    aprilTagCamera.calculateStandardDeviations().toMatrix()
+                    aprilTagCamera.getCurrentStandardDeviations().toMatrix()
             );
         }
     }

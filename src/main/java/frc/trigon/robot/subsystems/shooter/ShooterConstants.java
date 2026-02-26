@@ -31,7 +31,7 @@ public class ShooterConstants {
             UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.47495) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
     public static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
-    private static final double STATOR_CURRENT_LIMIT_AMPS = 80.0;
+    private static final double STATOR_CURRENT_LIMIT_AMPS = 120;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
@@ -72,7 +72,7 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 3;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 2;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.38272;

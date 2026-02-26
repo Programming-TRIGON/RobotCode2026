@@ -76,7 +76,7 @@ public class SpindexerConstants {
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 243.689458;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 50;
+        config.CurrentLimits.StatorCurrentLimit = 40;
 
         config.Commutation.AdvancedHallSupport = AdvancedHallSupportValue.Enabled;
         config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;

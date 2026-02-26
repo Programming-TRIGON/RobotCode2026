@@ -58,15 +58,15 @@ public class HoodConstants {
     static final Transform3d TURRET_TO_HOOD_OFFSET = HOOD_VISUALIZATION_ORIGIN_POINT.minus(TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT);
 
     static final SysIdRoutine.Config SYSID_CONFIG = new SysIdRoutine.Config(
-            Units.Volts.of(0.4).per(Units.Seconds),
-            Units.Volts.of(0.75),
+            Units.Volts.of(0.6).per(Units.Seconds),
+            Units.Volts.of(1.2),
             null
     );
 
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(1);
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(87),
-            DELIVERY_ANGLE = Rotation2d.fromDegrees(50.2),
+            DELIVERY_ANGLE = Rotation2d.fromDegrees(50.7),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
     static final double HOOD_RESET_VOLTAGE = 1;
     static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(87);
@@ -85,26 +85,26 @@ public class HoodConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-        config.Feedback.VelocityFilterTimeConstant = 0.1;
+        config.Feedback.VelocityFilterTimeConstant = 0.06;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 500;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42164;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42;
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 4.6448;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : -0.083787;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.GravityArmPositionOffset = -0.07425999999999999;
-        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2; // 2.44299674267
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 13; // 15.3028042
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 40;
+        config.CurrentLimits.StatorCurrentLimit = 60;
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAXIMUM_ANGLE.getRotations();
