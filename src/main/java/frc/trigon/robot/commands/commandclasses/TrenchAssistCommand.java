@@ -51,7 +51,6 @@ public class TrenchAssistCommand extends SequentialCommandGroup {
                 FieldConstants.LEFT_TRENCH_Y_POSITION_METERS;
 
         final double yOffsetFromTrench = robotPose.getY() - trenchYPositionMeters;
-        System.out.println(yOffsetFromTrench);
 
         return LATERAL_MOVEMENT_PID_CONTROLLER.calculate(yOffsetFromTrench);
     }
