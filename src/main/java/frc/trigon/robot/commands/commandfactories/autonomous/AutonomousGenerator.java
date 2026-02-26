@@ -88,7 +88,7 @@ public class AutonomousGenerator {
     }
 
     private static double getDeliveryTimeout(AutonomousState... nextStates) {
-        double timeToLeave = 20;
+        double timeToLeave = AutonomousConstants.AUTONOMOUS_TIME_SECONDS;
         for (AutonomousState nextState : nextStates) {
             if (nextState == null)
                 break;
