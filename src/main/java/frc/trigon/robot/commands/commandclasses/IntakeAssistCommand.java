@@ -53,7 +53,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
                         () -> calculateTranslationPower(true, shouldAssistX),
                         () -> calculateTranslationPower(false, shouldAssistY),
                         () -> calculateThetaPower(shouldAssistTheta)
-                )
+                ).asProxy()
         );
     }
 
