@@ -136,6 +136,9 @@ public class AutonomousGenerator {
     }
 
     private static boolean shouldStartDrivingToClimb() {
+        if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
+            return false;
+
         final double timeToLeaveForClimbSeconds = calculateTimeToLeaveForClimbSeconds(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
         return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds;
     }

@@ -201,6 +201,7 @@ public class GeneralAutonomousCommands {
         return currentRobotPose.getX() > AutonomousConstants.START_INTAKING_X;
     }
 
+    static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
         if (nextState == null && AutonomousGenerator.shouldClimb())
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
         if (nextState != null && !nextState.isInAllianceZone)
