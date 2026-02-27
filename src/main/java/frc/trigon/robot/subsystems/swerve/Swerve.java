@@ -301,18 +301,19 @@ public class Swerve extends MotorSubsystem {
     private ChassisSpeeds calculateSelfRelativePIDSpeedsToPose(FlippablePose2d targetPose) {
         final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(SwerveConstants.PID_TO_POSE_PREDICTION_TIME_SECONDS);
         final Pose2d flippedTargetPose = targetPose.get();
-
-        final double xSpeed = SwerveConstants.X_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
-                0 :
-                SwerveConstants.X_TRANSLATION_PID_CONTROLLER.calculate(currentPose.getX(), flippedTargetPose.getX());
-        final double ySpeed = SwerveConstants.Y_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
-                0 :
-                SwerveConstants.Y_TRANSLATION_PID_CONTROLLER.calculate(currentPose.getY(), flippedTargetPose.getY());
+        final double calculatedXSpeed = SwerveConstants.X_TRANSLATION_PID_CONTROLLER.calculate(currentPose.getX(), flippedTargetPose.getX());
+        final double calculatedYSpeed = SwerveConstants.Y_TRANSLATION_PID_CONTROLLER.calculate(currentPose.getY(), flippedTargetPose.getY());
+//        final double xSpeed = SwerveConstants.X_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
+//                0 :
+//                calculatedXSpeed;
+//        final double ySpeed = SwerveConstants.Y_TRANSLATION_PID_CONTROLLER.atSetpoint() ?
+//                0 :
+//                calculatedYSpeed;
 
         final int directionSign = Flippable.isRedAlliance() ? -1 : 1;
         final ChassisSpeeds targetFieldRelativeSpeeds = new ChassisSpeeds(
-                xSpeed * directionSign,
-                ySpeed * directionSign,
+                calculatedXSpeed * directionSign,
+                calculatedYSpeed * directionSign,
                 calculateProfiledAngularVelocityRadiansPerSecond(targetPose.getRotation())
         );
 

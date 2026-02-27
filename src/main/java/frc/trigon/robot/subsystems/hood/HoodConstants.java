@@ -66,7 +66,7 @@ public class HoodConstants {
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(1);
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(87),
-            DELIVERY_ANGLE = Rotation2d.fromDegrees(50.7),
+            DELIVERY_ANGLE = Rotation2d.fromDegrees(51),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
     static final double HOOD_RESET_VOLTAGE = 1;
     static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(87);
@@ -85,7 +85,7 @@ public class HoodConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-        config.Feedback.VelocityFilterTimeConstant = 0.06;
+        config.Feedback.VelocityFilterTimeConstant = 0.1;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 500;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -97,7 +97,7 @@ public class HoodConstants {
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.GravityArmPositionOffset = -0.07425999999999999;
-        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2; // 2.44299674267
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 13; // 15.3028042
