@@ -2,9 +2,11 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.robot.commands.CommandConstants;
+import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 import java.util.function.BooleanSupplier;
 
@@ -61,5 +63,14 @@ public class GeneralCommands {
      */
     public static Command runWhen(Command command, BooleanSupplier condition, double debounceTimeSeconds) {
         return runWhen(new WaitCommand(debounceTimeSeconds).andThen(command.onlyIf(condition)), condition);
+    }
+
+    public static Command getResetTurretCamerasCommand(double voltage) {
+        return new ConditionalCommand(
+                TurretCommands.getStopCommand(),
+                TurretCommands.getScanForAprilTagCommand(voltage),
+                ()->CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
+                        || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
+        ).repeatedly();
     }
 }

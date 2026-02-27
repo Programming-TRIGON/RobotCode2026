@@ -93,6 +93,7 @@ public class RobotContainer {
         OperatorConstants.RESET_HEADING_TRIGGER.onTrue(CommandConstants.RESET_HEADING_COMMAND);
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
+        OperatorConstants.RESET_TURRET_VISION_TRIGGER.whileTrue(GeneralCommands.getResetTurretCamerasCommand(2));
 
         OperatorConstants.INTAKE_TRIGGER.whileTrue(FuelIntakeCommands.getIntakeCommand());
         OperatorConstants.TOGGLE_SHOULD_KEEP_INTAKE_OPEN_TRIGGER.onTrue(FuelIntakeCommands.getToggleDefaultIntakeStateCommand());
