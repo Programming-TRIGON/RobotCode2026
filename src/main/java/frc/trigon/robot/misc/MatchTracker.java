@@ -60,11 +60,11 @@ public final class MatchTracker {
     }
 
     private static boolean didGameMessageChange() {
-        final String
-                lastGameMessage = LAST_GAME_MESSAGE;
-        LAST_GAME_MESSAGE = DriverStation.getGameSpecificMessage();
+        final String lastGameMessage = LAST_GAME_MESSAGE;
+        final String currentGameMessage = DriverStation.getGameSpecificMessage();
+        LAST_GAME_MESSAGE = currentGameMessage;
 
-        return lastGameMessage.equals(LAST_GAME_MESSAGE);
+        return !lastGameMessage.equals(currentGameMessage);
     }
 
     private static void setAutonomousWinner() {
