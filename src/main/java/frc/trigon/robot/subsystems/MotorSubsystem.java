@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
     private static final Trigger DISABLED_TRIGGER = new Trigger(DriverStation::isDisabled);
     private static final Executor BRAKE_MODE_EXECUTOR = Executors.newFixedThreadPool(8);
     private static final LoggedNetworkBoolean ENABLE_EXTENSIVE_LOGGING = new LoggedNetworkBoolean("/SmartDashboard/EnableExtensiveLogging", RobotHardwareStats.isSimulation());
+    private final LoggedNetworkNumber OVERRIDE_VOLTAGE;
 
     static {
         DISABLED_TRIGGER.onTrue(new InstantCommand(() -> forEach(MotorSubsystem::stop)).ignoringDisable(true));
@@ -40,6 +42,7 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
 
     public MotorSubsystem() {
         REGISTERED_SUBSYSTEMS.add(this);
+        OVERRIDE_VOLTAGE = new LoggedNetworkNumber("OverrideVoltage/" + this.getName(), 0);
     }
 
     /**
@@ -143,6 +146,10 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
      * This doesn't always run in order to save resources.
      */
     public void updateMechanism() {
+    }
+
+    public void runOverride() {
+        sysIDDrive(OVERRIDE_VOLTAGE.get());
     }
 
     public void changeDefaultCommand(Command newDefaultCommand) {

@@ -81,6 +81,7 @@ public class OperatorConstants {
             CANCEL_CLIMB_TRIGGER = new Trigger(ClimbCommands.IS_CLIMBING).and(DRIVER_CONTROLLER.leftBumper()).or(OPERATOR_CONTROLLER.x()),
             CONTINUE_CLIMB_TRIGGER = new Trigger(ClimbCommands.IS_CLIMBING).and(DRIVER_CONTROLLER.rightBumper()).or(OPERATOR_CONTROLLER.v());
     public static final Trigger //Debugging Triggers
+            RUN_OVERRIDE_MOTORS_TRIGGER = OPERATOR_CONTROLLER.f1(),
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
 

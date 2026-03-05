@@ -116,6 +116,7 @@ public class RobotContainer {
 
         OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
 
+        OperatorConstants.RUN_OVERRIDE_MOTORS_TRIGGER.whileTrue(GeneralCommands.getRunOverrideMotorsCommand());
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
     }
 

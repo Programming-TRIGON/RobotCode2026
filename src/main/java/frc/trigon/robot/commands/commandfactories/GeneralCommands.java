@@ -62,4 +62,14 @@ public class GeneralCommands {
     public static Command runWhen(Command command, BooleanSupplier condition, double debounceTimeSeconds) {
         return runWhen(new WaitCommand(debounceTimeSeconds).andThen(command.onlyIf(condition)), condition);
     }
+
+    public static Command getRunOverrideMotorsCommand() {
+        return new RunCommand(
+                GeneralCommands::runOverrideMotors
+        ).asProxy();
+    }
+
+    private static void runOverrideMotors() {
+        MotorSubsystem.forEach(MotorSubsystem::runOverride);
+    }
 }
