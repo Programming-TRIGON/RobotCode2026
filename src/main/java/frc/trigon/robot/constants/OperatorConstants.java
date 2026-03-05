@@ -13,6 +13,7 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -103,6 +104,11 @@ public class OperatorConstants {
     public static void updateAutoShootClause() {
         if (justEnteredAllianceZone() || isIntaking())
             LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = Timer.getTimestamp();
+
+        Logger.recordOutput("AutoShootClauseRemainingTime", isAutoShootClauseActive() ?
+                AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS - (Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP) :
+                0
+        );
     }
 
     private static boolean isAutoShootClauseActive() {

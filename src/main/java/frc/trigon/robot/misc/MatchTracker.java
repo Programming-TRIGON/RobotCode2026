@@ -3,8 +3,10 @@ package frc.trigon.robot.misc;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public final class MatchTracker {
+    private static final LoggedNetworkBoolean OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false);
     private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 5;
 
     @AutoLogOutput(key = "Assists/ShouldIndicateAllianceShift")
@@ -13,9 +15,9 @@ public final class MatchTracker {
                 isHubActive(getMatchTimeSeconds() - TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS);
     }
 
-    @AutoLogOutput(key = "IsHubActive")
+    @AutoLogOutput(key = "MatchTracker/IsHubActive")
     public static boolean isHubActive() {
-        return isHubActive(getMatchTimeSeconds());
+        return isHubActive(getMatchTimeSeconds()) || OVERRIDE_IS_HUB_ACTIVE.get();
     }
 
     public static boolean isHubActive(double matchTimeSeconds) {
