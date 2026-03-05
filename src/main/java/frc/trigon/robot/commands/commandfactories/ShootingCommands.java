@@ -14,6 +14,7 @@ import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
 import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.Supplier;
 
@@ -54,7 +55,7 @@ public class ShootingCommands {
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
-        return new InstantCommand(() -> FIXED_HUB_SHOOTING_STATE = fixedPosition.targetState);
+        return new InstantCommand(() -> updateFixedShootingPosition(fixedPosition));
     }
 
     private static Command getAimAtHubCommand() {
@@ -105,6 +106,11 @@ public class ShootingCommands {
                 SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
                 LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD)
         );
+    }
+
+    private static void updateFixedShootingPosition(FixedShootingPosition targetFixedShootingPosition) {
+        FIXED_HUB_SHOOTING_STATE = targetFixedShootingPosition.targetState;
+        Logger.recordOutput("FixedShootingPosition", targetFixedShootingPosition.name());
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {

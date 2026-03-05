@@ -1,39 +1,33 @@
 package frc.trigon.robot.misc;
 
+
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public final class MatchTracker {
-    private static final LoggedNetworkBoolean OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false);
+    private static final LoggedNetworkBoolean
+            OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false),
+            DID_RED_ALLIANCE_WIN_AUTONOMOUS = new LoggedNetworkBoolean("MatchTracker/DidRedAllianceWinAutonomous", false);
+    private static final double ALLIANCE_SHIFT_DURATION_SECONDS = 25;
     private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 5;
     private static final double HUB_DEACTIVATION_TIME_SECONDS = 3;
     private static final double MINIMUM_FUEL_DETECTION_DELAY = 1;
     private static final double MAXIMUM_FUEL_DETECTION_DELAY = 2;
     private static final double FUEL_FLIGHT_TIME_SECONDS = 1.5;
-    private static double startingMatchTime;
+    private static String LAST_GAME_MESSAGE = "";
 
-    public static void setStartingMatchTime() {
-        startingMatchTime = Timer.getFPGATimestamp();
-    }
-
-    @AutoLogOutput(key = "MatchTracker/CurrentShift")
-    public static String getCurrentShiftName() {
-        if (getMatchTimeSeconds() <= 20)
-            return "Autonomous";
-        if (getMatchTimeSeconds() <= 30)
-            return "Transition Shift";
-        if (getMatchTimeSeconds() <= 55)
-            return "Shift 1";
-        return "";
+    static {
+        new Trigger(MatchTracker::didGameMessageChange).onTrue(new InstantCommand(MatchTracker::setAutonomousWinner).ignoringDisable(true));
     }
 
     @AutoLogOutput(key = "Assists/ShouldIndicateAllianceShift")
     public static boolean shouldIndicateAllianceShift() {
-        return DriverStation.getMatchType() != DriverStation.MatchType.None &&
-                isHubActive(getMatchTimeSeconds() - TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS);
+        return getTimeUntilAllianceShiftSeconds() <= TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS;
     }
 
     @AutoLogOutput(key = "MatchTracker/IsHubActive")
@@ -41,30 +35,56 @@ public final class MatchTracker {
         return isHubActive(getMatchTimeSeconds()) || OVERRIDE_IS_HUB_ACTIVE.get();
     }
 
+    public static double getTimeUntilAllianceShiftSeconds() {
+        return getTimeUntilAllianceShiftSeconds(getMatchTimeSeconds());
+    }
+
     public static boolean isHubActive(double matchTimeSeconds) {
         if (!DriverStation.isTeleop())
             return true;
 
         if (!isHubActive(matchTimeSeconds)) {
-            final int currentShift = getShiftNumber(matchTimeSeconds);
-            if (getTimeUntilShiftEnd(currentShift) <= MINIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS)
+            if (getTimeUntilAllianceShiftSeconds(matchTimeSeconds) <= MINIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS)
                 return true;
-            if (getTimeSinceShiftStart(currentShift) + MAXIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS - HUB_DEACTIVATION_TIME_SECONDS <= 0)
+            if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) + MAXIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS - HUB_DEACTIVATION_TIME_SECONDS <= 0)
                 return true;
         }
 
         final boolean isRedAlliance = Flippable.isRedAlliance();
-        final String gameMessage = DriverStation.getGameSpecificMessage();
-        if (!"R".equals(gameMessage) && !"B".equals(gameMessage))
-            return true;
-        final boolean didRedAllianceWinAutonomous = "R".equals(gameMessage);
-        final boolean isRedHubActive = isRedHubActive(didRedAllianceWinAutonomous, matchTimeSeconds);
+        final boolean isRedHubActive = isRedHubActive(DID_RED_ALLIANCE_WIN_AUTONOMOUS.get(), matchTimeSeconds);
+
         return isRedAlliance == isRedHubActive;
     }
 
+    public static double getTimeSinceLastAllianceShiftSeconds(double matchTimeSeconds) {
+        return ALLIANCE_SHIFT_DURATION_SECONDS - getTimeUntilAllianceShiftSeconds(matchTimeSeconds);
+    }
 
-    public static double getMatchTimeSeconds() {
-        return Timer.getFPGATimestamp() - startingMatchTime;
+    public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
+        return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
+    }
+
+    public static void logMatchInfo() {
+        final double matchTimeSeconds = getMatchTimeSeconds();
+
+        Logger.recordOutput("MatchTracker/MatchTimeSeconds", matchTimeSeconds);
+        Logger.recordOutput("MatchTracker/CurrentShiftType", getCurrentShiftType(matchTimeSeconds));
+        Logger.recordOutput("MatchTracker/IsHubActive", isHubActive());
+        Logger.recordOutput("MatchTracker/TimeUntilAllianceShiftSeconds", getTimeUntilAllianceShiftSeconds());
+    }
+
+    private static double
+
+    private static boolean didGameMessageChange() {
+        final String lastGameMessage = LAST_GAME_MESSAGE;
+        final String currentGameMessage = DriverStation.getGameSpecificMessage();
+        LAST_GAME_MESSAGE = currentGameMessage;
+
+        return !lastGameMessage.equals(currentGameMessage);
+    }
+
+    private static void setAutonomousWinner() {
+        DID_RED_ALLIANCE_WIN_AUTONOMOUS.set("R".equalsIgnoreCase(DriverStation.getGameSpecificMessage()));
     }
 
     private static boolean isRedHubActive(boolean didRedAllianceWinAutonomous, double matchTimeSeconds) {
@@ -73,42 +93,45 @@ public final class MatchTracker {
             return true;
         if (didRedAllianceWinAutonomous && currentShiftNumber % 2 != 0)
             return false;
-        if (!didRedAllianceWinAutonomous && currentShiftNumber % 2 == 0)
-            return false;
-        return true;
-    }
-
-    private static double getTimeUntilShiftEnd(int shift) {
-        return getShiftEndTimeStamp(shift) - getMatchTimeSeconds();
-    }
-
-    private static double getTimeSinceShiftStart(int shift) {
-        return getMatchTimeSeconds() - getShiftStartTimeStamp(shift);
-    }
-
-    private static double getShiftEndTimeStamp(int shift) {
-        return getShiftStartTimeStamp(shift) + 25;
-    }
-
-    private static double getShiftStartTimeStamp(int shift) {
-        return switch (shift) {
-            case 1 -> 30;
-            case 2 -> 55;
-            case 3 -> 80;
-            case 4 -> 105;
-            default -> 0;
-        };
+        return didRedAllianceWinAutonomous || currentShiftNumber % 2 != 0;
     }
 
     private static int getShiftNumber(double matchTimeSeconds) {
         if (matchTimeSeconds > 30 && matchTimeSeconds <= 55)
-            return 1;
-        if (matchTimeSeconds > 55 && matchTimeSeconds <= 80)
-            return 2;
-        if (matchTimeSeconds > 80 && matchTimeSeconds <= 105)
-            return 3;
-        if (matchTimeSeconds > 105 && matchTimeSeconds <= 130)
             return 4;
+        if (matchTimeSeconds > 55 && matchTimeSeconds <= 80)
+            return 3;
+        if (matchTimeSeconds > 80 && matchTimeSeconds <= 105)
+            return 2;
+        if (matchTimeSeconds > 105 && matchTimeSeconds <= 130)
+            return 1;
         return -1;
+    }
+
+    private static double getNextShiftTimeSeconds(double matchTimeSeconds) {
+        if (matchTimeSeconds > 130)
+            return 130;
+        final int currentShiftNumber = getShiftNumber(matchTimeSeconds);
+
+        return switch (currentShiftNumber) {
+            case 1 -> 105;
+            case 2 -> 80;
+            case 3 -> 55;
+            case 4 -> 30;
+            default -> -1;
+        };
+    }
+
+    private static String getCurrentShiftType(double matchTimeSeconds) {
+        if (matchTimeSeconds > 140)
+            return "Autonomous";
+        else if (matchTimeSeconds > 130)
+            return "Transition Shift";
+        else if (matchTimeSeconds < 30)
+            return "Endgame";
+
+        if (isHubActive(matchTimeSeconds))
+            return "Alliance Shift";
+        return "Opposing Alliance Shift";
     }
 }
