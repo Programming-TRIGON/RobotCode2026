@@ -73,7 +73,9 @@ public final class MatchTracker {
         Logger.recordOutput("MatchTracker/TimeUntilAllianceShiftSeconds", getTimeUntilAllianceShiftSeconds());
     }
 
-    private static double
+    private static double getMatchTimeSeconds() {
+        return DriverStation.getMatchTime();
+    }
 
     private static boolean didGameMessageChange() {
         final String lastGameMessage = LAST_GAME_MESSAGE;
