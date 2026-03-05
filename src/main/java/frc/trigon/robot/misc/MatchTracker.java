@@ -42,7 +42,7 @@ public final class MatchTracker {
 
         if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) + MAXIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS - HUB_DEACTIVATION_TIME_SECONDS <= 0)
             return true;
-        
+
         return false;
     }
 
@@ -77,7 +77,7 @@ public final class MatchTracker {
         Logger.recordOutput("MatchTracker/TimeUntilAllianceShiftSeconds", getTimeUntilAllianceShiftSeconds());
     }
 
-    private static double getMatchTimeSeconds() {
+    public static double getMatchTimeSeconds() {
         return DriverStation.getMatchTime();
     }
 
