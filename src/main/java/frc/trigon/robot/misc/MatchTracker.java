@@ -77,9 +77,7 @@ public final class MatchTracker {
             return true;
         if (didRedAllianceWinAutonomous && currentShiftNumber % 2 != 0)
             return false;
-        if (!didRedAllianceWinAutonomous && currentShiftNumber % 2 == 0)
-            return false;
-        return true;
+        return didRedAllianceWinAutonomous || currentShiftNumber % 2 != 0;
     }
 
     private static int getShiftNumber(double matchTimeSeconds) {
@@ -116,7 +114,7 @@ public final class MatchTracker {
         else if (matchTimeSeconds < 30)
             return "Endgame";
 
-        if (isHubActive())
+        if (isHubActive(matchTimeSeconds))
             return "Alliance Shift";
         return "Opposing Alliance Shift";
     }
