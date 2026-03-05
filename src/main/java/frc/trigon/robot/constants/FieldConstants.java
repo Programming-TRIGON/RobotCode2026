@@ -4,10 +4,7 @@ import com.pathplanner.lib.util.FlippingUtil;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
@@ -35,15 +32,15 @@ public class FieldConstants {
             CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.getBlueObject().getX() + RIGHT_CLIMB_POSITION.getBlueObject().getX()) / 2, LEFT_CLIMB_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
             DEPOT_POSITION = new FlippablePose2d(0.45, 7, Rotation2d.fromDegrees(-90), true),
             LEFT_INTAKE_POSITION = new FlippablePose2d(7.4, 7.3, Rotation2d.fromDegrees(-90), true),
-            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(90), true),
+            RIGHT_INTAKE_POSITION = mirror(LEFT_INTAKE_POSITION),
             LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(-100), true),
-            RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(LEFT_START_INTAKING_FOR_DELIVERY_POSITION.getBlueObject().getX(), RIGHT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(100), true),
+            RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = mirror(LEFT_START_INTAKING_FOR_DELIVERY_POSITION),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
-            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
+            RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),
             LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(3.9, 7.4, Rotation2d.kZero, true),
-            RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE),
             LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(5.53, LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
-            RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE.getBlueObject().getY(), Rotation2d.kZero, true);
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
     private static final double
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
@@ -72,5 +69,18 @@ public class FieldConstants {
                 tagIDToPose.put(aprilTag.ID, aprilTag.pose.transformBy(TAG_OFFSET));
 
         return tagIDToPose;
+    }
+
+    /**
+     * Mirrors a FlippablePose2d across the field's Y-axis centerline.
+     */
+    public static FlippablePose2d mirror(FlippablePose2d pose) {
+        Pose2d basePose = pose.getBlueObject();
+        return new FlippablePose2d(
+                basePose.getX(),
+                FIELD_WIDTH_METERS - basePose.getY(),
+                Rotation2d.fromDegrees(-basePose.getRotation().getDegrees()),
+                true
+        );
     }
 }
