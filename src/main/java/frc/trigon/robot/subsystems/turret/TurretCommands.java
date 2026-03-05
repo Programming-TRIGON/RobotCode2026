@@ -87,9 +87,9 @@ public class TurretCommands {
         );
     }
 
-    public static Command getScanForAprilTagCommand(double voltage) {
+    public static Command getScanForAprilTagCommand() {
         return new ExecuteEndCommand(
-                () -> RobotContainer.TURRET.slowScanForAprilTag(voltage), // מתח נמוך ואיטי
+                RobotContainer.TURRET::slowScanForAprilTag,
                 RobotContainer.TURRET::stop,
                 RobotContainer.TURRET
         );

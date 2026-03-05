@@ -14,7 +14,6 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MechanismCameraTransformCalculator;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
@@ -23,7 +22,6 @@ import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Turret extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
@@ -41,6 +39,7 @@ public class Turret extends MotorSubsystem {
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private double[] latestThreadedPositions = new double[0];
     private Rotation2d targetSelfRelativeAngle = new Rotation2d();
+    private int scanForAprilTagsSign = 1;
 
     public Turret() {
         setName("Turret");
@@ -173,15 +172,14 @@ public class Turret extends MotorSubsystem {
         return FieldConstants.LEFT_DELIVERY_POSITION.get();
     }
 
-    public void slowScanForAprilTag(double voltage) {
-        Rotation2d currentAngle = getCurrentSelfRelativeAngle();
+    public void slowScanForAprilTag() {
+        final Rotation2d currentAngle = getCurrentSelfRelativeAngle().plus(Rotation2d.fromDegrees(10 * scanForAprilTagsSign));
 
-        if (!isAngleInRange(currentAngle)) {
-            voltage = -voltage;
-        }
+        if (!isAngleInRange(currentAngle))
+            scanForAprilTagsSign = -scanForAprilTagsSign;
 
         masterMotor.setControl(
-                voltageRequest.withOutput(voltage)
+                voltageRequest.withOutput(TurretConstants.SLOW_SCAN_FOR_APRILTAGS_VOLTAGE * scanForAprilTagsSign)
         );
     }
 

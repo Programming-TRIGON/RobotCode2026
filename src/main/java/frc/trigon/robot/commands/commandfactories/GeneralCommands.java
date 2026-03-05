@@ -65,11 +65,11 @@ public class GeneralCommands {
         return runWhen(new WaitCommand(debounceTimeSeconds).andThen(command.onlyIf(condition)), condition);
     }
 
-    public static Command getResetTurretCamerasCommand(double voltage) {
+    public static Command getResetTurretCamerasCommand() {
         return new ConditionalCommand(
                 TurretCommands.getStopCommand(),
-                TurretCommands.getScanForAprilTagCommand(voltage),
-                ()->CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
+                TurretCommands.getScanForAprilTagCommand(),
+                () -> CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
                         || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
         ).repeatedly();
     }
