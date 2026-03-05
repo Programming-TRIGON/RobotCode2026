@@ -32,7 +32,18 @@ public final class MatchTracker {
 
     @AutoLogOutput(key = "MatchTracker/IsHubActive")
     public static boolean isHubActive() {
-        return isHubActive(getMatchTimeSeconds()) || OVERRIDE_IS_HUB_ACTIVE.get();
+        final double matchTimeSeconds = getMatchTimeSeconds();
+
+        if (isHubActive(matchTimeSeconds) || OVERRIDE_IS_HUB_ACTIVE.get())
+            return true;
+
+        if (getTimeUntilAllianceShiftSeconds(matchTimeSeconds) <= MINIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS)
+            return true;
+
+        if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) + MAXIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS - HUB_DEACTIVATION_TIME_SECONDS <= 0)
+            return true;
+        
+        return false;
     }
 
     public static double getTimeUntilAllianceShiftSeconds() {
@@ -42,13 +53,6 @@ public final class MatchTracker {
     public static boolean isHubActive(double matchTimeSeconds) {
         if (!DriverStation.isTeleop())
             return true;
-
-        if (!isHubActive(matchTimeSeconds)) {
-            if (getTimeUntilAllianceShiftSeconds(matchTimeSeconds) <= MINIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS)
-                return true;
-            if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) + MAXIMUM_FUEL_DETECTION_DELAY + FUEL_FLIGHT_TIME_SECONDS - HUB_DEACTIVATION_TIME_SECONDS <= 0)
-                return true;
-        }
 
         final boolean isRedAlliance = Flippable.isRedAlliance();
         final boolean isRedHubActive = isRedHubActive(DID_RED_ALLIANCE_WIN_AUTONOMOUS.get(), matchTimeSeconds);
