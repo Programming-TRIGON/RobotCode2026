@@ -60,10 +60,6 @@ public final class MatchTracker {
         return isRedAlliance == isRedHubActive;
     }
 
-    public static double getTimeSinceLastAllianceShiftSeconds(double matchTimeSeconds) {
-        return ALLIANCE_SHIFT_DURATION_SECONDS - getTimeUntilAllianceShiftSeconds(matchTimeSeconds);
-    }
-
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
         return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
     }
@@ -79,6 +75,10 @@ public final class MatchTracker {
 
     public static double getMatchTimeSeconds() {
         return DriverStation.getMatchTime();
+    }
+
+    private static double getTimeSinceLastAllianceShiftSeconds(double matchTimeSeconds) {
+        return ALLIANCE_SHIFT_DURATION_SECONDS - getTimeUntilAllianceShiftSeconds(matchTimeSeconds);
     }
 
     private static boolean didGameMessageChange() {
