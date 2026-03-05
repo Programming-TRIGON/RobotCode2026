@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A class that represents a subsystem that has motors (rather than something like LEDs).
@@ -28,7 +30,6 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
     private static final Trigger DISABLED_TRIGGER = new Trigger(DriverStation::isDisabled);
     private static final Executor BRAKE_MODE_EXECUTOR = Executors.newFixedThreadPool(8);
     private static final LoggedNetworkBoolean ENABLE_EXTENSIVE_LOGGING = new LoggedNetworkBoolean("/SmartDashboard/EnableExtensiveLogging", RobotHardwareStats.isSimulation());
-    private final LoggedNetworkNumber OVERRIDE_VOLTAGE;
 
     static {
         DISABLED_TRIGGER.onTrue(new InstantCommand(() -> forEach(MotorSubsystem::stop)).ignoringDisable(true));
@@ -42,7 +43,10 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
 
     public MotorSubsystem() {
         REGISTERED_SUBSYSTEMS.add(this);
-        OVERRIDE_VOLTAGE = new LoggedNetworkNumber("OverrideVoltage/" + this.getName(), 0);
+
+        final LoggedNetworkBoolean shouldOverride = new LoggedNetworkBoolean("OverrideVoltage/" + this.getName() + "/ShouldOverride", false);
+        final LoggedNetworkNumber overrideVoltage = new LoggedNetworkNumber("OverrideVoltage/" + this.getName() + "/Voltage", 0);
+        new Trigger(shouldOverride).whileTrue(getRunOverrideVoltageCommand(() -> overrideVoltage));
     }
 
     /**
@@ -148,10 +152,6 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
     public void updateMechanism() {
     }
 
-    public void runOverride() {
-        sysIDDrive(OVERRIDE_VOLTAGE.get());
-    }
-
     public void changeDefaultCommand(Command newDefaultCommand) {
         final Command currentDefaultCommand = getDefaultCommand();
         if (currentDefaultCommand != null)
@@ -160,6 +160,14 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
     }
 
     public abstract void stop();
+
+    private Command getRunOverrideVoltageCommand(Supplier<LoggedNetworkNumber> overrideVoltage) {
+        return new StartEndCommand(
+                () -> sysIDDrive(overrideVoltage.get().get()),
+                this::stop,
+                this
+        ).asProxy();
+    }
 
     private SysIdRoutine createSysIDRoutine() {
         if (getSysIDConfig() == null)
