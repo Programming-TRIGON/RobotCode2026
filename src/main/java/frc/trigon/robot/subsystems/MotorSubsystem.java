@@ -5,16 +5,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A class that represents a subsystem that has motors (rather than something like LEDs).
@@ -40,6 +43,10 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
 
     public MotorSubsystem() {
         REGISTERED_SUBSYSTEMS.add(this);
+
+        final LoggedNetworkBoolean shouldOverride = new LoggedNetworkBoolean("OverrideVoltage/" + this.getName() + "/ShouldOverride", false);
+        final LoggedNetworkNumber overrideVoltage = new LoggedNetworkNumber("OverrideVoltage/" + this.getName() + "/Voltage", 0);
+        new Trigger(shouldOverride).whileTrue(getRunOverrideVoltageCommand(() -> overrideVoltage));
     }
 
     /**
@@ -153,6 +160,14 @@ public abstract class MotorSubsystem extends edu.wpi.first.wpilibj2.command.Subs
     }
 
     public abstract void stop();
+
+    private Command getRunOverrideVoltageCommand(Supplier<LoggedNetworkNumber> overrideVoltage) {
+        return new StartEndCommand(
+                () -> sysIDDrive(overrideVoltage.get().get()),
+                this::stop,
+                this
+        ).asProxy();
+    }
 
     private SysIdRoutine createSysIDRoutine() {
         if (getSysIDConfig() == null)

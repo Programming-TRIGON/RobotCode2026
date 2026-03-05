@@ -65,7 +65,7 @@ public class ShootingCommands {
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
-        return new InstantCommand(() -> FIXED_HUB_SHOOTING_STATE = fixedPosition.targetState);
+        return new InstantCommand(() -> updateFixedShootingPosition(fixedPosition));
     }
 
     private static Command getAimAtHubCommand() {
@@ -123,6 +123,11 @@ public class ShootingCommands {
                 SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_FOR_DELIVERY),
                 LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_DELIVERY)
         );
+    }
+
+    private static void updateFixedShootingPosition(FixedShootingPosition targetFixedShootingPosition) {
+        FIXED_HUB_SHOOTING_STATE = targetFixedShootingPosition.targetState;
+        Logger.recordOutput("FixedShootingPosition", targetFixedShootingPosition.name());
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {

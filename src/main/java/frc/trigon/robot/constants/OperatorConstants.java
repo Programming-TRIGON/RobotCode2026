@@ -12,6 +12,7 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -108,7 +109,18 @@ public class OperatorConstants {
     }
 
     private static boolean isAutoShootClauseActive() {
-        return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
+        final double timeSinceLastActivate = getTimeSinceLastAutoShootClauseActivate();
+        final boolean isActive = timeSinceLastActivate <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
+        Logger.recordOutput("AutoShootClauseRemainingTime", isActive ?
+                AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS - timeSinceLastActivate :
+                0
+        );
+
+        return isActive;
+    }
+
+    private static double getTimeSinceLastAutoShootClauseActivate() {
+        return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP;
     }
 
     private static boolean isInDeliveryZone() {
