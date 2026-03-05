@@ -140,7 +140,7 @@ public class AutonomousGenerator {
             return false;
 
         final double timeToLeaveForClimbSeconds = calculateTimeToLeaveForClimbSeconds(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
-        return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds;
+        return MatchTracker.getMatchTimeSeconds() <= timeToLeaveForClimbSeconds;
     }
 
     private static double calculateTimeToLeaveForClimbSeconds(Translation2d robotPose) {

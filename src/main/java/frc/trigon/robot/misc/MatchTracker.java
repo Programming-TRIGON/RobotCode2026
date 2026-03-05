@@ -36,10 +36,8 @@ public final class MatchTracker {
         if (!DriverStation.isTeleop())
             return true;
 
-        final boolean isRedAlliance = Flippable.isRedAlliance();
-        final boolean isRedHubActive = isRedHubActive(DID_RED_ALLIANCE_WIN_AUTONOMOUS.get(), matchTimeSeconds);
-
-        return isRedAlliance == isRedHubActive;
+        final boolean didWeWinAutonomous = DID_RED_ALLIANCE_WIN_AUTONOMOUS.get() && Flippable.isRedAlliance() || !DID_RED_ALLIANCE_WIN_AUTONOMOUS.get() && !Flippable.isRedAlliance();
+        return isHubActive(didWeWinAutonomous, matchTimeSeconds);
     }
 
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
@@ -71,13 +69,13 @@ public final class MatchTracker {
         DID_RED_ALLIANCE_WIN_AUTONOMOUS.set("R".equalsIgnoreCase(DriverStation.getGameSpecificMessage()));
     }
 
-    private static boolean isRedHubActive(boolean didRedAllianceWinAutonomous, double matchTimeSeconds) {
+    private static boolean isHubActive(boolean didWeWinAutonomous, double matchTimeSeconds) {
         final int currentShiftNumber = getShiftNumber(matchTimeSeconds);
         if (currentShiftNumber == -1)
             return true;
-        if (didRedAllianceWinAutonomous && currentShiftNumber % 2 != 0)
+        if (didWeWinAutonomous && currentShiftNumber % 2 != 0)
             return false;
-        return didRedAllianceWinAutonomous || currentShiftNumber % 2 != 0;
+        return didWeWinAutonomous || currentShiftNumber % 2 != 0;
     }
 
     private static int getShiftNumber(double matchTimeSeconds) {
