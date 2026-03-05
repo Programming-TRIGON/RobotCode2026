@@ -69,8 +69,7 @@ public class Swerve extends MotorSubsystem {
         updatePoseEstimatorStates();
         RobotContainer.ROBOT_POSE_ESTIMATOR.periodic();
 
-        Logger.recordOutput("MatchTimeSeconds", MatchTracker.getMatchTimeSeconds());
-        Logger.recordOutput("IsHubActive", MatchTracker.isHubActive());
+        MatchTracker.logMatchInfo();
     }
 
     @Override
