@@ -51,6 +51,7 @@ public class OperatorConstants {
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
+            RESET_TURRET_VISION_TRIGGER = OPERATOR_CONTROLLER.y(),
             TRENCH_ASSIST_TRIGGER = DRIVER_CONTROLLER.leftStick().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
             SHOOTING_SAFE_DRIVE_TRIGGER = DRIVER_CONTROLLER.leftStick().and(TRENCH_ASSIST_TRIGGER.negate()),
             CAMERAS_DISCONNECTED_TRIGGER = new Trigger(() -> !RobotContainer.ROBOT_POSE_ESTIMATOR.hasUpdateFromCameras()).debounce(ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS),

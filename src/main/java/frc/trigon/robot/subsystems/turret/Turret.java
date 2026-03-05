@@ -38,6 +38,7 @@ public class Turret extends MotorSubsystem {
     private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(TurretConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private double[] latestThreadedPositions = new double[0];
     private Rotation2d targetSelfRelativeAngle = new Rotation2d();
+    private int scanForAprilTagsSign = 1;
 
     public Turret() {
         setName("Turret");
@@ -173,6 +174,17 @@ public class Turret extends MotorSubsystem {
         if (distanceFromRightDeliveryPosition < distanceFromLeftDeliveryPosition)
             return FieldConstants.RIGHT_DELIVERY_POSITION.get();
         return FieldConstants.LEFT_DELIVERY_POSITION.get();
+    }
+
+    public void slowScanForAprilTag() {
+        final Rotation2d currentAngle = getCurrentSelfRelativeAngle().plus(Rotation2d.fromDegrees(10 * scanForAprilTagsSign));
+
+        if (!isAngleInRange(currentAngle))
+            scanForAprilTagsSign = -scanForAprilTagsSign;
+
+        masterMotor.setControl(
+                voltageRequest.withOutput(TurretConstants.SLOW_SCAN_FOR_APRILTAGS_VOLTAGE * scanForAprilTagsSign)
+        );
     }
 
     void alignToHub() {

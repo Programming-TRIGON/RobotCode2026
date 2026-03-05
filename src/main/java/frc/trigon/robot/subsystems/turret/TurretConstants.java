@@ -77,6 +77,7 @@ public class TurretConstants {
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
     static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
     static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.1;
+    static final double SLOW_SCAN_FOR_APRILTAGS_VOLTAGE = 1.5;
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
