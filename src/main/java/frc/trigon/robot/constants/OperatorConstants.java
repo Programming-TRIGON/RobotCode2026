@@ -12,7 +12,6 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
-import frc.trigon.robot.subsystems.intake.IntakeConstants;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -82,6 +81,8 @@ public class OperatorConstants {
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
+    public static final Trigger
+            UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
 
     private static boolean WAS_IN_ALLIANCE_ZONE = false;
     private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = -AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
@@ -95,14 +96,13 @@ public class OperatorConstants {
 
     public static boolean shouldAutoDeliver() {
         return DriverStation.isTeleop()
+                && isAutoShootClauseActive()
                 && isInDeliveryZone()
-                && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
     public static void updateAutoShootClause() {
-        if (justEnteredAllianceZone() || isIntaking())
-            LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = Timer.getTimestamp();
+        LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = Timer.getTimestamp();
     }
 
     private static boolean isAutoShootClauseActive() {
@@ -116,11 +116,8 @@ public class OperatorConstants {
 
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
-        WAS_IN_ALLIANCE_ZONE = FieldConstants.isInAllianceZone();
-        return WAS_IN_ALLIANCE_ZONE && !wasInAllianceZone;
-    }
-
-    private static boolean isIntaking() {
-        return RobotContainer.INTAKE.atState(IntakeConstants.IntakeState.INTAKE);
+        final boolean isInAllianceZone = FieldConstants.isInAllianceZone();
+        WAS_IN_ALLIANCE_ZONE = isInAllianceZone;
+        return isInAllianceZone && !wasInAllianceZone;
     }
 }

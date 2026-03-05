@@ -7,6 +7,7 @@ package frc.trigon.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
@@ -115,8 +116,8 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
 
         OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
-
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
+        OperatorConstants.UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER.onTrue(new InstantCommand(OperatorConstants::updateAutoShootClause).ignoringDisable(true));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {
