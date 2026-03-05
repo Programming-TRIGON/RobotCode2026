@@ -13,7 +13,7 @@ public class FuelIntakeCommands {
             SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("/SmartDashboard/ShouldKeepIntakeOpen", true),
             SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", true);
 
-    public static final boolean
+    private static final boolean
             SHOULD_ASSIST_X = false,
             SHOULD_ASSIST_Y = true,
             SHOULD_ASSIST_THETA = false;
@@ -21,26 +21,26 @@ public class FuelIntakeCommands {
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                getIntakeAssistCommand().asProxy().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
+                getIntakeAssistCommand().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
         );
     }
 
     public static Command getToggleDefaultIntakeStateCommand() {
         return new InstantCommand(
                 () -> SHOULD_KEEP_INTAKE_OPEN.set(!SHOULD_KEEP_INTAKE_OPEN.get())
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getEnableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(true)
-        );
+        ).ignoringDisable(true);
     }
 
     public static Command getDisableIntakeAssistCommand() {
         return new InstantCommand(
                 () -> SHOULD_ASSIST_INTAKE.set(false)
-        );
+        ).ignoringDisable(true);
     }
 
     private static Command getIntakeAssistCommand() {

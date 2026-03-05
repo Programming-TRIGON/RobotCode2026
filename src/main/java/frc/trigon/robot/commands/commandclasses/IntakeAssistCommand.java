@@ -53,7 +53,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
                         () -> calculateTranslationPower(true, shouldAssistX),
                         () -> calculateTranslationPower(false, shouldAssistY),
                         () -> calculateThetaPower(shouldAssistTheta)
-                )
+                ).asProxy()
         );
     }
 
@@ -119,7 +119,7 @@ public class IntakeAssistCommand extends ParallelCommandGroup {
 
         final Translation2d fieldRelativeDistanceFromBestGamePiece = robotPose.getTranslation().minus(bestGamePieceFieldRelativePosition);
         final Translation2d selfRelativeDistanceFromBestGamePiece = fieldRelativeDistanceFromBestGamePiece.rotateBy(robotPose.getRotation().unaryMinus());
-        Logger.recordOutput("IntakeAssist/selfRelativeDistanceFromBestGamePiece", selfRelativeDistanceFromBestGamePiece);
+        Logger.recordOutput("Assists/selfRelativeDistanceFromBestGamePiece", selfRelativeDistanceFromBestGamePiece);
         return selfRelativeDistanceFromBestGamePiece;
     }
 
