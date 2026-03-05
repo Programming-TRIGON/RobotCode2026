@@ -66,11 +66,11 @@ public class GeneralCommands {
     }
 
     public static Command getResetTurretCamerasCommand() {
-        return new ConditionalCommand(
+        return getContinuousConditionalCommand(
                 TurretCommands.getStopCommand(),
                 TurretCommands.getScanForAprilTagCommand(),
                 () -> CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
                         || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
-        ).repeatedly();
+        );
     }
 }
