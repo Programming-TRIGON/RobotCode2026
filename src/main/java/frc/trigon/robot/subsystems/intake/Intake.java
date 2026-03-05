@@ -148,6 +148,7 @@ public class Intake extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentArmAngle() {
-        return Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.POSITION));
+        return new Rotation2d();
+//        return Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.POSITION));
     }
 }

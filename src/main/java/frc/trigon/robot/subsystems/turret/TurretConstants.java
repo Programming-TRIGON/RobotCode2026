@@ -76,7 +76,7 @@ public class TurretConstants {
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
     static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
-    static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.12;
+    static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.1;
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
@@ -111,7 +111,7 @@ public class TurretConstants {
         config.Feedback.RotorToSensorRatio = ENCODER_GEAR_RATIO;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO / ENCODER_GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ENCODER.getID();
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         config.Feedback.VelocityFilterTimeConstant = 0.01;
 
 //        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
@@ -120,7 +120,7 @@ public class TurretConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 70;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.5;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.23229;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.2;
         config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0362;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
@@ -154,6 +154,7 @@ public class TurretConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 250);
         MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_POSITION, 250);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_VELOCITY, 250);
         MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 

@@ -8,6 +8,8 @@ import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.misc.shootingphysics.ShootingState;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
+import frc.trigon.robot.subsystems.intake.IntakeCommands;
+import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import frc.trigon.robot.subsystems.loader.LoaderCommands;
 import frc.trigon.robot.subsystems.loader.LoaderConstants;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
@@ -24,11 +26,19 @@ public class ShootingCommands {
 
     public static Command getShortEjectFuelCommand() {
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_TO_TURRET),
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_FOR_EJECT),
                 LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_EJECT),
                 TurretCommands.getAlignForEjectionCommand(),
                 HoodCommands.getAimForEjectionCommand(),
                 ShooterCommands.getAimForEjectionCommand()
+        );
+    }
+
+    public static Command getUnjamCommand() {
+        return new ParallelCommandGroup(
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.UNJAM),
+                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.UNJAM),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.EJECT)
         );
     }
 
@@ -96,15 +106,22 @@ public class ShootingCommands {
     private static Command getLoadFuelWhenReadyCommand(boolean isAutoShootingAtHub) {
         return new SequentialCommandGroup(
                 new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub)),
-                getLoadFuelCommand()
+                getLoadFuelCommand(isAutoShootingAtHub)
                         .until(() -> ShootingCommands.shouldStopShooting(isAutoShootingAtHub))
         ).repeatedly();
     }
 
-    private static Command getLoadFuelCommand() {
+    private static Command getLoadFuelCommand(boolean isAutoShootingAtHub) {
+        if (isAutoShootingAtHub) {
+            return new ParallelCommandGroup(
+                    SpindexerCommands.getLoadToShooterCommand(),
+                    LoaderCommands.getLoadToShooterCommand()
+            );
+        }
+
         return new ParallelCommandGroup(
-                SpindexerCommands.getLoadToShooterCommand(),
-                LoaderCommands.getLoadToShooterCommand()
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_FOR_DELIVERY),
+                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_DELIVERY)
         );
     }
 

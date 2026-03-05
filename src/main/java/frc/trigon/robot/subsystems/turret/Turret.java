@@ -199,7 +199,7 @@ public class Turret extends MotorSubsystem {
     }
 
     void setTargetFieldRelativeAngle(Rotation2d targetAngle) {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(TurretConstants.ROBOT_ROTATION_PREDICTION_TIME_SECONDS);
+        final Pose2d robotPose = getPredictedRobotPose();
         final Rotation2d targetRobotRelativeAngle = targetAngle.minus(robotPose.getRotation());
         setTargetSelfRelativeAngle(targetRobotRelativeAngle);
     }
@@ -221,7 +221,7 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d calculateFieldRelativeAngleToClosestAprilTag() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d robotPose = getPredictedRobotPose();
         final FlippablePose2d closestTagToRobotPose = calculateClosestAprilTagPose();
 
         if (closestTagToRobotPose == null)
@@ -267,12 +267,19 @@ public class Turret extends MotorSubsystem {
     }
 
     private Rotation2d calculateTargetAngleForDelivery() {
-        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d currentPosition = getPredictedRobotPose();
         final Rotation2d angleToDeliveryPoint = calculateTargetAngleToPose(calculateClosestDeliveryPosition(), currentPosition);
         final double currentYVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vyMetersPerSecond;
         final double currentAllianceYVelocity = Flippable.isRedAlliance() ? -currentYVelocity : currentYVelocity;
         final Rotation2d yVelocityResistanceAngle = Rotation2d.fromDegrees(currentAllianceYVelocity * TurretConstants.RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT);
         return angleToDeliveryPoint.plus(yVelocityResistanceAngle);
+    }
+
+    private Pose2d getPredictedRobotPose() {
+        final Pose2d currentPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d predictedPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(TurretConstants.ROBOT_ROTATION_PREDICTION_TIME_SECONDS);
+        Logger.recordOutput("Turret/PredictedDiffDegrees", currentPose.getRotation().minus(predictedPose.getRotation()).getDegrees());
+        return predictedPose;
     }
 
     private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation, Pose2d currentPosition) {

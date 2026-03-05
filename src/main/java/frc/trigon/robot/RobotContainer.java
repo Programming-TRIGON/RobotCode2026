@@ -77,7 +77,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-//        configureSysIDBindings(TURRET);
+//        configureSysIDBindings(SHOOTER);
     }
 
     private void bindDefaultCommands() {
@@ -116,9 +116,10 @@ public class RobotContainer {
         OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
 
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
+        OperatorConstants.UNJAM_TRIGGER.whileTrue(ShootingCommands.getUnjamCommand());
         OperatorConstants.RESET_HOOD_TRIGGER.whileTrue(HoodCommands.getResetHoodCommand());
-//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
-        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(TurretCommands.getDebuggingCommand());
+        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
+//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand());
 //        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(CommandConstants.WHEEL_RADIUS_CHARACTERIZATION_COMMAND);
     }
 

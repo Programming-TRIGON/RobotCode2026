@@ -65,7 +65,7 @@ public class Climber extends MotorSubsystem {
 
     @Override
     public void updatePeriodically() {
-        motor.update();
+//        motor.update();
     }
 
     @Override
@@ -133,7 +133,8 @@ public class Climber extends MotorSubsystem {
     }
 
     private double getPositionRotations() {
-        return motor.getSignal(TalonFXSignal.POSITION);
+        return 0;
+//        return motor.getSignal(TalonFXSignal.POSITION);
     }
 
     private double rotationsToMeters(double positionRotations) {

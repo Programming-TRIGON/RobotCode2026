@@ -63,23 +63,20 @@ public class ShootingLookupTable3D {
         return isLoaded && velocityData != null && velocityData.length > 0;
     }
 
-    private static LoggedNetworkNumber vel = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Velocity", 8);
-    private static LoggedNetworkNumber velConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityConstant", 1.32);
-    private static LoggedNetworkNumber pit = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/Pitch", 87);
+    private static LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 1.34);
+    private static LoggedNetworkNumber velInerceptConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityInterceptConstant", 1.32);
     private static LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 1);
 
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
-//        return calcActualVel(vel.get());
         validateLoaded();
         return calcActualVel(interpolate(velocityData, distance, radialVelocity, Math.abs(tangentialVelocity)));
     }
 
     private static double calcActualVel(double velWanted) {
-        return velConst.get() * velWanted;
+        return velSlopeConst.get() * velWanted;
     }
 
     public static double calculatePitch(final double distance, final double radialVelocity, final double tangentialVelocity) {
-//        return Math.toRadians(calcActualPit(pit.get()));
         validateLoaded();
         return calcActualPit(interpolate(pitchData, distance, radialVelocity, Math.abs(tangentialVelocity)));
     }

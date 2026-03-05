@@ -69,22 +69,21 @@ public class GeneralAutonomousCommands {
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
-                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 getShootAtHubWhileDrivingCommand()
         );
     }
 
     public static Command getScoreCommand(AutonomousGenerator.AutonomousState nextState, double timeout) {
-        return new ParallelCommandGroup(
+        return new ParallelRaceGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> getScoringPose(nextState),
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1000
-                ),
+                ).andThen(new WaitCommand(timeout)),
                 getShootAtHubWhileDrivingCommand()
-        ).withTimeout(timeout);
+        );
     }
 
     public static Command getCollectFromDepotCommand(boolean shootWhileDriving, double collectionTimeout) {
@@ -99,7 +98,6 @@ public class GeneralAutonomousCommands {
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
-                new WaitCommand(0.1),
                 getDriveToFuelCommand(true).alongWith(ShootingCommands.getShootAtHubCommand()).withTimeout(collectionTimeout)
         ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
@@ -136,7 +134,7 @@ public class GeneralAutonomousCommands {
                         SafeAutonomousDriveCommands::isInAllianceZone
                 ),
                 GeneralAutonomousCommands::isInTrench
-        );
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     public static boolean isInTrench() {
@@ -169,7 +167,7 @@ public class GeneralAutonomousCommands {
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(intakeSlowly),
-                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> 0.2 : () -> -0.2),
+                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> -0.2 : () -> 0.2),
                 GamePieceAutoDriveCommand::hasCollectableGamePiecesInView
         );
     }
