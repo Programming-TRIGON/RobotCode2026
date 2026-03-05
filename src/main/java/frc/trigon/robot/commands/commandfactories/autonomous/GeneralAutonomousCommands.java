@@ -74,7 +74,7 @@ public class GeneralAutonomousCommands {
     }
 
     public static Command getScoreCommand(AutonomousGenerator.AutonomousState nextState, double timeout) {
-        return new ParallelRaceGroup(
+        return new ParallelDeadlineGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> getScoringPose(nextState),
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
