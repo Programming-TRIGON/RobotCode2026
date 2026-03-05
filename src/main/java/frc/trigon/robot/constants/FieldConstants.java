@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
+import frc.trigon.robot.RobotContainer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class FieldConstants {
     private static final Transform3d TAG_OFFSET = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
+    public static final double LEFT_TRENCH_Y_POSITION_METERS = 7.4;
     public static final FlippablePose2d
             LEFT_CLIMB_POSITION = new FlippablePose2d(1.57, 4.25, Rotation2d.fromDegrees(0), true),
             RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.getBlueObject().getX(), 3.28, Rotation2d.fromDegrees(0), true),
@@ -82,5 +84,10 @@ public class FieldConstants {
                 Rotation2d.fromDegrees(-basePose.getRotation().getDegrees()),
                 true
         );
+    }
+
+    public static boolean isInAllianceZone() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < ALLIANCE_ZONE_LENGTH;
     }
 }
