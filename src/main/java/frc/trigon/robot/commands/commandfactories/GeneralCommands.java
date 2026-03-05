@@ -30,6 +30,15 @@ public class GeneralCommands {
         }).ignoringDisable(true);
     }
 
+    public static Command getResetTurretCamerasCommand() {
+        return getContinuousConditionalCommand(
+                TurretCommands.getStopCommand(),
+                TurretCommands.getScanForAprilTagCommand(),
+                () -> CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
+                        || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
+        );
+    }
+
     public static Command getDelayedCommand(double delaySeconds, Runnable toRun) {
         return new WaitCommand(delaySeconds).andThen(toRun).ignoringDisable(true);
     }
@@ -63,14 +72,5 @@ public class GeneralCommands {
      */
     public static Command runWhen(Command command, BooleanSupplier condition, double debounceTimeSeconds) {
         return runWhen(new WaitCommand(debounceTimeSeconds).andThen(command.onlyIf(condition)), condition);
-    }
-
-    public static Command getResetTurretCamerasCommand() {
-        return getContinuousConditionalCommand(
-                TurretCommands.getStopCommand(),
-                TurretCommands.getScanForAprilTagCommand(),
-                () -> CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
-                        || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
-        );
     }
 }
