@@ -75,7 +75,7 @@ public class FieldConstants {
      * Mirrors a FlippablePose2d across the field's Y-axis centerline.
      */
     public static FlippablePose2d mirror(FlippablePose2d pose) {
-        Pose2d basePose = pose.getBlueObject();
+        final Pose2d basePose = pose.getBlueObject();
         return new FlippablePose2d(
                 basePose.getX(),
                 FIELD_WIDTH_METERS - basePose.getY(),
