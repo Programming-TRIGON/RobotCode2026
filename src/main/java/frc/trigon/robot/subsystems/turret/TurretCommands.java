@@ -86,4 +86,12 @@ public class TurretCommands {
                 RobotContainer.TURRET
         );
     }
+
+    public static Command getScanForAprilTagCommand() {
+        return new ExecuteEndCommand(
+                RobotContainer.TURRET::slowScanForAprilTag,
+                RobotContainer.TURRET::stop,
+                RobotContainer.TURRET
+        );
+    }
 }

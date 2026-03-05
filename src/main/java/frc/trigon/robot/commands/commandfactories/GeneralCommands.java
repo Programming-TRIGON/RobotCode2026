@@ -2,9 +2,11 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.robot.commands.CommandConstants;
+import frc.trigon.robot.constants.CameraConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
+import frc.trigon.robot.subsystems.turret.TurretCommands;
 
 import java.util.function.BooleanSupplier;
 
@@ -26,6 +28,15 @@ public class GeneralCommands {
             MotorSubsystem.IS_BRAKING = !MotorSubsystem.IS_BRAKING;
             MotorSubsystem.setAllSubsystemsBrakeAsync(MotorSubsystem.IS_BRAKING);
         }).ignoringDisable(true);
+    }
+
+    public static Command getResetTurretCamerasCommand() {
+        return getContinuousConditionalCommand(
+                TurretCommands.getStopCommand(),
+                TurretCommands.getScanForAprilTagCommand(),
+                () -> CameraConstants.RIGHT_TURRET_CAMERA.hasValidResult()
+                        || CameraConstants.LEFT_TURRET_CAMERA.hasValidResult()
+        );
     }
 
     public static Command getDelayedCommand(double delaySeconds, Runnable toRun) {

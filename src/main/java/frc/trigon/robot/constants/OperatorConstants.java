@@ -12,6 +12,7 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
+import org.littletonrobotics.junction.Logger;
 
 import java.util.function.DoubleUnaryOperator;
 
@@ -51,6 +52,7 @@ public class OperatorConstants {
             DRIVE_FROM_DPAD_TRIGGER = new Trigger(() -> DRIVER_CONTROLLER.getPov() != -1),
             TOGGLE_BRAKE_TRIGGER = OPERATOR_CONTROLLER.g().or(RobotController::getUserButton),
             DEBUGGING_TRIGGER = OPERATOR_CONTROLLER.f2(),
+            RESET_TURRET_VISION_TRIGGER = OPERATOR_CONTROLLER.y(),
             TRENCH_ASSIST_TRIGGER = DRIVER_CONTROLLER.leftStick().multiPress(2, DOUBLE_TAP_TIMEOUT_SECONDS),
             SHOOTING_SAFE_DRIVE_TRIGGER = DRIVER_CONTROLLER.leftStick().and(TRENCH_ASSIST_TRIGGER.negate()),
             CAMERAS_DISCONNECTED_TRIGGER = new Trigger(() -> !RobotContainer.ROBOT_POSE_ESTIMATOR.hasUpdateFromCameras()).debounce(ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS),
@@ -106,7 +108,18 @@ public class OperatorConstants {
     }
 
     private static boolean isAutoShootClauseActive() {
-        return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
+        final double timeSinceLastActivate = getTimeSinceLastAutoShootClauseActivate();
+        final boolean isActive = timeSinceLastActivate <= AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
+        Logger.recordOutput("AutoShootClauseRemainingTime", isActive ?
+                AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS - timeSinceLastActivate :
+                0
+        );
+
+        return isActive;
+    }
+
+    private static double getTimeSinceLastAutoShootClauseActivate() {
+        return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP;
     }
 
     private static boolean isInDeliveryZone() {
