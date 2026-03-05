@@ -43,7 +43,7 @@ public final class MatchTracker {
     }
 
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
-        return getNextShiftTimeSeconds(matchTimeSeconds) - matchTimeSeconds;
+        return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
     }
 
     public static double getMatchTimeSeconds() {
