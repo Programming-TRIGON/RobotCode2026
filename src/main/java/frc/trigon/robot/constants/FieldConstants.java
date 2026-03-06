@@ -67,12 +67,12 @@ public class FieldConstants {
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
-            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1,
+            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.93,
             TRENCH_ZONE_MINIMUM_X = 4.4,
             TRENCH_ZONE_MAXIMUM_X = 4.9,
-            LEFT_TRENCH_MIN_Y = 7.2,
+            LEFT_TRENCH_MIN_Y = 6.9,
             RIGHT_TRENCH_MAX_Y = FIELD_WIDTH_METERS - LEFT_TRENCH_MIN_Y;
-    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.2;
+    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.23;
 
     static {
         Logger.recordOutput("IMPORTANT/HUB_POSE_BLUE", HUB_POSITION.getBlueObject());

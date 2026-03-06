@@ -349,7 +349,9 @@ public class Turret extends MotorSubsystem {
         }
 
         if (targetAngleInRangeIndices.isEmpty())
-            return getClosestAngleToLimits(adjustedAngleOptions).getDegrees() > TurretConstants.TOTAL_ANGULAR_RANGE.getDegrees() / 2 ? TurretConstants.MAXIMUM_ANGLE : TurretConstants.MINIMUM_ANGLE;
+            return getClosestAngleToLimits(adjustedAngleOptions).getDegrees() > (TurretConstants.MINIMUM_ANGLE.getDegrees() + TurretConstants.TOTAL_ANGULAR_RANGE.getDegrees() / 2) / 2 ?
+                    TurretConstants.MAXIMUM_ANGLE :
+                    TurretConstants.MINIMUM_ANGLE;
         if (targetAngleInRangeIndices.size() == 1)
             return angleOptions[targetAngleInRangeIndices.get(0)];
         if (bothInRangeIndices.size() == 1)
