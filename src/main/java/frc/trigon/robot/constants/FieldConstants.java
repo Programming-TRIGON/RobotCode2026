@@ -10,6 +10,7 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -102,7 +103,45 @@ public class FieldConstants {
         );
     }
 
-    public static boolean isInDeliveryZone() {
+    public static void logZoneChecks() {
+        Logger.recordOutput("Zones/IsRobotInTrenchZone", isRobotInTrenchZone());
+        Logger.recordOutput("Zones/IsRobotInTrenchXRange", isRobotInTrenchXRange());
+        Logger.recordOutput("Zones/IsRobotInTrenchYRange", isRobotInTrenchYRange());
+        Logger.recordOutput("Zones/IsRobotInDeliveryZone", isRobotInDeliveryZone());
+        Logger.recordOutput("Zones/IsRobotInAllianceZone", isRobotInAllianceZone());
+    }
+
+    public static boolean isRobotInTrenchZone() {
+        return isPoseInTrenchZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInTrenchZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return isPoseInTrenchXRange(pose) && isPoseInTrenchYRange(pose);
+    }
+
+    public static boolean isRobotInTrenchXRange() {
+        return isPoseInTrenchXRange(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInTrenchXRange(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return (pose.getX() > TRENCH_ALLIANCE_X && pose.getX() < TRENCH_NEUTRAL_X) || (pose.getX() > FIELD_LENGTH_METERS - TRENCH_NEUTRAL_X && pose.getX() < FIELD_LENGTH_METERS - TRENCH_ALLIANCE_X);
+    }
+
+    public static boolean isRobotInTrenchYRange() {
+        return isPoseInTrenchYRange(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInTrenchYRange(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return pose.getY() > FieldConstants.LEFT_TRENCH_MIN_Y || pose.getY() < FieldConstants.RIGHT_TRENCH_MAX_Y;
+    }
+
+    public static boolean isRobotInDeliveryZone() {
         return isPoseInDeliveryZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
     }
 
@@ -114,7 +153,7 @@ public class FieldConstants {
         return pose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
     }
 
-    public static boolean isInAllianceZone() {
+    public static boolean isRobotInAllianceZone() {
         return isPoseInAllianceZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
     }
 

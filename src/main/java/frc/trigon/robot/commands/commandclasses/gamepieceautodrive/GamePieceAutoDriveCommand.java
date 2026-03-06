@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
-import frc.trigon.robot.commands.commandfactories.autonomous.SafeAutonomousDriveCommands;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.objectdetection.ObjectPoseEstimator;
@@ -368,7 +367,7 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
 
         // 2. Zone-Specific Logic (Alliance vs Neutral)
         // The robot should only collect pieces located in the same zone type (Alliance or Neutral) as itself.
-        final boolean isRobotInAllianceZone = FieldConstants.isInAllianceZone();
+        final boolean isRobotInAllianceZone = FieldConstants.isRobotInAllianceZone();
         final boolean isPieceInAllianceZone = FieldConstants.isPoseInAllianceZone(piece);
 
         return isRobotInAllianceZone != isPieceInAllianceZone;

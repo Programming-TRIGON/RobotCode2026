@@ -71,7 +71,7 @@ public class Swerve extends MotorSubsystem {
         RobotContainer.ROBOT_POSE_ESTIMATOR.periodic();
 
         MatchTracker.logMatchInfo();
-        Logger.recordOutput("IsInAllianceZone", FieldConstants.isInAllianceZone());
+        FieldConstants.logZoneChecks();
     }
 
     @Override

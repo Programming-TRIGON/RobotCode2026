@@ -1,14 +1,12 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
@@ -98,7 +96,8 @@ public class OperatorConstants {
     public static boolean shouldAutoDeliver() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
-                && FieldConstants.isPoseInDeliveryZone(RobotContainer.TURRET.getTurretFieldRelativePosition().getTranslation())
+                && FieldConstants.isRobotInDeliveryZone()
+                && !FieldConstants.isRobotInTrenchZone()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
@@ -123,7 +122,7 @@ public class OperatorConstants {
 
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
-        final boolean isInAllianceZone = FieldConstants.isPoseInAllianceZone(RobotContainer.TURRET.getTurretFieldRelativePosition().getTranslation());
+        final boolean isInAllianceZone = FieldConstants.isRobotInAllianceZone() && !FieldConstants.isRobotInTrenchZone();
         WAS_IN_ALLIANCE_ZONE = isInAllianceZone;
         return isInAllianceZone && !wasInAllianceZone;
     }
