@@ -130,7 +130,7 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
         Logger.recordOutput("Autonomous/IsInAllianceZone", SafeAutonomousDriveCommands.isInAllianceZone());
         Logger.recordOutput("Autonomous/IsInTrenchXRange", GeneralAutonomousCommands.isInTrenchXRange());
-        Logger.recordOutput("Autonomous/IsInTrenchYRange", GeneralAutonomousCommands.isInTrenchYRange());
+        Logger.recordOutput("Autonomous/IsInTrenchYRange", SafeAutonomousDriveCommands.isInTrenchYRange());
     }
 
     private static boolean shouldStartDrivingToClimb() {
