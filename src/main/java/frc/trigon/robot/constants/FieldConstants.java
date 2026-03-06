@@ -28,31 +28,46 @@ public class FieldConstants {
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
     public static final double LEFT_TRENCH_Y_POSITION_METERS = 7.4;
-    public static final FlippablePose2d
-            LEFT_CLIMB_POSITION = new FlippablePose2d(1.57, 4.25, Rotation2d.fromDegrees(0), true),
-            RIGHT_CLIMB_POSITION = new FlippablePose2d(LEFT_CLIMB_POSITION.getBlueObject().getX(), 3.28, Rotation2d.fromDegrees(0), true),
-            CENTER_CLIMB_POSITION = new FlippablePose2d((LEFT_CLIMB_POSITION.getBlueObject().getX() + RIGHT_CLIMB_POSITION.getBlueObject().getX()) / 2, LEFT_CLIMB_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
-            DEPOT_POSITION = new FlippablePose2d(0.45, 7, Rotation2d.fromDegrees(-90), true),
-            LEFT_INTAKE_POSITION = new FlippablePose2d(7.4, 7.3, Rotation2d.fromDegrees(-90), true),
-            RIGHT_INTAKE_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(90), true),
-            LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(-100), true),
-            RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(LEFT_START_INTAKING_FOR_DELIVERY_POSITION.getBlueObject().getX(), RIGHT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(100), true),
-            LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
-            RIGHT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_IDEAL_SHOOTING_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(0), true),
-            LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(3.9, LEFT_TRENCH_Y_POSITION_METERS, Rotation2d.kZero, true),
-            RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
-            LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(5.53, LEFT_TRENCH_Y_POSITION_METERS, Rotation2d.kZero, true),
-            RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE.getBlueObject().getX(), FIELD_WIDTH_METERS - LEFT_TRENCH_Y_POSITION_METERS, Rotation2d.kZero, true);
     private static final double
-            BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
+            CLIMB_X = 1.57,
+            LEFT_CLIMB_Y = 4.25,
+            RIGHT_CLIMB_Y = 3.28,
+            DEPOT_X = 0.45,
+            DEPOT_Y = 7.0,
+            INTAKE_X = 7.4,
+            INTAKE_Y = 7.3,
+            IDEAL_SHOOTING_X = 2.7,
+            IDEAL_SHOOTING_Y = 5.8,
+            TRENCH_ALLIANCE_X = 3.9,
+            TRENCH_NEUTRAL_X = 5.53,
+            TRENCH_ENTRY_Y = 7.4,
+            BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
+
+    public static final FlippablePose2d
+            LEFT_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, LEFT_CLIMB_Y, Rotation2d.kZero, true),
+            RIGHT_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, RIGHT_CLIMB_Y, Rotation2d.kZero, true),
+            CENTER_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, LEFT_CLIMB_Y, Rotation2d.kZero, true),
+            DEPOT_POSITION = new FlippablePose2d(DEPOT_X, DEPOT_Y, Rotation2d.fromDegrees(-90), true),
+            LEFT_INTAKE_POSITION = new FlippablePose2d(INTAKE_X, INTAKE_Y, Rotation2d.fromDegrees(-90), true),
+            RIGHT_INTAKE_POSITION = mirror(LEFT_INTAKE_POSITION),
+            LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2.0, INTAKE_Y, Rotation2d.fromDegrees(-100), true),
+            RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = mirror(LEFT_START_INTAKING_FOR_DELIVERY_POSITION),
+            LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(IDEAL_SHOOTING_X, IDEAL_SHOOTING_Y, Rotation2d.kZero, true),
+            RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(TRENCH_ALLIANCE_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(TRENCH_NEUTRAL_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
+            RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
     public static final FlippableTranslation2d
             HUB_POSITION = new FlippableTranslation2d(4.7, FIELD_WIDTH_METERS / 2, true),
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
-            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1;
+            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1,
+            LEFT_TRENCH_MIN_Y = 7.2,
+            RIGHT_TRENCH_MAX_Y = FIELD_WIDTH_METERS - LEFT_TRENCH_MIN_Y;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
@@ -71,6 +86,19 @@ public class FieldConstants {
                 tagIDToPose.put(aprilTag.ID, aprilTag.pose.transformBy(TAG_OFFSET));
 
         return tagIDToPose;
+    }
+
+    /**
+     * Mirrors a FlippablePose2d across the field's Y-axis centerline.
+     */
+    public static FlippablePose2d mirror(FlippablePose2d pose) {
+        final Pose2d basePose = pose.getBlueObject();
+        return new FlippablePose2d(
+                basePose.getX(),
+                FIELD_WIDTH_METERS - basePose.getY(),
+                Rotation2d.fromDegrees(-basePose.getRotation().getDegrees()),
+                true
+        );
     }
 
     public static boolean isInAllianceZone() {

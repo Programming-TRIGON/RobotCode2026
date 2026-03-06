@@ -35,13 +35,12 @@ public class AutonomousConstants {
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
 
-    public static final LoggedNetworkNumber DELIVERY_TIMEOUT_SECONDS = new LoggedNetworkNumber("DeliveryTimeoutSeconds", 6);
     public static final double
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
-            SCORING_TIMEOUT_SECONDS = 3.7,
+            SCORING_TIMEOUT_SECONDS = 4,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,

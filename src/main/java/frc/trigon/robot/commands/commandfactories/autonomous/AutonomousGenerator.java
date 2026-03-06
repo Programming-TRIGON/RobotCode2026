@@ -1,11 +1,13 @@
 package frc.trigon.robot.commands.commandfactories.autonomous;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
@@ -32,7 +34,7 @@ public class AutonomousGenerator {
         configureAutonomousChooser(THIRD_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FOURTH_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FIFTH_AUTONOMOUS_CHOOSER);
-        configureClimbPositionChooser(CLIMB_POSITION_CHOOSER);
+        configureClimbPositionChooser();
     }
 
     public static Command getAutonomousCommand() {
@@ -45,27 +47,76 @@ public class AutonomousGenerator {
 
     private static Command getAutonomousStateSequenceCommand() {
         return new SequentialCommandGroup(
-                getCommandFromState(FIRST_AUTONOMOUS_CHOOSER.get(), null, SECOND_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(SECOND_AUTONOMOUS_CHOOSER.get(), FIRST_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(THIRD_AUTONOMOUS_CHOOSER.get(), SECOND_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(FOURTH_AUTONOMOUS_CHOOSER.get(), THIRD_AUTONOMOUS_CHOOSER.get(), FIFTH_AUTONOMOUS_CHOOSER.get()),
-                getCommandFromState(FIFTH_AUTONOMOUS_CHOOSER.get(), FOURTH_AUTONOMOUS_CHOOSER.get(), null)
+                getCommandFromState(0),
+                getCommandFromState(1),
+                getCommandFromState(2),
+                getCommandFromState(3),
+                getCommandFromState(4)
         );
     }
 
-    private static Command getCommandFromState(AutonomousState state, AutonomousState previousState, AutonomousState nextState) {
+    private static Command getCommandFromState(int index) {
+        AutonomousState state = getStateFromIndex(index);
+
         if (state == null)
             return Commands.none();
 
         return switch (state) {
             case DELIVERY ->
-                    GeneralAutonomousCommands.getDeliveryCommand(previousState, AutonomousConstants.DELIVERY_TIMEOUT_SECONDS::get);
+                    GeneralAutonomousCommands.getDeliveryCommand(getStateFromIndex(index - 1), () -> getDeliveryTimeout(getStateFromIndex(index + 1), getStateFromIndex(index + 2), getStateFromIndex(index + 3), getStateFromIndex(index + 4)));
             case SCORE ->
-                    GeneralAutonomousCommands.getScoreCommand(nextState, AutonomousConstants.SCORING_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getScoreCommand(getStateFromIndex(index + 1), AutonomousConstants.SCORING_TIMEOUT_SECONDS);
             case COLLECT_FROM_DEPOT ->
                     GeneralAutonomousCommands.getCollectFromDepotCommand(true, AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS);
             case COLLECT_FROM_NEUTRAL_ZONE ->
-                    GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(previousState, AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
+                    GeneralAutonomousCommands.getCollectFromNeutralZoneCommand(getStateFromIndex(index - 1), AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS);
+        };
+    }
+
+    private static AutonomousState getStateFromIndex(int index) {
+        return switch (index) {
+            case 0 -> FIRST_AUTONOMOUS_CHOOSER.get();
+            case 1 -> SECOND_AUTONOMOUS_CHOOSER.get();
+            case 2 -> THIRD_AUTONOMOUS_CHOOSER.get();
+            case 3 -> FOURTH_AUTONOMOUS_CHOOSER.get();
+            case 4 -> FIFTH_AUTONOMOUS_CHOOSER.get();
+            default -> null;
+        };
+    }
+
+    private static double getDeliveryTimeout(AutonomousState... nextStates) {
+        double timeToLeave = AutonomousConstants.AUTONOMOUS_TIME_SECONDS;
+        for (AutonomousState nextState : nextStates) {
+            if (nextState == null)
+                break;
+            switch (nextState) {
+                case SCORE -> timeToLeave -= AutonomousConstants.SCORING_TIMEOUT_SECONDS;
+                case COLLECT_FROM_DEPOT -> timeToLeave -= AutonomousConstants.DEPOT_COLLECTION_TIMEOUT_SECONDS;
+                case COLLECT_FROM_NEUTRAL_ZONE ->
+                        timeToLeave -= AutonomousConstants.NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS;
+            }
+        }
+
+        if (shouldClimb())
+            timeToLeave -= calculateTimeToLeaveForClimbSeconds(getLastValidPoseOrDefault(nextStates)) + 0.5;
+
+        return timeToLeave;
+    }
+
+    private static Translation2d getLastValidPoseOrDefault(AutonomousState[] nextStates) {
+        for (int i = nextStates.length - 1; i >= 0; i--)
+            if (nextStates[i] != null)
+                return getExpectedEndPose(nextStates, i).get();
+
+        return (SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION).getTranslation().get();
+    }
+
+    private static Flippable<Translation2d> getExpectedEndPose(AutonomousState[] states, int validIndex) {
+        return switch (states[validIndex]) {
+            case DELIVERY -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION;
+            case COLLECT_FROM_NEUTRAL_ZONE -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION.getTranslation() : FieldConstants.LEFT_INTAKE_POSITION.getTranslation();
+            case COLLECT_FROM_DEPOT -> FieldConstants.DEPOT_POSITION.getTranslation();
+            case SCORE -> GeneralAutonomousCommands.getScoringPose(states.length > validIndex + 1 ? states[validIndex + 1] : null).getTranslation();
         };
     }
 
@@ -78,19 +129,26 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
         Logger.recordOutput("Autonomous/IsInAllianceZone", SafeAutonomousDriveCommands.isInAllianceZone());
-        Logger.recordOutput("Autonomous/IsInTrench", GeneralAutonomousCommands.isInTrench());
+        Logger.recordOutput("Autonomous/IsInTrenchXRange", GeneralAutonomousCommands.isInTrenchXRange());
+        Logger.recordOutput("Autonomous/IsInTrenchYRange", GeneralAutonomousCommands.isInTrenchYRange());
     }
 
     private static boolean shouldStartDrivingToClimb() {
         if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
             return false;
 
-        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final double timeToLeaveForClimbSeconds = calculateTimeToLeaveForClimbSeconds(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+        return MatchTracker.getMatchTimeSeconds() <= timeToLeaveForClimbSeconds;
+    }
+
+    private static double calculateTimeToLeaveForClimbSeconds(Translation2d robotPose) {
+        if (!shouldClimb() || !IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY.get())
+            return 0;
+
         final Pose2d targetClimbPose = CLIMB_POSITION_CHOOSER.get().climbPose.get();
-        final double distanceToClimbPoseMeters = currentRobotPose.getTranslation().getDistance(targetClimbPose.getTranslation());
+        final double distanceToClimbPoseMeters = robotPose.getDistance(targetClimbPose.getTranslation());
         final double estimatedDriveTimeSeconds = distanceToClimbPoseMeters / AutonomousConstants.ROBOT_AVERAGE_SPEED_METERS_PER_SECOND;
-        final double timeToLeaveForClimbSeconds = AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS + estimatedDriveTimeSeconds + AutonomousConstants.CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS;
-        return MatchTracker.getMatchTimeSeconds() <= AutonomousConstants.TOTAL_MATCH_TIME_SECONDS - AutonomousConstants.AUTONOMOUS_TIME_SECONDS + timeToLeaveForClimbSeconds;
+        return AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS + estimatedDriveTimeSeconds + AutonomousConstants.CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS;
     }
 
     public static boolean shouldClimb() {
@@ -105,11 +163,11 @@ public class AutonomousGenerator {
         chooser.addDefaultOption("Nothing", null);
     }
 
-    private static void configureClimbPositionChooser(LoggedDashboardChooser<AutonomousClimbPosition> chooser) {
-        chooser.addOption("RightL1", AutonomousClimbPosition.RIGHT_L1);
-        chooser.addOption("LeftL1", AutonomousClimbPosition.LEFT_L1);
-        chooser.addOption("CenterL1", AutonomousClimbPosition.CENTER_L1);
-        chooser.addDefaultOption("NoClimb", AutonomousClimbPosition.NO_CLIMB);
+    private static void configureClimbPositionChooser() {
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("RightL1", AutonomousClimbPosition.RIGHT_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("LeftL1", AutonomousClimbPosition.LEFT_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addOption("CenterL1", AutonomousClimbPosition.CENTER_L1);
+        AutonomousGenerator.CLIMB_POSITION_CHOOSER.addDefaultOption("NoClimb", AutonomousClimbPosition.NO_CLIMB);
     }
 
     public enum AutonomousState {

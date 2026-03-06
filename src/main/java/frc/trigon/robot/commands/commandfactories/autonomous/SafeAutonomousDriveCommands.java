@@ -4,7 +4,10 @@ import com.pathplanner.lib.path.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
@@ -152,7 +155,7 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
-        final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(currentPose.getRotation());
+        final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(shouldRotateBeforeTrench(targetPose, currentPose) ? targetPose.get().getRotation() : currentPose.getRotation());
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
@@ -231,6 +234,19 @@ public class SafeAutonomousDriveCommands {
             }
         }
         return closestPose;
+    }
+
+    private static boolean shouldRotateBeforeTrench(FlippablePose2d targetPose, Pose2d currentPose) {
+        if (targetPose == null || currentPose == null)
+            return false;
+
+        final Pose2d trenchEntry = getTrenchEntryPose(targetPose).get();
+        final Pose2d trenchExit = getTrenchExitPose(targetPose).get();
+
+        final double distanceBeforeTrench = currentPose.getTranslation().getDistance(trenchEntry.getTranslation());
+        final double distanceAfterTrench = targetPose.get().getTranslation().getDistance(trenchExit.getTranslation());
+
+        return distanceBeforeTrench > distanceAfterTrench;
     }
 
     public static boolean isRight() {
