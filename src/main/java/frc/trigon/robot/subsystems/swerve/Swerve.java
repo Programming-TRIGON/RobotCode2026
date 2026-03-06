@@ -17,6 +17,7 @@ import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableRotation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
+import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MatchTracker;
 import frc.trigon.robot.poseestimation.robotposeestimator.RobotPoseEstimatorConstants;
 import frc.trigon.robot.subsystems.MotorSubsystem;
@@ -70,6 +71,7 @@ public class Swerve extends MotorSubsystem {
         RobotContainer.ROBOT_POSE_ESTIMATOR.periodic();
 
         MatchTracker.logMatchInfo();
+        FieldConstants.logZoneChecks();
     }
 
     @Override
