@@ -47,7 +47,7 @@ public class GeneralAutonomousCommands {
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
-                new WaitUntilCommand(GeneralAutonomousCommands::isInTrenchYRange).onlyIf(FieldConstants::isInAllianceZone).andThen(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         ShootingCommands.getDeliveryCommand(),
@@ -69,7 +69,7 @@ public class GeneralAutonomousCommands {
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
-                new WaitUntilCommand(GeneralAutonomousCommands::isInTrenchYRange).onlyIf(FieldConstants::isInAllianceZone).andThen(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)),
+                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
                 getShootAtHubWhileDrivingCommand()
         );
     }
@@ -147,11 +147,6 @@ public class GeneralAutonomousCommands {
         entryXFromNeutralZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromNeutralZone : entryXFromNeutralZone;
         return currentRobotPose.getX() > entryXFromAllianceZone && currentRobotPose.getX() < entryXFromNeutralZone
                 || currentRobotPose.getX() < entryXFromAllianceZone && currentRobotPose.getX() > entryXFromNeutralZone;
-    }
-
-    static boolean isInTrenchYRange() {
-        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return currentRobotPose.getY() > FieldConstants.LEFT_TRENCH_MIN_Y || currentRobotPose.getY() < FieldConstants.RIGHT_TRENCH_MAX_Y;
     }
 
     private static boolean isAngleCloserTo180(Rotation2d angle) {
