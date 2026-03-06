@@ -6,9 +6,11 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,8 +40,8 @@ public class FieldConstants {
             INTAKE_Y = 7.3,
             IDEAL_SHOOTING_X = 2.7,
             IDEAL_SHOOTING_Y = 5.8,
-            TRENCH_ALLIANCE_X = 3.9,
-            TRENCH_NEUTRAL_X = 5.53,
+            TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.9,
+            TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.53,
             TRENCH_ENTRY_Y = 7.4,
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
@@ -55,9 +57,9 @@ public class FieldConstants {
             RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = mirror(LEFT_START_INTAKING_FOR_DELIVERY_POSITION),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(IDEAL_SHOOTING_X, IDEAL_SHOOTING_Y, Rotation2d.kZero, true),
             RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),
-            LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(TRENCH_ALLIANCE_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
             RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE),
-            LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(TRENCH_NEUTRAL_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
+            LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
             RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
     public static final FlippableTranslation2d
             HUB_POSITION = new FlippableTranslation2d(4.7, FIELD_WIDTH_METERS / 2, true),
@@ -66,8 +68,11 @@ public class FieldConstants {
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
             DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1,
+            TRENCH_ZONE_MINIMUM_X = 4.4,
+            TRENCH_ZONE_MAXIMUM_X = 4.9,
             LEFT_TRENCH_MIN_Y = 7.2,
             RIGHT_TRENCH_MAX_Y = FIELD_WIDTH_METERS - LEFT_TRENCH_MIN_Y;
+    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.2;
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
@@ -101,8 +106,98 @@ public class FieldConstants {
         );
     }
 
-    public static boolean isInAllianceZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() < ALLIANCE_ZONE_LENGTH;
+    public static void logZoneChecks() {
+        Logger.recordOutput("Zones/IsRobotInDeliveryZone", isRobotInDeliveryZone());
+        Logger.recordOutput("Zones/IsRobotInAllianceZone", isRobotInAllianceZone());
+        Logger.recordOutput("Zones/IsPassingThroughTrenchZone", isPassingThroughTrenchZone());
+    }
+
+    public static boolean isPassingThroughTrenchZone() {
+        return FieldConstants.isTurretInTrenchZone() ||
+                FieldConstants.willTurretBeInTrenchZone(TRENCH_POSE_PREDICTION_TIME_SECONDS) ||
+                (FieldConstants.isTurretBeforeTrench() && FieldConstants.willTurretBeAfterTrench(TRENCH_POSE_PREDICTION_TIME_SECONDS)) ||
+                (FieldConstants.isTurretAfterTrench() && FieldConstants.willTurretBeBeforeTrench(TRENCH_POSE_PREDICTION_TIME_SECONDS));
+    }
+
+    public static boolean willTurretBeInTrenchZone(double predictionSeconds) {
+        return isPoseInTrenchZone(RobotContainer.TURRET.getPredictedTurretFieldRelativePosition(predictionSeconds).getTranslation());
+    }
+
+    public static boolean isTurretInTrenchZone() {
+        return isPoseInTrenchZone(RobotContainer.TURRET.getCurrentTurretFieldRelativePosition().getTranslation());
+    }
+
+    public static boolean isPoseInTrenchZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return isPoseInTrenchXRange(pose) && isPoseInTrenchYRange(pose);
+    }
+
+    public static boolean isPoseInTrenchXRange(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return (pose.getX() > TRENCH_ZONE_MINIMUM_X && pose.getX() < TRENCH_ZONE_MAXIMUM_X) || (pose.getX() > FIELD_LENGTH_METERS - TRENCH_ZONE_MAXIMUM_X && pose.getX() < FIELD_LENGTH_METERS - TRENCH_ZONE_MINIMUM_X);
+    }
+
+    public static boolean willTurretBeBeforeTrench(double predictionSeconds) {
+        return isPoseBeforeTrench(RobotContainer.TURRET.getPredictedTurretFieldRelativePosition(predictionSeconds).getTranslation());
+    }
+
+    public static boolean isTurretBeforeTrench() {
+        return isPoseBeforeTrench(RobotContainer.TURRET.getCurrentTurretFieldRelativePosition().getTranslation());
+    }
+
+    public static boolean isPoseBeforeTrench(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return pose.getX() < TRENCH_ZONE_MINIMUM_X || pose.getX() > FIELD_LENGTH_METERS - TRENCH_ZONE_MINIMUM_X;
+    }
+
+    public static boolean willTurretBeAfterTrench(double predictionSeconds) {
+        return isPoseAfterTrench(RobotContainer.TURRET.getPredictedTurretFieldRelativePosition(predictionSeconds).getTranslation());
+    }
+
+    public static boolean isTurretAfterTrench() {
+        return isPoseAfterTrench(RobotContainer.TURRET.getCurrentTurretFieldRelativePosition().getTranslation());
+    }
+
+    public static boolean isPoseAfterTrench(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return pose.getX() > TRENCH_ZONE_MAXIMUM_X && pose.getX() < FIELD_LENGTH_METERS - TRENCH_ZONE_MAXIMUM_X;
+    }
+
+    public static boolean isRobotInTrenchYRange() {
+        return isPoseInTrenchYRange(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInTrenchYRange(Translation2d pose) {
+        if (pose == null)
+            return false;
+        return pose.getY() > FieldConstants.LEFT_TRENCH_MIN_Y || pose.getY() < FieldConstants.RIGHT_TRENCH_MAX_Y;
+    }
+
+    public static boolean isRobotInDeliveryZone() {
+        return isPoseInDeliveryZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInDeliveryZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        if (Flippable.isRedAlliance())
+            return pose.getX() < FieldConstants.FIELD_LENGTH_METERS - FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+        return pose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+    }
+
+    public static boolean isRobotInAllianceZone() {
+        return isPoseInAllianceZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInAllianceZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        if (Flippable.isRedAlliance())
+            return pose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
+        return pose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 }

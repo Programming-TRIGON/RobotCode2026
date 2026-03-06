@@ -18,6 +18,7 @@ import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.misc.MechanismCameraTransformCalculator;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
@@ -124,6 +125,25 @@ public class Turret extends MotorSubsystem {
                 new Rotation3d(0, 0, getCurrentSelfRelativeAngle().getRadians())
         );
         return TurretConstants.TURRET_VISUALIZATION_ORIGIN_POINT.transformBy(yawTransform);
+    }
+
+    @AutoLogOutput(key = "Turret/FieldRelativePosition")
+    public Pose2d getCurrentTurretFieldRelativePosition() {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Transform2d turretTransform = new Transform2d(
+                TurretConstants.TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION.getTranslation().toTranslation2d(),
+                getCurrentSelfRelativeAngle()
+        );
+        return robotPose.transformBy(turretTransform);
+    }
+
+    public Pose2d getPredictedTurretFieldRelativePosition(double predictionSeconds) {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(predictionSeconds);
+        final Transform2d turretTransform = new Transform2d(
+                TurretConstants.TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION.getTranslation().toTranslation2d(),
+                getCurrentSelfRelativeAngle()
+        );
+        return robotPose.transformBy(turretTransform);
     }
 
     public Rotation2d getTargetFieldRelativeAngle() {
