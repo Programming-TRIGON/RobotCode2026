@@ -67,7 +67,7 @@ public class TurretConstants {
     );
 
     static final Rotation2d
-            MAXIMUM_ANGLE = Rotation2d.fromDegrees(40),
+            MAXIMUM_ANGLE = Rotation2d.fromDegrees(30),
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-380),
             TOTAL_ANGULAR_RANGE = MAXIMUM_ANGLE.minus(MINIMUM_ANGLE);
     static final Rotation2d

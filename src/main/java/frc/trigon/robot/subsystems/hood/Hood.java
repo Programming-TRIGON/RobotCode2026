@@ -57,15 +57,17 @@ public class Hood extends MotorSubsystem {
                 targetProfiledAngle
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
-
-        Logger.recordOutput("Hood/TargetAngleDegrees", targetAngle.getDegrees());
-        Logger.recordOutput("Hood/CurrentAngleDegrees", currentAngle.getDegrees());
-        Logger.recordOutput("Hood/TargetProfiledAngleDegrees", targetProfiledAngle.getDegrees());
     }
 
     @Override
     public void updatePeriodically() {
         motor.update();
+
+        final Rotation2d currentAngle = getCurrentAngle();
+        final Rotation2d targetProfiledAngle = Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
+        Logger.recordOutput("Hood/TargetAngleDegrees", targetAngle.getDegrees());
+        Logger.recordOutput("Hood/CurrentAngleDegrees", currentAngle.getDegrees());
+        Logger.recordOutput("Hood/TargetProfiledAngleDegrees", targetProfiledAngle.getDegrees());
     }
 
     @Override

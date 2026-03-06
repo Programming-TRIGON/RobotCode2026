@@ -27,7 +27,7 @@ public class OperatorConstants {
     );
     public static final KeyboardController OPERATOR_CONTROLLER = new KeyboardController();
     private static final double ARE_CAMERAS_DISCONNECTED_CHECK_DEBOUNCE_SECONDS = 3;
-    private static final double DOUBLE_TAP_TIMEOUT_SECONDS = 0.5;
+    private static final double DOUBLE_TAP_TIMEOUT_SECONDS = 1;
 
     public static final double
             POV_DIVIDER = 2,
@@ -93,6 +93,7 @@ public class OperatorConstants {
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
+                && FieldConstants.isInAllianceZone()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }

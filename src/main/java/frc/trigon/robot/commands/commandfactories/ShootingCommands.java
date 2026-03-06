@@ -65,7 +65,7 @@ public class ShootingCommands {
     }
 
     public static Command getChangeFixedShootingPositionCommand(FixedShootingPosition fixedPosition) {
-        return new InstantCommand(() -> updateFixedShootingPosition(fixedPosition));
+        return new InstantCommand(() -> updateFixedShootingPosition(fixedPosition)).ignoringDisable(true);
     }
 
     private static Command getAimAtHubCommand() {

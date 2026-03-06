@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.trigon.lib.commands.ExecuteEndCommand;
 import frc.trigon.lib.commands.GearRatioCalculationCommand;
@@ -42,7 +41,7 @@ public class TurretCommands {
     }
 
     public static Command getAlignToClosestAprilTagCommand() {
-        return new WaitUntilCommand(() -> DriverStation.isTeleop()).andThen(new WaitCommand(10)).andThen(new ExecuteEndCommand(
+        return new WaitUntilCommand(() -> DriverStation.isTeleop()).andThen(new ExecuteEndCommand(
                 RobotContainer.TURRET::alignToClosestAprilTag,
                 RobotContainer.TURRET::stop,
                 RobotContainer.TURRET

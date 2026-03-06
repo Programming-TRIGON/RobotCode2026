@@ -177,13 +177,13 @@ public class Turret extends MotorSubsystem {
     }
 
     public void slowScanForAprilTag() {
-        final Rotation2d currentAngle = getCurrentSelfRelativeAngle().plus(Rotation2d.fromDegrees(10 * scanForAprilTagsSign));
+        final Rotation2d currentAngle = Rotation2d.fromDegrees(getCurrentSelfRelativeAngle().getDegrees() + (10 * scanForAprilTagsSign));
 
         if (!isAngleInRange(currentAngle))
             scanForAprilTagsSign = -scanForAprilTagsSign;
 
         masterMotor.setControl(
-                voltageRequest.withOutput(TurretConstants.SLOW_SCAN_FOR_APRILTAGS_VOLTAGE * scanForAprilTagsSign)
+                voltageRequest.withOutput(TurretConstants.SLOW_SCAN_FOR_APRILTAGS_VOLTAGE * scanForAprilTagsSign).withIgnoreSoftwareLimits(false)
         );
     }
 
