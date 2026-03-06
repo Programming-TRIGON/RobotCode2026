@@ -1,14 +1,12 @@
 package frc.trigon.robot.constants;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
-import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.misc.MatchTracker;
@@ -83,15 +81,17 @@ public class OperatorConstants {
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
-    public static final Trigger
-            UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
+    public static final Trigger UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
 
     private static boolean WAS_IN_ALLIANCE_ZONE = false;
     private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = -AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
 
+
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
+                && FieldConstants.isRobotInAllianceZone()
+                && !FieldConstants.isPassingThroughTrenchZone()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
@@ -99,7 +99,8 @@ public class OperatorConstants {
     public static boolean shouldAutoDeliver() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
-                && isInDeliveryZone()
+                && FieldConstants.isRobotInDeliveryZone()
+                && !FieldConstants.isPassingThroughTrenchZone()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
@@ -122,14 +123,9 @@ public class OperatorConstants {
         return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP;
     }
 
-    private static boolean isInDeliveryZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
-    }
-
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
-        final boolean isInAllianceZone = FieldConstants.isInAllianceZone();
+        final boolean isInAllianceZone = FieldConstants.isRobotInAllianceZone();
         WAS_IN_ALLIANCE_ZONE = isInAllianceZone;
         return isInAllianceZone && !wasInAllianceZone;
     }

@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 public final class MatchTracker {
     private static final LoggedNetworkBoolean
             OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false),
-            DID_RED_ALLIANCE_WIN_AUTONOMOUS = new LoggedNetworkBoolean("MatchTracker/DidRedAllianceWinAutonomous", false);
+            DID_WE_WIN_AUTONOMOUS = new LoggedNetworkBoolean("MatchTracker/DidWeWinAutonomous", false);
     private static final double ALLIANCE_SHIFT_DURATION_SECONDS = 25;
     private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 5;
     private static final double HUB_DEACTIVATION_TIME_SECONDS = 3;
@@ -50,17 +50,21 @@ public final class MatchTracker {
         return getTimeUntilAllianceShiftSeconds(getMatchTimeSeconds());
     }
 
-    public static boolean isHubActive(double matchTimeSeconds) {
+    private static boolean isHubActive(double matchTimeSeconds) {
         if (!DriverStation.isTeleop())
             return true;
 
-        final boolean isRedAlliance = Flippable.isRedAlliance();
-        final boolean isRedHubActive = isRedHubActive(DID_RED_ALLIANCE_WIN_AUTONOMOUS.get(), matchTimeSeconds);
-
-        return isRedAlliance == isRedHubActive;
+        final int currentShiftNumber = getShiftNumber(matchTimeSeconds);
+        if (currentShiftNumber < 0)
+            return true;
+        if (DID_WE_WIN_AUTONOMOUS.get() && currentShiftNumber % 2 != 0)
+            return false;
+        return DID_WE_WIN_AUTONOMOUS.get() || currentShiftNumber % 2 != 0;
     }
 
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
+        if (!isHubActive(matchTimeSeconds))
+            matchTimeSeconds -= 1;
         return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
     }
 
@@ -71,6 +75,7 @@ public final class MatchTracker {
         Logger.recordOutput("MatchTracker/CurrentShiftType", getCurrentShiftType(matchTimeSeconds));
         Logger.recordOutput("MatchTracker/IsHubActive", isHubActive());
         Logger.recordOutput("MatchTracker/TimeUntilAllianceShiftSeconds", getTimeUntilAllianceShiftSeconds());
+        Logger.recordOutput("MatchTracker/shiftNumber", getShiftNumber(matchTimeSeconds));
     }
 
     public static double getMatchTimeSeconds() {
@@ -90,28 +95,28 @@ public final class MatchTracker {
     }
 
     private static void setAutonomousWinner() {
-        DID_RED_ALLIANCE_WIN_AUTONOMOUS.set("R".equalsIgnoreCase(DriverStation.getGameSpecificMessage()));
-    }
-
-    private static boolean isRedHubActive(boolean didRedAllianceWinAutonomous, double matchTimeSeconds) {
-        final int currentShiftNumber = getShiftNumber(matchTimeSeconds);
-        if (currentShiftNumber == -1)
-            return true;
-        if (didRedAllianceWinAutonomous && currentShiftNumber % 2 != 0)
-            return false;
-        return didRedAllianceWinAutonomous || currentShiftNumber % 2 != 0;
+        final boolean didRedAllianceWinAutonomous = "R".equalsIgnoreCase(DriverStation.getGameSpecificMessage());
+        DID_WE_WIN_AUTONOMOUS.set(didRedAllianceWinAutonomous && Flippable.isRedAlliance() || !didRedAllianceWinAutonomous && !Flippable.isRedAlliance());
     }
 
     private static int getShiftNumber(double matchTimeSeconds) {
-        if (matchTimeSeconds > 30 && matchTimeSeconds <= 55)
-            return 4;
-        if (matchTimeSeconds > 55 && matchTimeSeconds <= 80)
-            return 3;
-        if (matchTimeSeconds > 80 && matchTimeSeconds <= 105)
-            return 2;
-        if (matchTimeSeconds > 105 && matchTimeSeconds <= 130)
-            return 1;
-        return -1;
+        final boolean didWeWinAutonomous = DID_WE_WIN_AUTONOMOUS.get();
+
+        if (!didWeWinAutonomous) {
+            if (matchTimeSeconds <= 130 && matchTimeSeconds >= 105) return 1;
+            if (matchTimeSeconds < 105 && matchTimeSeconds > 80) return 2;
+            if (matchTimeSeconds <= 80 && matchTimeSeconds >= 55) return 3;
+            if (matchTimeSeconds < 55 && matchTimeSeconds > 30) return 4;
+        } else {
+            if (matchTimeSeconds < 130 && matchTimeSeconds > 105) return 1;
+            if (matchTimeSeconds <= 105 && matchTimeSeconds >= 80) return 2;
+            if (matchTimeSeconds < 80 && matchTimeSeconds > 55) return 3;
+            if (matchTimeSeconds <= 55 && matchTimeSeconds >= 30) return 4;
+        }
+
+        if (matchTimeSeconds <= 30)
+            return -1;
+        return -2;
     }
 
     private static double getNextShiftTimeSeconds(double matchTimeSeconds) {
@@ -124,6 +129,8 @@ public final class MatchTracker {
             case 2 -> 80;
             case 3 -> 55;
             case 4 -> 30;
+            case -1 -> 0;
+            case -2 -> 130;
             default -> -1;
         };
     }
