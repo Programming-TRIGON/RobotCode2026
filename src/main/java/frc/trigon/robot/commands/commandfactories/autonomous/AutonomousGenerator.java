@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
-import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.AutonomousConstants;
 import frc.trigon.robot.constants.FieldConstants;
@@ -18,8 +17,6 @@ import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
-
-import java.util.function.Supplier;
 
 public class AutonomousGenerator {
     public static final LoggedDashboardChooser<AutonomousState>
@@ -132,7 +129,8 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
         Logger.recordOutput("Autonomous/IsInAllianceZone", SafeAutonomousDriveCommands.isInAllianceZone());
-        Logger.recordOutput("Autonomous/IsInTrench", GeneralAutonomousCommands.isInTrench());
+        Logger.recordOutput("Autonomous/IsInTrenchXRange", GeneralAutonomousCommands.isInTrenchXRange());
+        Logger.recordOutput("Autonomous/IsInTrenchYRange", GeneralAutonomousCommands.isInTrenchYRange());
     }
 
     private static boolean shouldStartDrivingToClimb() {

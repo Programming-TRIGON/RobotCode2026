@@ -47,7 +47,7 @@ public class GeneralAutonomousCommands {
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
-                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
+                new WaitUntilCommand(GeneralAutonomousCommands::isInTrenchYRange).onlyIf(FieldConstants::isInAllianceZone).andThen(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         ShootingCommands.getDeliveryCommand(),
@@ -69,7 +69,7 @@ public class GeneralAutonomousCommands {
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
-                IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
+                new WaitUntilCommand(GeneralAutonomousCommands::isInTrenchYRange).onlyIf(FieldConstants::isInAllianceZone).andThen(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE)),
                 getShootAtHubWhileDrivingCommand()
         );
     }
@@ -135,11 +135,11 @@ public class GeneralAutonomousCommands {
                         getPrepareForShootingCommand(),
                         SafeAutonomousDriveCommands::isInAllianceZone
                 ),
-                GeneralAutonomousCommands::isInTrench
+                GeneralAutonomousCommands::isInTrenchXRange
         );
     }
 
-    public static boolean isInTrench() {
+    static boolean isInTrenchXRange() {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         double entryXFromAllianceZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 4.25 : 4.1;
         double entryXFromNeutralZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 5.4 : 5.6;
@@ -147,6 +147,11 @@ public class GeneralAutonomousCommands {
         entryXFromNeutralZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromNeutralZone : entryXFromNeutralZone;
         return currentRobotPose.getX() > entryXFromAllianceZone && currentRobotPose.getX() < entryXFromNeutralZone
                 || currentRobotPose.getX() < entryXFromAllianceZone && currentRobotPose.getX() > entryXFromNeutralZone;
+    }
+
+    static boolean isInTrenchYRange() {
+        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return currentRobotPose.getY() > FieldConstants.LEFT_TRENCH_MIN_Y || currentRobotPose.getY() < FieldConstants.RIGHT_TRENCH_MAX_Y;
     }
 
     private static boolean isAngleCloserTo180(Rotation2d angle) {
