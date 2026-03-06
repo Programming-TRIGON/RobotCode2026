@@ -128,7 +128,6 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/ShouldClimb", shouldClimb());
         Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
-        Logger.recordOutput("Autonomous/IsInTrenchXRange", GeneralAutonomousCommands.isInTrenchXRange());
     }
 
     private static boolean shouldStartDrivingToClimb() {

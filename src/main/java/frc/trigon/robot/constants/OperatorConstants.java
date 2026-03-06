@@ -86,9 +86,12 @@ public class OperatorConstants {
     private static boolean WAS_IN_ALLIANCE_ZONE = false;
     private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = -AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
 
+
     public static boolean shouldAutoShootAtHub() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
+                && FieldConstants.isRobotInAllianceZone()
+                && !FieldConstants.isPassingThroughTrenchZone()
                 && MatchTracker.isHubActive()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
@@ -97,7 +100,7 @@ public class OperatorConstants {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
                 && FieldConstants.isRobotInDeliveryZone()
-                && !FieldConstants.isRobotInTrenchZone()
+                && !FieldConstants.isPassingThroughTrenchZone()
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
@@ -122,7 +125,7 @@ public class OperatorConstants {
 
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
-        final boolean isInAllianceZone = FieldConstants.isRobotInAllianceZone() && !FieldConstants.isRobotInTrenchZone();
+        final boolean isInAllianceZone = FieldConstants.isRobotInAllianceZone();
         WAS_IN_ALLIANCE_ZONE = isInAllianceZone;
         return isInAllianceZone && !wasInAllianceZone;
     }

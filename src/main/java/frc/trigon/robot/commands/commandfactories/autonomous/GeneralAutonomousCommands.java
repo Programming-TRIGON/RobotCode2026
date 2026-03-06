@@ -48,11 +48,7 @@ public class GeneralAutonomousCommands {
                         () -> previousState != null && !previousState.isInAllianceZone
                 ),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                GeneralCommands.getContinuousConditionalCommand(
-                        ShootingCommands.getShootAtHubCommand(),
-                        ShootingCommands.getDeliveryCommand(),
-                        FieldConstants::isRobotInAllianceZone
-                )
+                getDeliverWhileDrivingCommand()
         );
     }
 
@@ -135,18 +131,20 @@ public class GeneralAutonomousCommands {
                         getPrepareForShootingCommand(),
                         FieldConstants::isRobotInAllianceZone
                 ),
-                GeneralAutonomousCommands::isInTrenchXRange
+                FieldConstants::isPassingThroughTrenchZone
         );
     }
 
-    static boolean isInTrenchXRange() {
-        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        double entryXFromAllianceZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 4.25 : 4.1;
-        double entryXFromNeutralZone = isAngleCloserTo180(currentRobotPose.getRotation()) ^ Flippable.isRedAlliance() ? 5.4 : 5.6;
-        entryXFromAllianceZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromAllianceZone : entryXFromAllianceZone;
-        entryXFromNeutralZone = Flippable.isRedAlliance() ? FieldConstants.FIELD_LENGTH_METERS - entryXFromNeutralZone : entryXFromNeutralZone;
-        return currentRobotPose.getX() > entryXFromAllianceZone && currentRobotPose.getX() < entryXFromNeutralZone
-                || currentRobotPose.getX() < entryXFromAllianceZone && currentRobotPose.getX() > entryXFromNeutralZone;
+    private static Command getDeliverWhileDrivingCommand() {
+        return GeneralCommands.getContinuousConditionalCommand(
+                getPrepareForShootingWithoutHoodCommand(),
+                GeneralCommands.getContinuousConditionalCommand(
+                        ShootingCommands.getShootAtHubCommand(),
+                        ShootingCommands.getDeliveryCommand(),
+                        FieldConstants::isRobotInAllianceZone
+                ),
+                FieldConstants::isPassingThroughTrenchZone
+        );
     }
 
     private static boolean isAngleCloserTo180(Rotation2d angle) {
