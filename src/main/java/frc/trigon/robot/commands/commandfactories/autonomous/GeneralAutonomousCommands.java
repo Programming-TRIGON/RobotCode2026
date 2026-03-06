@@ -51,7 +51,7 @@ public class GeneralAutonomousCommands {
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         ShootingCommands.getDeliveryCommand(),
-                        SafeAutonomousDriveCommands::isInAllianceZone
+                        FieldConstants::isInAllianceZone
                 )
         );
     }
@@ -133,7 +133,7 @@ public class GeneralAutonomousCommands {
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         getPrepareForShootingCommand(),
-                        SafeAutonomousDriveCommands::isInAllianceZone
+                        FieldConstants::isInAllianceZone
                 ),
                 GeneralAutonomousCommands::isInTrenchXRange
         );

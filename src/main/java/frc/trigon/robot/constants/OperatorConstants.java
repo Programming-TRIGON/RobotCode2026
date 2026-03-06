@@ -83,8 +83,7 @@ public class OperatorConstants {
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e());
-    public static final Trigger
-            UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
+    public static final Trigger UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
 
     private static boolean WAS_IN_ALLIANCE_ZONE = false;
     private static double LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP = -AUTO_SHOOT_CLAUSE_TIMEOUT_SECONDS;
@@ -99,7 +98,7 @@ public class OperatorConstants {
     public static boolean shouldAutoDeliver() {
         return DriverStation.isTeleop()
                 && isAutoShootClauseActive()
-                && isInDeliveryZone()
+                && FieldConstants.isPoseInDeliveryZone(RobotContainer.TURRET.getTurretFieldRelativePosition().getTranslation())
                 && !DISABLE_AUTO_SHOOT_TRIGGER.getAsBoolean();
     }
 
@@ -122,14 +121,9 @@ public class OperatorConstants {
         return Timer.getTimestamp() - LAST_AUTO_SHOOT_CLAUSE_ACTIVATE_TIMESTAMP;
     }
 
-    private static boolean isInDeliveryZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
-    }
-
     private static boolean justEnteredAllianceZone() {
         final boolean wasInAllianceZone = WAS_IN_ALLIANCE_ZONE;
-        final boolean isInAllianceZone = FieldConstants.isInAllianceZone();
+        final boolean isInAllianceZone = FieldConstants.isPoseInAllianceZone(RobotContainer.TURRET.getTurretFieldRelativePosition().getTranslation());
         WAS_IN_ALLIANCE_ZONE = isInAllianceZone;
         return isInAllianceZone && !wasInAllianceZone;
     }

@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import frc.trigon.lib.utilities.FilesHandler;
+import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.lib.utilities.flippable.FlippableTranslation2d;
 import frc.trigon.robot.RobotContainer;
@@ -101,8 +102,27 @@ public class FieldConstants {
         );
     }
 
+    public static boolean isInDeliveryZone() {
+        return isPoseInDeliveryZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInDeliveryZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        if (Flippable.isRedAlliance())
+            return pose.getX() < FieldConstants.FIELD_LENGTH_METERS - FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+        return pose.getX() > FieldConstants.DELIVERY_ZONE_START_BLUE_X;
+    }
+
     public static boolean isInAllianceZone() {
-        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
-        return currentRobotPose.getX() < ALLIANCE_ZONE_LENGTH;
+        return isPoseInAllianceZone(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation());
+    }
+
+    public static boolean isPoseInAllianceZone(Translation2d pose) {
+        if (pose == null)
+            return false;
+        if (Flippable.isRedAlliance())
+            return pose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
+        return pose.getX() < FieldConstants.ALLIANCE_ZONE_LENGTH;
     }
 }
