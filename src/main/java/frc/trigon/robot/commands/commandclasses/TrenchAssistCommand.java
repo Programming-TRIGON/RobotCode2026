@@ -48,8 +48,8 @@ public class TrenchAssistCommand extends SequentialCommandGroup {
     private static double calculateLateralAssistPower() {
         final Pose2d robotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
         final double trenchYPositionMeters = SafeAutonomousDriveCommands.isRight() ?
-                FieldConstants.FIELD_WIDTH_METERS - FieldConstants.LEFT_TRENCH_Y_POSITION_METERS :
-                FieldConstants.LEFT_TRENCH_Y_POSITION_METERS;
+                FieldConstants.FIELD_WIDTH_METERS - FieldConstants.TRENCH_ENTRY_Y :
+                FieldConstants.TRENCH_ENTRY_Y;
 
         final double yOffsetFromTrench = robotPose.getY() - trenchYPositionMeters;
 
