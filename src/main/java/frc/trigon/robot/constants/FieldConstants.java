@@ -35,7 +35,7 @@ public class FieldConstants {
             DEPOT_POSITION = new FlippablePose2d(0.45, 7, Rotation2d.fromDegrees(-90), true),
             LEFT_INTAKE_POSITION = new FlippablePose2d(7.4, 7.3, Rotation2d.fromDegrees(-90), true),
             RIGHT_INTAKE_POSITION = mirror(LEFT_INTAKE_POSITION),
-            LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(LEFT_INTAKE_POSITION.getBlueObject().getX(), LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(-100), true),
+            LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2, LEFT_INTAKE_POSITION.getBlueObject().getY(), Rotation2d.fromDegrees(-100), true),
             RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = mirror(LEFT_START_INTAKING_FOR_DELIVERY_POSITION),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(2.7, 5.8, Rotation2d.fromDegrees(0), true),
             RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),
@@ -43,11 +43,12 @@ public class FieldConstants {
             RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE),
             LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(5.53, LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.getBlueObject().getY(), Rotation2d.kZero, true),
             RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
-    private static final double DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
-    public static final FlippableTranslation2d
+    private static final double
+            BLUE_RELATIVE_DELIVERY_POSITION_X = 3,
+            DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;    public static final FlippableTranslation2d
             HUB_POSITION = new FlippableTranslation2d(4.7, FIELD_WIDTH_METERS / 2, true),
-            RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(FIELD_LENGTH_METERS / 2, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
-            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(FIELD_LENGTH_METERS / 2, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
+    RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
+            LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
             DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1,
