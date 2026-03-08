@@ -38,7 +38,7 @@ public class FieldConstants {
             DEPOT_Y = 7.0,
             INTAKE_X = 7,
             INTAKE_Y = 4,
-            IDEAL_SHOOTING_X = 3.85, // 4.3 - need fix!
+            IDEAL_SHOOTING_X = 4.3, // 4.3 - need fix!
             IDEAL_SHOOTING_Y = 7.48,
             TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.85,
             TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.58,

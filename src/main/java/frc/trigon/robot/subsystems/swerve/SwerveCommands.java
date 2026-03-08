@@ -177,8 +177,7 @@ public class SwerveCommands {
         return new FunctionalCommand(
                 RobotContainer.SWERVE::resetRotationController,
                 () -> RobotContainer.SWERVE.pidToPose(targetPose),
-                (interrupted) -> {
-                },
+                (interrupted) -> RobotContainer.SWERVE.stop(),
                 () -> RobotContainer.SWERVE.atPose(targetPose)
         );
     }
