@@ -117,6 +117,6 @@ public class Shooter extends MotorSubsystem {
         final double distanceToDeliveryPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation().getDistance(RobotContainer.TURRET.calculateClosestDeliveryPosition());
         final double distanceAimingVelocity = (distanceToDeliveryPosition * ShooterConstants.DELIVERY_VELOCITY_SLOPE) + ShooterConstants.DELIVERY_VELOCITY_INTERCEPT_POINT;
         final double currentXVelocityTowardsAlliance = Flippable.isRedAlliance() ? -currentXVelocity : currentXVelocity;
-        return distanceAimingVelocity + currentXVelocityTowardsAlliance;
+        return Math.min(distanceAimingVelocity + currentXVelocityTowardsAlliance, 16);
     }
 }

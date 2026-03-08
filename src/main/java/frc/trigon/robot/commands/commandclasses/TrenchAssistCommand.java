@@ -20,7 +20,7 @@ public class TrenchAssistCommand extends SequentialCommandGroup {
             LATERAL_MOVEMENT_PID_CONTROLLER =
             RobotHardwareStats.isSimulation() ?
                     new PIDController(3, 0, 0.1) :
-                    new PIDController(0, 0, 0);
+                    new PIDController(0.5, 0, 0);
     private static final Rotation2d[] CAN_PASS_TRENCH_ANGLES = new Rotation2d[]{
             Rotation2d.kZero,
             Rotation2d.kPi

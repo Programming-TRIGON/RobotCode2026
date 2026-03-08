@@ -9,7 +9,7 @@ import frc.trigon.robot.poseestimation.robotposeestimator.StandardDeviations;
 
 @SuppressWarnings("all")
 public class CameraConstants {
-    public static final double OBJECT_POSE_ESTIMATOR_DELETION_THRESHOLD_SECONDS = 1;
+    public static final double OBJECT_POSE_ESTIMATOR_DELETION_THRESHOLD_SECONDS = 0.5;
     public static final ObjectDetectionCamera OBJECT_DETECTION_CAMERA = new ObjectDetectionCamera(
             "ObjectDetectionCamera",
             new DynamicCameraTransform((timestampSeconds) -> RobotContainer.INTAKE.calculateIntakeCameraTransformAtTime(timestampSeconds))//IMPORTANT: Leave as lambda expression, method reference will crash code

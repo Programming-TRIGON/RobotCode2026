@@ -9,12 +9,14 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SingleJointedArmSimulation;
 import frc.trigon.lib.utilities.mechanisms.SingleJointedArmMechanism2d;
+import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.subsystems.turret.TurretConstants;
 
 public class HoodConstants {
@@ -119,5 +121,10 @@ public class HoodConstants {
         MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+
+        CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(3, () -> {
+            if (MOTOR.getSignal(TalonFXSignal.POSITION) < MINIMUM_ANGLE.minus(Rotation2d.fromDegrees(10)).getRotations())
+                MOTOR.setPosition(RESET_ANGLE.getRotations());
+        }));
     }
 }

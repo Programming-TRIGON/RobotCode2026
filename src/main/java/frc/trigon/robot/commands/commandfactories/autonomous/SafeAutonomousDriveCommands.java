@@ -3,7 +3,6 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 import com.pathplanner.lib.path.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -163,14 +162,14 @@ public class SafeAutonomousDriveCommands {
         if (waypoints.size() == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
-                    new RotationTarget(1.7, targetPose.get().getRotation()),
+                    new RotationTarget(1.5, targetPose.get().getRotation()),
                     new RotationTarget(2, targetPose.get().getRotation())
             );
         }
         return List.of(
                 new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
                 new RotationTarget(2, targetTrenchDrivingHolonomicAngle),
-                new RotationTarget(2.7, targetPose.get().getRotation()),
+                new RotationTarget(2.5, targetPose.get().getRotation()),
                 new RotationTarget(3, targetPose.get().getRotation())
         );
     }
@@ -250,7 +249,7 @@ public class SafeAutonomousDriveCommands {
         final double distanceBeforeTrench = currentPose.getTranslation().getDistance(trenchEntry.getTranslation());
         final double distanceAfterTrench = targetPose.get().getTranslation().getDistance(trenchExit.getTranslation());
 
-        return distanceBeforeTrench > distanceAfterTrench;
+        return distanceBeforeTrench > 0.2;
     }
 
     public static boolean isRight() {

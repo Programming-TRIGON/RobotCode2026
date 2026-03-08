@@ -3,7 +3,7 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.Flippable;
@@ -130,7 +130,7 @@ public class GeneralAutonomousCommands {
                         FieldConstants::isRobotInAllianceZone
                 ),
                 FieldConstants::isPassingThroughTrenchZone
-        );
+        ).alongWith(IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE));
     }
 
     private static Command getDeliverWhileDrivingCommand() {
@@ -174,7 +174,7 @@ public class GeneralAutonomousCommands {
         return getAimWithTargetShootingState(
                 () -> ShootingCalculations.getInstance().calculateTargetShootingState(
                         SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get() : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get(),
-                        new Translation2d()
+                        new ChassisSpeeds()
                 )
         );
     }
@@ -200,8 +200,8 @@ public class GeneralAutonomousCommands {
     static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
         if (nextState == null && AutonomousGenerator.shouldClimb())
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
-        if (nextState != null && !nextState.isInAllianceZone)
-            return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE;
+//        if (nextState != null && !nextState.isInAllianceZone)
+//            return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE;
         if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
             return FieldConstants.DEPOT_POSITION;
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;

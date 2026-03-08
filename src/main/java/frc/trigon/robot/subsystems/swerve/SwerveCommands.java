@@ -169,7 +169,7 @@ public class SwerveCommands {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
                 AutoBuilder.followPath(path),
-                getPIDToPoseCommand(new FlippablePose2d(path.getPathPoses().get(path.getPathPoses().size() - 1), false)).onlyIf(() -> path.getGoalEndState().velocityMPS() < 1e-3)
+                getPIDToPoseCommand(new FlippablePose2d(path.getPathPoses().get(path.getPathPoses().size() - 1).getTranslation(), path.getGoalEndState().rotation().getRadians(), false)).onlyIf(() -> path.getGoalEndState().velocityMPS() < 1e-3)
         );
     }
 
