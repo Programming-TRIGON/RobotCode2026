@@ -76,7 +76,8 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                        1000
+                        1000,
+                        false
                 ).andThen(new WaitCommand(timeout)),
                 getShootAtHubWhileDrivingCommand()
         );
@@ -90,7 +91,8 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                                shootWhileDriving ? 1000 : 0
+                                shootWhileDriving ? 1000 : 0,
+                                false
                         ),
                         getShootAtHubWhileDrivingCommand()
                 ).until(() -> RobotContainer.SWERVE.atPose(FieldConstants.DEPOT_POSITION)),
@@ -105,7 +107,8 @@ public class GeneralAutonomousCommands {
                                 AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
-                                1000
+                                1000,
+                                false
                         ).raceWith(getShootAtHubWhileDrivingCommand())
                         .until(() -> RobotContainer.SWERVE.atPose(climbPosition.get()))
                         .andThen(SwerveCommands.getClosedLoopFieldRelativeDriveCommand(() -> 0, () -> 0, () -> 0)),
@@ -156,7 +159,8 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS,
                         3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
-                        shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0
+                        shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0,
+                        true
                 ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(targetPose) : GeneralAutonomousCommands::shouldRobotStartIntaking),
                 getDriveToFuelCommand(intakeSlowly).withTimeout(timeout)
         );
