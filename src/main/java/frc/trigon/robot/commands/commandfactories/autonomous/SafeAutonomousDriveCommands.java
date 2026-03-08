@@ -93,11 +93,7 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    static int num = 0;
-
     private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints pathConstraints, double endVelocity) {
-        num++;
-        Logger.recordOutput("Autonomous/GetPathThroughTrenchNum", num);
         if (targetPose == null)
             return new PathPlannerPath(
                     PathPlannerPath.waypointsFromPoses(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()),
