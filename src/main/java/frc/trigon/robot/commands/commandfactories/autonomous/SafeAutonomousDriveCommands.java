@@ -67,9 +67,17 @@ public class SafeAutonomousDriveCommands {
     private static Command getDriveThroughTrenchFromNeutralZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
         return new SequentialCommandGroup(
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS()).until(FieldConstants::isRobotInAllianceZone),
-                getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone),
-                getDriveSlowlyInAllianceZoneCommand(() -> targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone)
+                getDriveThroughTrenchFromNeutralZoneInAllianceZone(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds)
         ).onlyIf(() -> targetPose != null);
+    }
+
+    private static Command getDriveThroughTrenchFromNeutralZoneInAllianceZone(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds) {
+        return new ConditionalCommand(
+                getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone).andThen(
+                        getDriveSlowlyInAllianceZoneCommand(() -> targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone)),
+                getDriveSlowlyInAllianceZoneCommand(() -> targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone),
+                () -> !arePosesInTrench(targetPose)
+        );
     }
 
     private static Command getDriveThroughTrenchCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity) {
@@ -130,16 +138,9 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
-        Logger.recordOutput("Autonomous/TargetPoseInTrench", isTargetPoseInTrench(trenchExitPose, targetPose));
         Rotation2d travelHeading = targetPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle();
 
         if (isCurrentPoseInTrenchX(currentRobotPose, trenchEntryPose) && FieldConstants.isRobotInTrenchYRange()) {
-            if (isTargetPoseInTrench(trenchExitPose, targetPose))
-                return PathPlannerPath.waypointsFromPoses(
-                        new Pose2d(currentRobotPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle())),
-                        new Pose2d(targetPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle()))
-                );
-
             final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
 
             return PathPlannerPath.waypointsFromPoses(
@@ -148,19 +149,36 @@ public class SafeAutonomousDriveCommands {
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
             );
         }
-        if (isTargetPoseInTrench(trenchExitPose, targetPose))
-            return PathPlannerPath.waypointsFromPoses(
-                    new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
-                    new Pose2d(trenchEntryPose.getTranslation(), targetPose.getTranslation().minus(trenchEntryPose.getTranslation()).getAngle()),
-                    new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchEntryPose.getTranslation()).getAngle())
-            );
-
         return PathPlannerPath.waypointsFromPoses(
                 new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                 new Pose2d(trenchEntryPose.getTranslation(), getHeading(travelHeading)),
                 new Pose2d(trenchExitPose.getTranslation(), getHeading(travelHeading)),
                 new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
         );
+    }
+
+    /**
+     * Checks if both the current robot pose and the target pose are within the trench boundaries.
+     * * @param targetPose The flippable target pose.
+     * @return true if both the robot and target are in the trench.
+     */
+    private static boolean arePosesInTrench(FlippablePose2d targetPose) {
+        if (targetPose == null)
+            return false;
+
+        Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
+        Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
+
+        // 1. Check if the current robot is within the trench X-range and Y-range
+        boolean currentInTrench = isCurrentPoseInTrenchX(currentRobotPose, trenchEntryPose)
+                && FieldConstants.isRobotInTrenchYRange();
+
+        // 2. Check if the target pose is within the trench relative to the exit
+        // Note: This uses your existing logic that defines the trench area based on the exit point
+        boolean targetInTrench = isTargetPoseInTrench(trenchExitPose, targetPose.get());
+
+        return currentInTrench && targetInTrench;
     }
 
     private static boolean isTargetPoseInTrench(Pose2d trenchExitPose, Pose2d targetPose) {
@@ -175,7 +193,6 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static List<RotationTarget> getRotationTargetsThroughTrench(FlippablePose2d targetPose, Pose2d currentPose, List<Waypoint> waypoints) {
-        Logger.recordOutput("Autonomous/NUm", waypoints.size());
         final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(shouldRotateBeforeTrench(targetPose, currentPose) ? targetPose.get().getRotation() : currentPose.getRotation());
         if (waypoints.size() == 2) {
             return List.of(
