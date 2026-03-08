@@ -160,30 +160,6 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    /**
-     * Checks if both the current robot pose and the target pose are within the trench boundaries.
-     * * @param targetPose The flippable target pose.
-     * @return true if both the robot and target are in the trench.
-     */
-    private static boolean arePosesInTrench(FlippablePose2d targetPose) {
-        if (targetPose == null)
-            return false;
-
-        Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
-        Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
-
-        // 1. Check if the current robot is within the trench X-range and Y-range
-        boolean currentInTrench = isCurrentPoseInTrenchX(currentRobotPose, trenchEntryPose)
-                && FieldConstants.isRobotInTrenchYRange();
-
-        // 2. Check if the target pose is within the trench relative to the exit
-        // Note: This uses your existing logic that defines the trench area based on the exit point
-        boolean targetInTrench = isTargetPoseInTrench(trenchExitPose, targetPose.get());
-
-        return currentInTrench && targetInTrench;
-    }
-
     private static boolean isTargetPoseInTrench(Pose2d trenchExitPose, Pose2d targetPose) {
         return (targetPose.getX() < trenchExitPose.getX() && FieldConstants.isRobotInAllianceZone() && !Flippable.isRedAlliance()) ||
                 (targetPose.getX() > trenchExitPose.getX() && !FieldConstants.isRobotInAllianceZone() && !Flippable.isRedAlliance()) ||
