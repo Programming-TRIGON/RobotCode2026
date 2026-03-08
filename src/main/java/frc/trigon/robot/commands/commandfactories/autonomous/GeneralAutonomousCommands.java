@@ -145,6 +145,10 @@ public class GeneralAutonomousCommands {
         );
     }
 
+    private static boolean isAngleCloserTo180(Rotation2d angle) {
+        return Math.abs(angle.getDegrees()) > 90;
+    }
+
     private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
@@ -161,13 +165,9 @@ public class GeneralAutonomousCommands {
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(intakeSlowly),
-                getIntakeWithoutCamerasCommand(),
+                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> -0.2 : () -> 0.2),
                 GamePieceAutoDriveCommand::hasCollectableGamePiecesInView
         );
-    }
-
-    private static SequentialCommandGroup getIntakeWithoutCamerasCommand() {
-        return SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(() -> FieldConstants.NO_VISIBLE_OBJECTS_INTAKE_POSITION, AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS).andThen(SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> -0.2 : () -> 0.2));
     }
 
     private static Command getPrepareForShootingCommand() {
