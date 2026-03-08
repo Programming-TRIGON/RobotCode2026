@@ -147,10 +147,6 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static boolean isAngleCloserTo180(Rotation2d angle) {
-        return Math.abs(angle.getDegrees()) > 90;
-    }
-
     private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
@@ -167,9 +163,13 @@ public class GeneralAutonomousCommands {
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
         return GeneralCommands.getContinuousConditionalCommand(
                 new GamePieceAutoDriveCommand(intakeSlowly),
-                SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> 0.2 : () -> -0.2),
+                getIntakeWithoutCamerasCommand(),
                 GamePieceAutoDriveCommand::hasCollectableGamePiecesInView
         );
+    }
+
+    private static SequentialCommandGroup getIntakeWithoutCamerasCommand() {
+        return SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(() -> FieldConstants.NO_VISIBLE_OBJECTS_INTAKE_POSITION, AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS).andThen(SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, Flippable.isRedAlliance() ? () -> -0.2 : () -> 0.2));
     }
 
     private static Command getPrepareForShootingCommand() {
@@ -202,8 +202,6 @@ public class GeneralAutonomousCommands {
     static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
         if (nextState == null && AutonomousGenerator.shouldClimb())
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
-        if (nextState != null && !nextState.isInAllianceZone)
-            return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE;
         if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
             return FieldConstants.DEPOT_POSITION;
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
