@@ -81,7 +81,7 @@ public class OperatorConstants {
     public static final Trigger //Debugging Triggers
             UNJAM_TRIGGER = DRIVER_CONTROLLER.start().or(OPERATOR_CONTROLLER.q()),
             SHORT_EJECTION_TRIGGER = DRIVER_CONTROLLER.x().or(OPERATOR_CONTROLLER.e()),
-            RESET_HOOD_TRIGGER = OPERATOR_CONTROLLER.r();
+            RESET_HOOD_TRIGGER = OPERATOR_CONTROLLER.r().and(OPERATOR_CONTROLLER.leftShift());
     public static final Trigger UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER = new Trigger(OperatorConstants::justEnteredAllianceZone).or(INTAKE_TRIGGER);
 
     private static boolean WAS_IN_ALLIANCE_ZONE = false;

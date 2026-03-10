@@ -23,11 +23,13 @@ import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -126,7 +128,7 @@ public class GeneralAutonomousCommands {
 
     private static Command getShootAtHubWhileDrivingCommand() {
         return GeneralCommands.getContinuousConditionalCommand(
-                getPrepareForShootingWithoutHoodCommand(),
+                ShootingCommands.getAimAtHubWithoutHoodCommand(),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         getPrepareForShootingCommand(),
@@ -138,7 +140,7 @@ public class GeneralAutonomousCommands {
 
     private static Command getDeliverWhileDrivingCommand() {
         return GeneralCommands.getContinuousConditionalCommand(
-                getPrepareForShootingWithoutHoodCommand(),
+                ShootingCommands.getAimAtHubWithoutHoodCommand(),
                 GeneralCommands.getContinuousConditionalCommand(
                         ShootingCommands.getShootAtHubCommand(),
                         ShootingCommands.getDeliveryCommand(),
@@ -163,7 +165,7 @@ public class GeneralAutonomousCommands {
                         true
                 ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(targetPose) : GeneralAutonomousCommands::shouldRobotStartIntaking),
                 getDriveToFuelCommand(intakeSlowly).withTimeout(timeout)
-        );
+        ).withTimeout(AutonomousConstants.NORMAL_DRIVE_TIMEOUT + timeout);
     }
 
     private static Command getDriveToFuelCommand(boolean intakeSlowly) {
@@ -175,18 +177,12 @@ public class GeneralAutonomousCommands {
     }
 
     private static Command getPrepareForShootingCommand() {
-        return GeneralCommands.getContinuousConditionalCommand(
-                new ParallelCommandGroup(
-                        TurretCommands.getAlignToClosestAprilTagCommand(),
-                        HoodCommands.getRestCommand()
+        return getAimWithTargetShootingState(
+                () -> ShootingCalculations.getInstance().calculateTargetShootingState(
+                        SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
+                        new ChassisSpeeds()
                 ),
-                getAimWithTargetShootingState(
-                        () -> ShootingCalculations.getInstance().calculateTargetShootingState(
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
-                                new ChassisSpeeds()
-                        )
-                ),
-                GeneralAutonomousCommands::isInTrench
+                () -> !GeneralAutonomousCommands.isInTrench()
         );
     }
 
@@ -195,13 +191,14 @@ public class GeneralAutonomousCommands {
         return currentRobotPose.getX() < FieldConstants.TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X;
     }
 
-    private static Command getPrepareForShootingWithoutHoodCommand() {
-        return HoodCommands.getRestCommand();
-    }
-
-    private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState) {
+    private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState, BooleanSupplier aimAtApriltags) {
         return new ParallelCommandGroup(
-                TurretCommands.getSetTargetFieldRelativeAngleCommand(() -> targetShootingState.get().targetFieldRelativeYaw()),
+                GeneralCommands.getContinuousConditionalCommand(
+                        TurretCommands.getAlignToClosestAprilTagCommand(),
+                        TurretCommands.getSetTargetFieldRelativeAngleCommand(() -> targetShootingState.get().targetFieldRelativeYaw()),
+                        aimAtApriltags
+                ),
+                ShooterCommands.getSetTargetVelocityCommand(() -> targetShootingState.get().targetShootingVelocityMetersPerSecond()),
                 HoodCommands.getRestCommand()
 //                HoodCommands.getSetTargetAngleCommand(() -> targetShootingState.get().targetPitch())
         );

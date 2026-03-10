@@ -3,6 +3,7 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 import com.pathplanner.lib.path.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -110,7 +111,7 @@ public class SafeAutonomousDriveCommands {
                     new GoalEndState(endVelocity, RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation())
             );
 
-        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(0.07);
         final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
         final Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
         final List<Waypoint> waypoints = getWaypointsThroughTrench(
@@ -138,35 +139,41 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static List<Waypoint> getWaypointsThroughTrench(Pose2d currentRobotPose, Pose2d trenchEntryPose, Pose2d trenchExitPose, Pose2d targetPose) {
-        Rotation2d travelHeading = targetPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle();
+        final Rotation2d travelHeading = targetPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle();
+        final Translation2d fieldRelativeVelocity = RobotContainer.SWERVE.getFieldRelativeVelocity();
+        final Rotation2d velocityHeading = fieldRelativeVelocity.getAngle();
 
         if (isCurrentPoseInTrenchX(currentRobotPose, trenchEntryPose) && FieldConstants.isRobotInTrenchYRange()) {
             if (isTargetPoseInTrench(trenchExitPose, targetPose))
                 return PathPlannerPath.waypointsFromPoses(
-                        new Pose2d(currentRobotPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle())),
-                        new Pose2d(targetPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle()))
+                        new Pose2d(currentRobotPose.getTranslation(), hasVelocity() ? velocityHeading : currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle())),
+                        new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle())
                 );
 
             final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
 
             return PathPlannerPath.waypointsFromPoses(
-                    new Pose2d(currentRobotPose.getTranslation(), closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                    new Pose2d(currentRobotPose.getTranslation(), hasVelocity() ? velocityHeading : closestPoseToTarget.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                     new Pose2d(closestPoseToTarget.getTranslation(), getHeading(travelHeading)),
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
             );
         }
         if (isTargetPoseInTrench(trenchExitPose, targetPose))
             return PathPlannerPath.waypointsFromPoses(
-                    new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                    new Pose2d(currentRobotPose.getTranslation(), hasVelocity() ? velocityHeading : trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                     new Pose2d(trenchEntryPose.getTranslation(), targetPose.getTranslation().minus(trenchEntryPose.getTranslation()).getAngle()),
                     new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchEntryPose.getTranslation()).getAngle())
             );
         return PathPlannerPath.waypointsFromPoses(
-                new Pose2d(currentRobotPose.getTranslation(), trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
+                new Pose2d(currentRobotPose.getTranslation(), hasVelocity() ? velocityHeading : trenchEntryPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle()),
                 new Pose2d(trenchEntryPose.getTranslation(), getHeading(travelHeading)),
                 new Pose2d(trenchExitPose.getTranslation(), getHeading(travelHeading)),
                 new Pose2d(targetPose.getTranslation(), targetPose.getTranslation().minus(trenchExitPose.getTranslation()).getAngle())
         );
+    }
+
+    private static boolean hasVelocity() {
+        return RobotContainer.SWERVE.getFieldRelativeVelocity().getNorm() > 0.1;
     }
 
     private static boolean isTargetPoseInTrench(Pose2d trenchExitPose, Pose2d targetPose) {
@@ -187,22 +194,22 @@ public class SafeAutonomousDriveCommands {
         final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(shouldRotateBeforeTrench(targetPose, currentPose) ? targetPose.get().getRotation() : currentPose.getRotation());
         if (amountOfWaypoints == 2) {
             return List.of(
-                    new RotationTarget(shouldRotateAsFastAsPossible ? 0.1 : 0.6, targetPose.get().getRotation()),
-                    new RotationTarget(1, targetPose.get().getRotation())
+                    new RotationTarget(shouldRotateAsFastAsPossible ? 0.1 : 0.6, targetPose.get().getRotation())
+//                    new RotationTarget(1, targetPose.get().getRotation())
             );
         }
         if (amountOfWaypoints == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
-                    new RotationTarget(shouldRotateAsFastAsPossible ? 1.1 : 1.6, targetPose.get().getRotation()),
-                    new RotationTarget(2, targetPose.get().getRotation())
+                    new RotationTarget(shouldRotateAsFastAsPossible ? 1.1 : 1.6, targetPose.get().getRotation())
+//                    new RotationTarget(2, targetPose.get().getRotation())
             );
         }
         return List.of(
                 new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
                 new RotationTarget(2, targetTrenchDrivingHolonomicAngle),
-                new RotationTarget(shouldRotateAsFastAsPossible ? 2.1 : 2.6, targetPose.get().getRotation()),
-                new RotationTarget(3, targetPose.get().getRotation())
+                new RotationTarget(shouldRotateAsFastAsPossible ? 2.1 : 2.6, targetPose.get().getRotation())
+//                new RotationTarget(3, targetPose.get().getRotation())
         );
     }
 

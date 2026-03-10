@@ -78,8 +78,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-//        configureSysIDBindings(TURRET);
-        OperatorConstants.OPERATOR_CONTROLLER.one().whileTrue(TurretCommands.getDebuggingCommand());
+//        configureSysIDBindings(SWERVE);
     }
 
     private void bindDefaultCommands() {

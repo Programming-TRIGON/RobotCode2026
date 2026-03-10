@@ -26,10 +26,10 @@ public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 1;//TODO: Calibrate
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.8, 1.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.3, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 1, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(1.8, 1.5, Units.degreesToRadians(500), Units.degreesToRadians(900));
+            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(500), Units.degreesToRadians(900));
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
@@ -41,7 +41,7 @@ public class AutonomousConstants {
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 2,
             SCORING_TIMEOUT_SECONDS = 2.5,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3,
-            NORMAL_DRIVE_TIMEOUT = 2;
+            NORMAL_DRIVE_TIMEOUT = 4;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
             CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
@@ -81,7 +81,8 @@ public class AutonomousConstants {
     private static void configureAutoBuilder() {
         AutoBuilder.configure(
                 RobotContainer.ROBOT_POSE_ESTIMATOR::getEstimatedRobotPose,
-                RobotContainer.ROBOT_POSE_ESTIMATOR::resetPose,
+                (a) -> {
+                },
                 RobotContainer.SWERVE::getSelfRelativeChassisSpeeds,
                 RobotContainer.SWERVE::drivePathPlanner,
                 AUTO_PATH_FOLLOWING_CONTROLLER,

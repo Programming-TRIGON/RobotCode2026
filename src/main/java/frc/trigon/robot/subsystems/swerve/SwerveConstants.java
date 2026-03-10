@@ -60,7 +60,7 @@ public class SwerveConstants {
     private static final PIDConstants
             TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
             new PIDConstants(5, 0, 0) :
-            new PIDConstants(5, 0, 0),
+            new PIDConstants(7.4, 0, 0),
             PROFILED_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(4, 0, 0) :
                     new PIDConstants(6, 0, 0.1);
@@ -92,7 +92,7 @@ public class SwerveConstants {
     private static final double
             ROTATION_PID_TOLERANCE_DEGREES = 1,
             TRANSLATION_PID_TOLERANCE_METERS = 0.02;
-    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.15;//TODO:Calibrate
+    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.05;
 
     static {
         configureGyro();
@@ -103,9 +103,9 @@ public class SwerveConstants {
     private static void configureGyro() {
         final Pigeon2Configuration config = new Pigeon2Configuration();
         //TODO:Calibrate
-        config.MountPose.MountPoseYaw = 0;
-        config.MountPose.MountPosePitch = 0;
-        config.MountPose.MountPoseRoll = 0;
+        config.MountPose.MountPoseYaw = 0.8371232151985168;
+        config.MountPose.MountPosePitch = 0.4867132604122162;
+        config.MountPose.MountPoseRoll = -178.99557495117188;
 
         GYRO.applyConfiguration(config);
         GYRO.setSimulationYawVelocitySupplier(() -> RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond());//IMPORTANT: Leave as lambda expression, method reference will crash code

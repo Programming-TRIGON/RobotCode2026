@@ -84,7 +84,7 @@ public class RobotPoseEstimator implements AutoCloseable {
     public void resetHeading() {
         final Rotation2d resetRotation = Flippable.isRedAlliance() ? Rotation2d.k180deg : Rotation2d.kZero;
         swerveDrivePoseEstimator.resetRotation(resetRotation);
-        swerveDriveOdometry.resetRotation(resetRotation);
+        swerveDriveOdometry.resetPose(new Pose2d(getEstimatedRobotPose().getTranslation(), resetRotation));
     }
 
     /**

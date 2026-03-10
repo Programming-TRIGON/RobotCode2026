@@ -79,6 +79,17 @@ public class ShootingCommands {
         );
     }
 
+    public static Command getAimAtHubWithoutHoodCommand() {
+        return new InstantCommand(ShootingCommands::updateShootingCalculations).andThen(
+                new ParallelCommandGroup(
+                        new RunCommand(ShootingCommands::updateShootingCalculations),
+                        TurretCommands.getAlignToHubCommand(),
+                        HoodCommands.getRestCommand(),
+                        ShooterCommands.getAimAtHubCommand()
+                )
+        );
+    }
+
     private static Command getAimForDeliveryCommand() {
         return new ParallelCommandGroup(
                 TurretCommands.getAlignForDeliveryCommand(),
