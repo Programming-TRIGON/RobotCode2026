@@ -76,7 +76,7 @@ public class ObjectDetectionCamera extends SubsystemBase {
         final Pose3d cameraPoseAtTimestamp = new Pose3d(robotPoseAtResultTimestamp).plus(robotCenterToCamera);
 
         for (int i = 0; i < visibleObjectRotations.length; i++)
-            objectPositionsOnField[i] = calculateObjectPositionFromRotation(visibleObjectRotations[i], cameraPoseAtTimestamp, i);
+            objectPositionsOnField[i] = calculateObjectPositionFromRotation(visibleObjectRotations[i], cameraPoseAtTimestamp);
 
         Logger.recordOutput("ObjectDetectionCamera/Visible" + targetGamePiece.name(), objectPositionsOnField);
         return objectPositionsOnField;
@@ -95,7 +95,7 @@ public class ObjectDetectionCamera extends SubsystemBase {
      * @param objectRotation the object's 3D rotation relative to the camera
      * @return the object's 2D position on the field (z is assumed to be 0)
      */
-    private Translation2d calculateObjectPositionFromRotation(Rotation3d objectRotation, Pose3d cameraPoseAtTime, int i) {
+    private Translation2d calculateObjectPositionFromRotation(Rotation3d objectRotation, Pose3d cameraPoseAtTime) {
         final Pose3d objectRotationStart = cameraPoseAtTime.plus(new Transform3d(0, 0, 0, objectRotation));
 
         final double cameraZ = cameraPoseAtTime.getTranslation().getZ();
@@ -105,10 +105,6 @@ public class ObjectDetectionCamera extends SubsystemBase {
         final Transform3d objectRotationStartToGround = new Transform3d(xTransform, 0, 0, new Rotation3d());
 
         var a = objectRotationStart.transformBy(objectRotationStartToGround).getTranslation();
-        Logger.recordOutput("Calc/" + i + "/Height", a.getZ());
-        Logger.recordOutput("Calc/" + i + "/X", a.getX());
-        Logger.recordOutput("Calc/" + i + "/Yaw", Math.toDegrees(objectRotation.getZ()));
-        Logger.recordOutput("Calc/" + i + "/Pitch", Math.toDegrees(objectRotation.getY()));
         return a.toTranslation2d();
     }
 
