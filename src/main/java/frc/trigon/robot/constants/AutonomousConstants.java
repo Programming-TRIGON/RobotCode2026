@@ -40,7 +40,8 @@ public class AutonomousConstants {
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
             NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 2,
             SCORING_TIMEOUT_SECONDS = 2.5,
-            ESTIMATED_CLIMBING_TIME_SECONDS = 3;
+            ESTIMATED_CLIMBING_TIME_SECONDS = 3,
+            NORMAL_DRIVE_TIMEOUT = 2;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
             CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;

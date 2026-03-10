@@ -79,7 +79,6 @@ public class ObjectDetectionCamera extends SubsystemBase {
             objectPositionsOnField[i] = calculateObjectPositionFromRotation(visibleObjectRotations[i], cameraPoseAtTimestamp, i);
 
         Logger.recordOutput("ObjectDetectionCamera/Visible" + targetGamePiece.name(), objectPositionsOnField);
-        Logger.recordOutput("CameraaodPose", cameraPoseAtTimestamp);
         return objectPositionsOnField;
     }
 

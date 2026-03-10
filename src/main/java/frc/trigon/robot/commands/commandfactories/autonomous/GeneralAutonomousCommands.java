@@ -80,7 +80,7 @@ public class GeneralAutonomousCommands {
                         false
                 ).andThen(new WaitCommand(timeout)),
                 getShootAtHubWhileDrivingCommand()
-        );
+        ).withTimeout(timeout + AutonomousConstants.NORMAL_DRIVE_TIMEOUT);
     }
 
     public static Command getCollectFromDepotCommand(boolean shootWhileDriving, double collectionTimeout) {
