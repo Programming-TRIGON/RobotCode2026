@@ -19,12 +19,10 @@ public final class MatchTracker {
         new Trigger(MatchTracker::didGameMessageChange).onTrue(new InstantCommand(MatchTracker::setAutonomousWinner).ignoringDisable(true));
     }
 
-    @AutoLogOutput(key = "Assists/ShouldIndicateAllianceShift")
     public static boolean shouldIndicateAllianceShift() {
         return getTimeUntilAllianceShiftSeconds() <= MatchTrackerConstants.TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS;
     }
 
-    @AutoLogOutput(key = "MatchTracker/IsHubActive")
     public static boolean isHubActive() {
         final double matchTimeSeconds = getMatchTimeSeconds();
 
