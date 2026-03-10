@@ -122,9 +122,10 @@ public class HoodConstants {
         MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
 
-        CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(3, () -> {
-            if (MOTOR.getSignal(TalonFXSignal.POSITION) < MINIMUM_ANGLE.minus(Rotation2d.fromDegrees(10)).getRotations())
-                MOTOR.setPosition(RESET_ANGLE.getRotations());
-        }));
+        if (!RobotHardwareStats.isSimulation())
+            CommandScheduler.getInstance().schedule(GeneralCommands.getDelayedCommand(3, () -> {
+                if (MOTOR.getSignal(TalonFXSignal.POSITION) < MINIMUM_ANGLE.minus(Rotation2d.fromDegrees(10)).getRotations())
+                    MOTOR.setPosition(RESET_ANGLE.getRotations());
+            }));
     }
 }
