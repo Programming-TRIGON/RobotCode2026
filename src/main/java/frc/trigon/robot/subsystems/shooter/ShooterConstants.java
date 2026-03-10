@@ -75,9 +75,9 @@ public class ShooterConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 0.4;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.015881 : 0.46;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.84 : 0.665;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.014316 : 0.038317;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.012165 : 0.46;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.67692 : 0.665;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011184 : 0.038317;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 16.9743263;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 340.96721;
