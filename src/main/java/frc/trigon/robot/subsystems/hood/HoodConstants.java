@@ -89,7 +89,7 @@ public class HoodConstants {
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
         config.Feedback.VelocityFilterTimeConstant = 0.1;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 100 : 500;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 500;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1;
         config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42;
