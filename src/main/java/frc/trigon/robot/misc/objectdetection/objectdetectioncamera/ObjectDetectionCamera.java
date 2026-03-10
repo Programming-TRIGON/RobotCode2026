@@ -104,8 +104,8 @@ public class ObjectDetectionCamera extends SubsystemBase {
         final double xTransform = Math.abs(zDifference / objectPitchSin);
         final Transform3d objectRotationStartToGround = new Transform3d(xTransform, 0, 0, new Rotation3d());
 
-        var a = objectRotationStart.transformBy(objectRotationStartToGround).getTranslation();
-        return a.toTranslation2d();
+        final Translation3d objectTranslation3d = objectRotationStart.transformBy(objectRotationStartToGround).getTranslation();
+        return objectTranslation3d.toTranslation2d();
     }
 
     private ObjectDetectionCameraIO generateIO(String hostname, DynamicCameraTransform dynamicCameraTransform) {
