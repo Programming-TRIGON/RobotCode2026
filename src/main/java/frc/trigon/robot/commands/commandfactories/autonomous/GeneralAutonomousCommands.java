@@ -182,7 +182,7 @@ public class GeneralAutonomousCommands {
                 ),
                 getAimWithTargetShootingState(
                         () -> ShootingCalculations.getInstance().calculateTargetShootingState(
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get() : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get(),
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
                                 new ChassisSpeeds()
                         )
                 ),
