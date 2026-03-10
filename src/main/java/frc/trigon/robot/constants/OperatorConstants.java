@@ -9,7 +9,7 @@ import frc.trigon.lib.hardware.misc.KeyboardController;
 import frc.trigon.lib.hardware.misc.XboxController;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.ClimbCommands;
-import frc.trigon.robot.misc.MatchTracker;
+import frc.trigon.robot.misc.matchTracker.MatchTracker;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.function.DoubleUnaryOperator;
