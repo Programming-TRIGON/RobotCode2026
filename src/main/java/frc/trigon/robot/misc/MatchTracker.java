@@ -63,8 +63,6 @@ public final class MatchTracker {
     }
 
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
-        if (!isHubActive(matchTimeSeconds))
-            matchTimeSeconds -= 1;
         return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
     }
 
