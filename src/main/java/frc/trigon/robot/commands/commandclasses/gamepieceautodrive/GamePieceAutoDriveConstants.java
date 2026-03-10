@@ -21,9 +21,4 @@ public class GamePieceAutoDriveConstants {
     public static final double ROBOT_HALF_WIDTH = 0.37;  // half-side of the robot square
     public static final double INTAKE_REACH = 0.4;  // how far the intake extends past the body
     public static final double ALLIANCE_WALL_X_METERS = 0.0;  // field X coordinate of the alliance wall
-
-    public static final double HUB_WIDTH_METERS = 1.19;
-    public static final double HUB_EXTENSION_METERS = 0.74;
-    // Adds your robot's half-width plus a 0.15m safety buffer
-    public static final double HUB_AVOIDANCE_MARGIN_METERS = ROBOT_HALF_WIDTH + 0.15;
 }

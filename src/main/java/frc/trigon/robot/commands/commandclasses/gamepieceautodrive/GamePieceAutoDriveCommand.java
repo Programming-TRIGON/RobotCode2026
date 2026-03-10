@@ -343,9 +343,11 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         return false;
     }
 
+    /**
+     * Determines if a game piece is out of bounds based on global field limits
+     * AND the robot's current zone (Alliance vs Neutral).
+     */
     private static boolean isOutOfBounds(Translation2d piece) {
-        // 0. Check if the piece is physically inside the Hub
-        if (isInsideHub(piece)) return true;
         // 1. Check Global Field Limits
         final double minX;
         final double maxX;
@@ -369,17 +371,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         final boolean isPieceInAllianceZone = FieldConstants.isPoseInAllianceZone(piece);
 
         return isRobotInAllianceZone != isPieceInAllianceZone;
-    }
-
-    private static boolean isInsideHub(Translation2d piece) {
-        double blueHubMaxX = FieldConstants.ALLIANCE_ZONE_LENGTH + GamePieceAutoDriveConstants.HUB_EXTENSION_METERS;
-        double redHubMinX = FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH - GamePieceAutoDriveConstants.HUB_EXTENSION_METERS;
-
-        // The hub starts at the alliance line and extends outward
-        boolean inBlueHub = piece.getX() >= FieldConstants.ALLIANCE_ZONE_LENGTH && piece.getX() <= blueHubMaxX;
-        boolean inRedHub = piece.getX() >= redHubMinX && piece.getX() <= FieldConstants.FIELD_LENGTH_METERS - FieldConstants.ALLIANCE_ZONE_LENGTH;
-
-        return inBlueHub || inRedHub;
     }
 
     private GamePieceCluster findBestCluster() {
