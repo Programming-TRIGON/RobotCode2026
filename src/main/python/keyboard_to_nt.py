@@ -27,11 +27,13 @@ def set_table(t):
 def put_boolean_safe(key, value):
     t = get_table()
     if t is None:
-        return
+        return False  # indicate not connected
     try:
         t.putBoolean(key, value)
+        return True
     except Exception as e:
         print(f"NT write failed for {key}={value}: {e}")
+        return False
 
 
 def connect_nt():
@@ -70,7 +72,6 @@ def nt_watchdog():
 
 
 def turn_off_keys_with_delay():
-    """Runs in background. Sends False for keys held past minimum_press_time."""
     while True:
         time.sleep(0.01)
         to_remove = []
@@ -81,10 +82,33 @@ def turn_off_keys_with_delay():
                     to_remove.append(key)
 
         for key in to_remove:
-            put_boolean_safe(key, False)
+            sent = put_boolean_safe(key, False)
+            if sent:
+                print(f"{key} released")  # only print if actually sent
             with keys_lock:
                 keys_dict.pop(key, None)
-            print(f"{key} released")
+
+
+def on_action(event: keyboard.KeyboardEvent):
+    if event is None or event.name is None or event.name == "/":
+        return
+
+    key = ("numpad" + event.name) if event.is_keypad else event.name.lower()
+    is_pressed = event.event_type == keyboard.KEY_DOWN
+
+    if is_pressed:
+        sent = put_boolean_safe(key, True)
+        if sent:
+            print(f"{key} pressed")  # only print if actually sent
+        with keys_lock:
+            if key not in keys_dict:
+                keys_dict[key] = [time.time(), False]
+    else:
+        with keys_lock:
+            if key in keys_dict:
+                keys_dict[key][1] = True
+            else:
+                keys_dict[key] = [time.time(), True]
 
 
 def on_action(event: keyboard.KeyboardEvent):
