@@ -95,9 +95,9 @@ public class Intake extends MotorSubsystem {
 
     public void updateCameraTransforms() {
         intakeCameraTransformCalculator.update(
-                latestThreadedAngles,
+                new double[]{0},
 //                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
-                new double[0],
+                new double[]{0},
                 0
 //                angleMotor.getSignal(TalonFXSignal.VELOCITY)
         );

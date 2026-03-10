@@ -29,7 +29,7 @@ public class AutonomousConstants {
             DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.8, 1.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 1, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(1.8, 1.5, Units.degreesToRadians(500), Units.degreesToRadians(700));
+            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(1.8, 1.5, Units.degreesToRadians(500), Units.degreesToRadians(900));
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;

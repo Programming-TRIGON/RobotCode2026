@@ -175,12 +175,24 @@ public class GeneralAutonomousCommands {
     }
 
     private static Command getPrepareForShootingCommand() {
-        return getAimWithTargetShootingState(
-                () -> ShootingCalculations.getInstance().calculateTargetShootingState(
-                        SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get() : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get(),
-                        new ChassisSpeeds()
-                )
+        return GeneralCommands.getContinuousConditionalCommand(
+                new ParallelCommandGroup(
+                        TurretCommands.getAlignToClosestAprilTagCommand(),
+                        HoodCommands.getRestCommand()
+                ),
+                getAimWithTargetShootingState(
+                        () -> ShootingCalculations.getInstance().calculateTargetShootingState(
+                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get() : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE.get(),
+                                new ChassisSpeeds()
+                        )
+                ),
+                GeneralAutonomousCommands::isInTrench
         );
+    }
+
+    private static boolean isInTrench() {
+        final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
+        return currentRobotPose.getX() < FieldConstants.TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X;
     }
 
     private static Command getPrepareForShootingWithoutHoodCommand() {
@@ -190,7 +202,8 @@ public class GeneralAutonomousCommands {
     private static Command getAimWithTargetShootingState(Supplier<ShootingState> targetShootingState) {
         return new ParallelCommandGroup(
                 TurretCommands.getSetTargetFieldRelativeAngleCommand(() -> targetShootingState.get().targetFieldRelativeYaw()),
-                HoodCommands.getSetTargetAngleCommand(() -> targetShootingState.get().targetPitch())
+                HoodCommands.getRestCommand()
+//                HoodCommands.getSetTargetAngleCommand(() -> targetShootingState.get().targetPitch())
         );
     }
 

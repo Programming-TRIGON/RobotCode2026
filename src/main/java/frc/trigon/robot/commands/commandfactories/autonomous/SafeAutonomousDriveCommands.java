@@ -141,11 +141,11 @@ public class SafeAutonomousDriveCommands {
         Rotation2d travelHeading = targetPose.getTranslation().minus(currentRobotPose.getTranslation()).getAngle();
 
         if (isCurrentPoseInTrenchX(currentRobotPose, trenchEntryPose) && FieldConstants.isRobotInTrenchYRange()) {
-                if (isTargetPoseInTrench(trenchExitPose, targetPose))
-                    return PathPlannerPath.waypointsFromPoses(
-                            new Pose2d(currentRobotPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle())),
-                            new Pose2d(targetPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle()))
-                    );
+            if (isTargetPoseInTrench(trenchExitPose, targetPose))
+                return PathPlannerPath.waypointsFromPoses(
+                        new Pose2d(currentRobotPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle())),
+                        new Pose2d(targetPose.getTranslation(), currentRobotPose.getTranslation().getAngle().minus(targetPose.getTranslation().getAngle()))
+                );
 
             final Pose2d closestPoseToTarget = getClosestPoseToPose(targetPose, trenchEntryPose, trenchExitPose);
 
@@ -187,21 +187,21 @@ public class SafeAutonomousDriveCommands {
         final Rotation2d targetTrenchDrivingHolonomicAngle = getHeading(shouldRotateBeforeTrench(targetPose, currentPose) ? targetPose.get().getRotation() : currentPose.getRotation());
         if (amountOfWaypoints == 2) {
             return List.of(
-                    new RotationTarget(shouldRotateAsFastAsPossible ? 0.2 : 0.6, targetPose.get().getRotation()),
+                    new RotationTarget(shouldRotateAsFastAsPossible ? 0.1 : 0.6, targetPose.get().getRotation()),
                     new RotationTarget(1, targetPose.get().getRotation())
             );
         }
         if (amountOfWaypoints == 3) {
             return List.of(
                     new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
-                    new RotationTarget(shouldRotateAsFastAsPossible ? 1.2 : 1.6, targetPose.get().getRotation()),
+                    new RotationTarget(shouldRotateAsFastAsPossible ? 1.1 : 1.6, targetPose.get().getRotation()),
                     new RotationTarget(2, targetPose.get().getRotation())
             );
         }
         return List.of(
                 new RotationTarget(1, targetTrenchDrivingHolonomicAngle),
                 new RotationTarget(2, targetTrenchDrivingHolonomicAngle),
-                new RotationTarget(shouldRotateAsFastAsPossible ? 2.2 : 2.6, targetPose.get().getRotation()),
+                new RotationTarget(shouldRotateAsFastAsPossible ? 2.1 : 2.6, targetPose.get().getRotation()),
                 new RotationTarget(3, targetPose.get().getRotation())
         );
     }

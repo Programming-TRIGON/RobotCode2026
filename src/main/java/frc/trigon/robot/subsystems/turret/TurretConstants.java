@@ -183,7 +183,7 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0.6484375;
+        config.MagnetSensor.MagnetOffset = 0.403564453125;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.2;
 
         ENCODER.applyConfiguration(config);
