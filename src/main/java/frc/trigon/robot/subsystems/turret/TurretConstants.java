@@ -135,7 +135,7 @@ public class TurretConstants {
 //        config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 1.49270441;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 90 : 10;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 4 : 10;
         config.MotionMagic.MotionMagicJerk = RobotHardwareStats.isSimulation() ? 0 : config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
