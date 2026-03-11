@@ -207,6 +207,15 @@ public class Turret extends MotorSubsystem {
         );
     }
 
+    public Rotation2d calculateTargetAngleForDelivery() {
+        final Pose2d currentPosition = getPredictedRobotPose();
+        final Rotation2d angleToDeliveryPoint = calculateTargetAngleToPose(calculateClosestDeliveryPosition(), currentPosition);
+        final double currentYVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vyMetersPerSecond;
+        final double currentAllianceYVelocity = Flippable.isRedAlliance() ? -currentYVelocity : currentYVelocity;
+        final Rotation2d yVelocityResistanceAngle = Rotation2d.fromDegrees(currentAllianceYVelocity * TurretConstants.RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT);
+        return angleToDeliveryPoint.plus(yVelocityResistanceAngle);
+    }
+
     void alignToHub() {
         final Rotation2d targetFieldRelativeYaw = shootingCalculations.getTargetShootingState().targetFieldRelativeYaw();
         setTargetFieldRelativeAngle(targetFieldRelativeYaw);
@@ -296,15 +305,6 @@ public class Turret extends MotorSubsystem {
         final double robotRotationalVelocityRadiansPerSecond = RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond();
         final double robotRotationalVelocityRotationsPerSecond = robotRotationalVelocityRadiansPerSecond / (2 * Math.PI);
         return -robotRotationalVelocityRotationsPerSecond * TurretConstants.RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN;
-    }
-
-    private Rotation2d calculateTargetAngleForDelivery() {
-        final Pose2d currentPosition = getPredictedRobotPose();
-        final Rotation2d angleToDeliveryPoint = calculateTargetAngleToPose(calculateClosestDeliveryPosition(), currentPosition);
-        final double currentYVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vyMetersPerSecond;
-        final double currentAllianceYVelocity = Flippable.isRedAlliance() ? -currentYVelocity : currentYVelocity;
-        final Rotation2d yVelocityResistanceAngle = Rotation2d.fromDegrees(currentAllianceYVelocity * TurretConstants.RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT);
-        return angleToDeliveryPoint.plus(yVelocityResistanceAngle);
     }
 
     private Pose2d getPredictedRobotPose() {
