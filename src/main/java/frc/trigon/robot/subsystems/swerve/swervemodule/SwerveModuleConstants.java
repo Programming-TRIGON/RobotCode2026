@@ -11,7 +11,7 @@ import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.robot.constants.AutonomousConstants;
 
 public class SwerveModuleConstants {
-    static final double COUPLING_RATIO = 0;
+    static final double COUPLING_RATIO = 0; // V1
     private static final double
             DRIVE_MOTOR_GEAR_RATIO = 7.03125,//R1: 7.03125, R2: 6.03, R3: 5.27
             STEER_MOTOR_GEAR_RATIO = 287.0 / 11.0;
@@ -75,14 +75,14 @@ public class SwerveModuleConstants {
         config.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.1;
         config.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.1;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 1.0129;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0010955 : 0.29342;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.74583 : 0.86881;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.01247 : 0.079218;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0 : 1.0129; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0010955 : 0.29342; // V1
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.74583 : 0.86881; // V1
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.01247 : 0.079218; // V1
 
-        config.Feedback.VelocityFilterTimeConstant = 0.02;
+        config.Feedback.VelocityFilterTimeConstant = 0.02; // V1
 
         return config;
     }
@@ -96,17 +96,17 @@ public class SwerveModuleConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        config.CurrentLimits.StatorCurrentLimit = RobotHardwareStats.isSimulation() ? 200 : 50;
+        config.CurrentLimits.StatorCurrentLimit = RobotHardwareStats.isSimulation() ? 200 : 50; // V1
         config.CurrentLimits.StatorCurrentLimitEnable = true;
 
         config.Feedback.RotorToSensorRatio = STEER_MOTOR_GEAR_RATIO;
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         config.Feedback.FeedbackRemoteSensorID = feedbackRemoteSensorID;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 120 : 60;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0.32;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 120 : 60; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0 : 0.32; // V1
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.ClosedLoopGeneral.ContinuousWrap = true;
 

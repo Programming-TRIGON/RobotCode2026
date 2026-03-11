@@ -27,11 +27,11 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     public static final double
-            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.61) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
-            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.47495) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.61) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))), // V1
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.47495) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1))); // V1
     public static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
-    private static final double STATOR_CURRENT_LIMIT_AMPS = 100;
+    private static final double STATOR_CURRENT_LIMIT_AMPS = 100; // V1
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
@@ -53,10 +53,10 @@ public class ShooterConstants {
 
     static final double EJECTION_VELOCITY_METERS_PER_SECOND = 3;
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.2;
-    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1;
+    static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1; // V1
     static final double
-            DELIVERY_VELOCITY_SLOPE = 1.10,
-            DELIVERY_VELOCITY_INTERCEPT_POINT = 2.5;
+            DELIVERY_VELOCITY_SLOPE = 1.10, // V1
+            DELIVERY_VELOCITY_INTERCEPT_POINT = 2.5; // V1
 
     static {
         configureMasterMotor();
@@ -72,18 +72,18 @@ public class ShooterConstants {
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 0.4;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.012165 : 0.46;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.67692 : 0.665;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011184 : 0.038317;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.02 : 0.4; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.012165 : 0.46; // V1
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.67692 : 0.665; // V1
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.011184 : 0.038317; // V1
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 16.9743263;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 340.96721;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 16.9743263; // V1
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 340.96721; // V1
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-        config.Feedback.VelocityFilterTimeConstant = 0.03;
+        config.Feedback.VelocityFilterTimeConstant = 0.03; // V1
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = STATOR_CURRENT_LIMIT_AMPS;

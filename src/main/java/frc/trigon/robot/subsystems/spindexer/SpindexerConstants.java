@@ -24,7 +24,7 @@ public class SpindexerConstants {
     static final TalonFXSMotor MOTOR = new TalonFXSMotor(MOTOR_ID, MOTOR_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 1 / ((1 / 5.0) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(6)));
+    private static final double GEAR_RATIO = 1 / ((1 / 5.0) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(6))); // V1
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getMinion(MOTOR_AMOUNT);
@@ -65,18 +65,18 @@ public class SpindexerConstants {
 
         config.ExternalFeedback.withSensorToMechanismRatio(GEAR_RATIO);
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.10229;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 1.7821 * (5 / 9.0);
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.049243;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.10229; // V1
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 1.7821 * (5 / 9.0); // V1
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.049243; // V1
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 6.73362886 / (5 / 9.0);
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 243.689458 / (5 / 9.0);
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 6.73362886 / (5 / 9.0); // V1
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 243.689458 / (5 / 9.0); // V1
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 80;
+        config.CurrentLimits.StatorCurrentLimit = 80; // V1
 
         config.Commutation.AdvancedHallSupport = AdvancedHallSupportValue.Enabled;
         config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;

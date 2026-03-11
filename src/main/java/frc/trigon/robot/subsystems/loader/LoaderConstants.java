@@ -19,7 +19,7 @@ public class LoaderConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 1 / ((1 / 0.96) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
+    private static final double GEAR_RATIO = 1 / ((1 / 0.96) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2))); // V1
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -57,17 +57,17 @@ public class LoaderConstants {
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.29065;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 1.5957 * (0.96 / 2.14);
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.064829;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.29065; // V1
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 1.5957 * (0.96 / 2.14); // V1
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.064829; // V1
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 7.520210565895845 / (0.96 / 2.14);
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 185.10234617223773 / (0.96 / 2.14);
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 7.520210565895845 / (0.96 / 2.14); // V1
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 185.10234617223773 / (0.96 / 2.14); // V1
 
-        config.CurrentLimits.StatorCurrentLimit = 90;
+        config.CurrentLimits.StatorCurrentLimit = 90; // V1
         config.CurrentLimits.StatorCurrentLimitEnable = true;
 
         MOTOR.applyConfiguration(config);
@@ -81,10 +81,10 @@ public class LoaderConstants {
     }
 
     public enum LoaderState {
-        LOAD_FOR_DELIVERY(6),
-        LOAD_FOR_EJECT(4),
-        UNJAM(-4),
-        STOP(0);
+        LOAD_FOR_DELIVERY(6), // V1
+        LOAD_FOR_EJECT(4), // V1
+        UNJAM(-4), // V1
+        STOP(0); // V1
 
         public final double targetVelocityMetersPerSecond;
 

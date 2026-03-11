@@ -25,7 +25,7 @@ public class HoodConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 49.36;
+    private static final double GEAR_RATIO = 49.36; // V1
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
@@ -67,7 +67,7 @@ public class HoodConstants {
 
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(1);
     static final Rotation2d
-            REST_ANGLE = Rotation2d.fromDegrees(87),
+            REST_ANGLE = Rotation2d.fromDegrees(87), // V1
             DELIVERY_ANGLE = Rotation2d.fromDegrees(51),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
     static final double HOOD_RESET_VOLTAGE = 1;
@@ -89,24 +89,24 @@ public class HoodConstants {
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
         config.Feedback.VelocityFilterTimeConstant = 0.1;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 500;
-        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 4.6448;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : -0.083787;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 500; // V1
+        config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1; // V1
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42; // V1
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 4.6448; // V1
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0; // V1
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : -0.083787; // V1
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        config.Slot0.GravityArmPositionOffset = -0.07425999999999999;
-        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+        config.Slot0.GravityArmPositionOffset = -0.07425999999999999; // V1
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign; // V1
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2; // 2.44299674267
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 13; // 15.3028042
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2;  // V1
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 13;  // V1
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = 60;
+        config.CurrentLimits.StatorCurrentLimit = 60; // V1
 
         config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = MAXIMUM_ANGLE.getRotations();

@@ -210,10 +210,10 @@ public class IntakeConstants {
     }
 
     public enum IntakeState {
-        REST(Rotation2d.fromDegrees(90), 0),
-        PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0),
-        INTAKE(Rotation2d.fromDegrees(0), 6),
-        EJECT(Rotation2d.fromDegrees(0), -6);
+        REST(Rotation2d.fromDegrees(90), 0), // V1
+        PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0), // V1
+        INTAKE(Rotation2d.fromDegrees(0), 6), // V1
+        EJECT(Rotation2d.fromDegrees(0), -6); // V1
 
         public final Rotation2d targetAngle;
         public final double targetVoltage;
