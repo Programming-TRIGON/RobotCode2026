@@ -29,11 +29,10 @@ public class SafeAutonomousDriveCommands {
 
     public static Command getSafeDriveToPoseCommand(
             Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible
-    ) {
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
         return new ConditionalCommand(
                 getDriveThroughTrenchCommand(
-                        targetPose.get(),
+                        targetPose,
                         normalPathConstrains,
                         endVelocity,
                         driveSlowlyInAllianceZoneConstraints,
@@ -52,12 +51,8 @@ public class SafeAutonomousDriveCommands {
     }
 
     private static Command getDriveThroughTrenchCommand(
-            FlippablePose2d targetPose,
-            PathConstraints normalPathConstrains,
-            double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints,
-            double driveSlowlyInAllianceZoneTimeSeconds,
-            boolean shouldRotateAsFastAsPossible
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible
     ) {
         return new ConditionalCommand(
                 getDriveThroughTrenchFromAllianceZoneCommand(targetPose, normalPathConstrains, endVelocity, driveSlowlyInAllianceZoneConstraints, driveSlowlyInAllianceZoneTimeSeconds, shouldRotateAsFastAsPossible),
@@ -66,14 +61,18 @@ public class SafeAutonomousDriveCommands {
         ).onlyIf(() -> targetPose != null);
     }
 
-    private static Command getDriveThroughTrenchFromAllianceZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
+    private static Command getDriveThroughTrenchFromAllianceZoneCommand(
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
         return new SequentialCommandGroup(
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity, shouldRotateAsFastAsPossible).withTimeout(driveSlowlyInAllianceZoneTimeSeconds).onlyWhile(FieldConstants::isRobotInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity, shouldRotateAsFastAsPossible)
         ).onlyIf(() -> targetPose != null);
     }
 
-    private static Command getDriveThroughTrenchFromNeutralZoneCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
+    private static Command getDriveThroughTrenchFromNeutralZoneCommand(
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
         return new SequentialCommandGroup(
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS(), shouldRotateAsFastAsPossible).until(FieldConstants::isRobotInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity, shouldRotateAsFastAsPossible).withTimeout(driveSlowlyInAllianceZoneTimeSeconds),
@@ -81,17 +80,15 @@ public class SafeAutonomousDriveCommands {
         ).onlyIf(() -> targetPose != null);
     }
 
-    private static Command getDriveThroughTrenchCommand(FlippablePose2d targetPose, PathConstraints normalPathConstrains, double endVelocity, boolean shouldRotateAsFastAsPossible) {
+    private static Command getDriveThroughTrenchCommand(
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains,
+            double endVelocity, boolean shouldRotateAsFastAsPossible) {
         return SwerveCommands.getFollowPathCommand(() -> getPathThroughTrench(targetPose, normalPathConstrains, endVelocity, shouldRotateAsFastAsPossible)).onlyIf(() -> targetPose != null);
     }
 
     private static Command getDriveSlowlyInAllianceZoneCommand(
-            Supplier<FlippablePose2d> targetPose,
-            PathConstraints normalPathConstrains,
-            double endVelocity,
-            PathConstraints driveSlowlyInAllianceZoneConstraints,
-            double driveSlowlyInAllianceZoneTime
-    ) {
+            Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
+            PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTime) {
         if (driveSlowlyInAllianceZoneTime == 0)
             return SwerveCommands.getDriveToPoseCommand(targetPose, normalPathConstrains, endVelocity);
 
@@ -102,7 +99,9 @@ public class SafeAutonomousDriveCommands {
         );
     }
 
-    private static PathPlannerPath getPathThroughTrench(FlippablePose2d targetPose, PathConstraints pathConstraints, double endVelocity, boolean shouldRotateAsFastAsPossible) {
+    private static PathPlannerPath getPathThroughTrench(
+            Supplier<FlippablePose2d>  targetPose, PathConstraints pathConstraints,
+            double endVelocity, boolean shouldRotateAsFastAsPossible) {
         if (targetPose == null)
             return new PathPlannerPath(
                     PathPlannerPath.waypointsFromPoses(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose()),
@@ -112,15 +111,15 @@ public class SafeAutonomousDriveCommands {
             );
 
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getPredictedRobotPose(0.07);
-        final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose).get();
-        final Pose2d trenchExitPose = getTrenchExitPose(targetPose).get();
+        final Pose2d trenchEntryPose = getTrenchEntryPose(targetPose.get()).get();
+        final Pose2d trenchExitPose = getTrenchExitPose(targetPose.get()).get();
         final List<Waypoint> waypoints = getWaypointsThroughTrench(
                 currentRobotPose,
                 trenchEntryPose,
                 trenchExitPose,
-                targetPose.get()
+                targetPose.get().get()
         );
-        final List<RotationTarget> rotationTargets = getRotationTargetsThroughTrench(targetPose, currentRobotPose, waypoints.size(), shouldRotateAsFastAsPossible);
+        final List<RotationTarget> rotationTargets = getRotationTargetsThroughTrench(targetPose.get(), currentRobotPose, waypoints.size(), shouldRotateAsFastAsPossible);
 
         final PathPlannerPath path = new PathPlannerPath(
                 waypoints,
@@ -130,7 +129,7 @@ public class SafeAutonomousDriveCommands {
                 List.of(),
                 pathConstraints,
                 new IdealStartingState(RobotContainer.SWERVE.getSelfRelativeVelocity().getNorm(), currentRobotPose.getRotation()),
-                new GoalEndState(endVelocity, targetPose.get().getRotation()),
+                new GoalEndState(endVelocity, targetPose.get().get().getRotation()),
                 false
         );
 

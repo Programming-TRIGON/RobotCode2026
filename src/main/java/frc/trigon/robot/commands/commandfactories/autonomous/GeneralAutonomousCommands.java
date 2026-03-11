@@ -157,7 +157,7 @@ public class GeneralAutonomousCommands {
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> targetPose,
                         AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS,
-                        3,
+                        0,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0,
                         true
