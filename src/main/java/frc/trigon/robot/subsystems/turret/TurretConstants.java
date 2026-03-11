@@ -80,17 +80,17 @@ public class TurretConstants {
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d TURRET_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
-            new Translation3d(-0.1454, 0.1454, 0.28423),
-            new Rotation3d(0, 0, 0)
+            new Translation3d(-0.1454, 0.1454, 0.28423), // V1
+            new Rotation3d(0, 0, 0) // V1
     );
     static final Transform3d
             TURRET_TO_RIGHT_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.14853, -0.06965, 0.2511),
-            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30))
+            new Translation3d(0.14853, -0.06965, 0.2511), // V1
+            new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(-30)) // V1
     ),
             TURRET_TO_LEFT_CAMERA_TRANSFORM = new Transform3d(
-                    new Translation3d(0.14853, 0.06965, 0.2511),
-                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30))
+                    new Translation3d(0.14853, 0.06965, 0.2511), // V1
+                    new Rotation3d(Math.toRadians(180), Math.toRadians(-36), Math.toRadians(30)) // V1
             );
 
     static {

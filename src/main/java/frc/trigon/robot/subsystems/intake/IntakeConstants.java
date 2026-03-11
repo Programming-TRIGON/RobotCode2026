@@ -101,12 +101,12 @@ public class IntakeConstants {
     static final Rotation2d ANGLE_MOTOR_TOLERANCE = Rotation2d.fromDegrees(2);
     static final double INTAKE_ANGLE_HISTORY_SIZE_SECONDS = 2;
     static final Pose3d INTAKE_ORIGIN_POINT_FOR_CAMERA_CALCULATION = new Pose3d(
-            new Translation3d(0.16425, 0, 0.135),
-            new Rotation3d(0, 0, 0)
+            new Translation3d(0.16425, 0, 0.135), // V1
+            new Rotation3d(0, 0, 0) // V1
     );
     static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.33205, -0.27225, 0.199934),
-            new Rotation3d(0, Math.toRadians(13), Math.toRadians(19.8))
+            new Translation3d(0.33205, -0.27225, 0.199934), // V1
+            new Rotation3d(0, Math.toRadians(13), Math.toRadians(19.8)) // V1
     );
 
     static {
