@@ -24,7 +24,8 @@ public class AutonomousGenerator {
             SECOND_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SecondAutonomousChooser", new SendableChooser<>()),
             THIRD_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("ThirdAutonomousChooser", new SendableChooser<>()),
             FOURTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FourthAutonomousChooser", new SendableChooser<>()),
-            FIFTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FifthAutonomousChooser", new SendableChooser<>());
+            FIFTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FifthAutonomousChooser", new SendableChooser<>()),
+            SIXTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SixthAutonomousChooser", new SendableChooser<>());
     public static final LoggedDashboardChooser<AutonomousClimbPosition> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("AutonomousClimbChooser", new SendableChooser<>());
     public static final LoggedNetworkBoolean IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("IsClimbHighestPriority", true);
 
@@ -34,6 +35,7 @@ public class AutonomousGenerator {
         configureAutonomousChooser(THIRD_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FOURTH_AUTONOMOUS_CHOOSER);
         configureAutonomousChooser(FIFTH_AUTONOMOUS_CHOOSER);
+        configureAutonomousChooser(SIXTH_AUTONOMOUS_CHOOSER);
         configureClimbPositionChooser();
     }
 
@@ -51,7 +53,8 @@ public class AutonomousGenerator {
                 getCommandFromState(1),
                 getCommandFromState(2),
                 getCommandFromState(3),
-                getCommandFromState(4)
+                getCommandFromState(4),
+                getCommandFromState(5)
         );
     }
 
@@ -80,6 +83,7 @@ public class AutonomousGenerator {
             case 2 -> THIRD_AUTONOMOUS_CHOOSER.get();
             case 3 -> FOURTH_AUTONOMOUS_CHOOSER.get();
             case 4 -> FIFTH_AUTONOMOUS_CHOOSER.get();
+            case 5 -> SIXTH_AUTONOMOUS_CHOOSER.get();
             default -> null;
         };
     }
