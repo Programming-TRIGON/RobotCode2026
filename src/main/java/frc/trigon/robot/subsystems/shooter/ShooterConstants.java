@@ -26,17 +26,20 @@ public class ShooterConstants {
             FOLLOWER_MOTOR = new TalonFXMotor(FOLLOWER_MOTOR_ID, FOLLOWER_MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
+    private static final double
+            LOWER_WHEEL_GEAR_RATIO = 1.61,
+            UPPER_WHEEL_GEAR_RATIO = 0.47495;
     public static final double
-            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 1.61) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
-            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / 0.47495) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
-    public static final double GEAR_RATIO = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
+            LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / LOWER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / UPPER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+    public static final double SYSTEM_ROTATIONS_PER_METER = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 100;
 
     private static final int MOTOR_AMOUNT = 2;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX60Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.002;
-    static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, GEAR_RATIO, MOMENT_OF_INERTIA);
+    static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(GEARBOX, SYSTEM_ROTATIONS_PER_METER, MOMENT_OF_INERTIA);
 
     static final SysIdRoutine.Config SYS_ID_CONFIG = new SysIdRoutine.Config(
             Units.Volts.of(1).per(Units.Second),
@@ -82,7 +85,7 @@ public class ShooterConstants {
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 15 : 16.9743263;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 300 : 340.96721;
 
-        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = SYSTEM_ROTATIONS_PER_METER;
         config.Feedback.VelocityFilterTimeConstant = 0.03;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;

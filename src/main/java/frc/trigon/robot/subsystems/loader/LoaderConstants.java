@@ -19,14 +19,17 @@ public class LoaderConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 1 / ((1 / 0.96) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
+
+    private static final double
+            GEAR_RATIO = 0.96,
+            ROTATIONS_PER_METER = 1 / ((1 / GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
     private static final double MOMENT_OF_INERTIA = 0.003;
     static final SimpleMotorSimulation SIMULATION = new SimpleMotorSimulation(
             GEARBOX,
-            GEAR_RATIO,
+            ROTATIONS_PER_METER,
             MOMENT_OF_INERTIA
     );
 
@@ -55,7 +58,7 @@ public class LoaderConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = ROTATIONS_PER_METER;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
