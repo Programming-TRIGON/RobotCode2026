@@ -39,6 +39,7 @@ public class IntakeConstants {
 
     private static final double
             ANGLE_MOTOR_GEAR_RATIO = (3.0) * (4.0) * (30.0 / 12.0),
+            ANGLE_ENCODER_GEAR_RATIO = (3.0) * (4.0) * (30.0 / 24.0) * (30.0 / 24.0),
             INTAKE_MOTOR_GEAR_RATIO = 2.25;
     static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
@@ -122,7 +123,8 @@ public class IntakeConstants {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        config.Feedback.RotorToSensorRatio = ANGLE_MOTOR_GEAR_RATIO;
+        config.Feedback.RotorToSensorRatio = ANGLE_ENCODER_GEAR_RATIO;
+        config.Feedback.SensorToMechanismRatio = ANGLE_MOTOR_GEAR_RATIO / ANGLE_ENCODER_GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
 
@@ -199,7 +201,7 @@ public class IntakeConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0.318115234375;
+        config.MagnetSensor.MagnetOffset = -0.304931640625;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);

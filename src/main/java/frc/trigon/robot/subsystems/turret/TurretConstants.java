@@ -152,9 +152,9 @@ public class TurretConstants {
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 250);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_POSITION, 250);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_VELOCITY, 250);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_POSITION, 100);
+        MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_VELOCITY, 100);
         MASTER_MOTOR.registerThreadedSignal(TalonFXSignal.POSITION, 250);
     }
 
@@ -183,7 +183,7 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0.403564453125;
+        config.MagnetSensor.MagnetOffset = -0.036865234375;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.2;
 
         ENCODER.applyConfiguration(config);
