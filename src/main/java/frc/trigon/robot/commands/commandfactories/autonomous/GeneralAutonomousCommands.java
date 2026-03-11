@@ -42,7 +42,7 @@ public class GeneralAutonomousCommands {
                 new ConditionalCommand(
                         getDriveToFuelCommand(true).withTimeout(collectionTimeout.get()),
                         getDriveToFuelInNeutralZoneCommand(
-                                previousState == null,
+                                AutonomousGenerator.SHOULD_SHOOT_PRELOAD.getAsBoolean() && previousState == null,
                                 collectionTimeout.get(),
                                 previousState == null,
                                 getIntakingPoseInNeutralZone(previousState),
@@ -60,7 +60,7 @@ public class GeneralAutonomousCommands {
                 new ConditionalCommand(
                         getDriveToFuelCommand(false).withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(
-                                previousState == null,
+                                AutonomousGenerator.SHOULD_SHOOT_PRELOAD.getAsBoolean() && previousState == null,
                                 collectionTimeout,
                                 previousState == null,
                                 getIntakingPoseInNeutralZone(previousState),

@@ -27,7 +27,9 @@ public class AutonomousGenerator {
             FIFTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("FifthAutonomousChooser", new SendableChooser<>()),
             SIXTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SixthAutonomousChooser", new SendableChooser<>());
     public static final LoggedDashboardChooser<AutonomousClimbPosition> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("AutonomousClimbChooser", new SendableChooser<>());
-    public static final LoggedNetworkBoolean IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("IsClimbHighestPriority", true);
+    public static final LoggedNetworkBoolean
+            IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("IsClimbHighestPriority", true),
+            SHOULD_SHOOT_PRELOAD = new LoggedNetworkBoolean("ShouldShootPreload", true);
 
     public static void init() {
         configureAutonomousChooser(FIRST_AUTONOMOUS_CHOOSER);
