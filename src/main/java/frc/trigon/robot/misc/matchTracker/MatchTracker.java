@@ -32,7 +32,7 @@ public final class MatchTracker {
         if (getTimeUntilAllianceShiftSeconds(matchTimeSeconds) <= MatchTrackerConstants.MINIMUM_FUEL_DETECTION_DELAY + MatchTrackerConstants.FUEL_FLIGHT_TIME_SECONDS)
             return true;
 
-        if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) + MatchTrackerConstants.MAXIMUM_FUEL_DETECTION_DELAY + MatchTrackerConstants.FUEL_FLIGHT_TIME_SECONDS - MatchTrackerConstants.HUB_DEACTIVATION_TIME_SECONDS <= 0)
+        if (getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) - MatchTrackerConstants.MAXIMUM_FUEL_DETECTION_DELAY - MatchTrackerConstants.FUEL_FLIGHT_TIME_SECONDS + MatchTrackerConstants.HUB_DEACTIVATION_TIME_SECONDS <= 0)
             return true;
 
         return false;
