@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.poseestimation.robotposeestimator.StandardDeviations;
@@ -21,7 +20,11 @@ public class AprilTagCamera {
     private final DynamicCameraTransform dynamicCameraTransform;
     private final StandardDeviations standardDeviations;
     private final AprilTagCameraIO aprilTagCameraIO;
-    private Pose2d estimatedRobotPose = new Pose2d();
+    private Pose2d
+            previousEstimatedRobotPose = null,
+            estimatedRobotPose = new Pose2d();
+    private double previousResultTimestampSeconds = 0;
+    private StandardDeviations currentStandardDeviations = null;
 
     /**
      * Constructs a new AprilTagCamera with a static camera transform.
@@ -63,6 +66,8 @@ public class AprilTagCamera {
         Logger.processInputs("Cameras/" + name, inputs);
 
         estimatedRobotPose = calculateRobotPose();
+        if (hasValidResult())
+            currentStandardDeviations = calculateStandardDeviations(estimatedRobotPose);
         logCameraInfo();
     }
 
@@ -95,20 +100,40 @@ public class AprilTagCamera {
         return hasValidResult() && inputs.distancesFromTags[0] < AprilTagCameraConstants.MAXIMUM_DISTANCE_FROM_TAG_FOR_ACCURATE_SOLVE_PNP_RESULT_METERS;
     }
 
-    /**
-     * Calculates the range of how inaccurate the estimated pose could be using the distance from the target, the number of targets, and a calibrated gain.
-     *
-     * @return the standard deviations of the current estimated pose
-     */
-    public StandardDeviations calculateStandardDeviations() {
+    public StandardDeviations getCurrentStandardDeviations() {
+        return currentStandardDeviations;
+    }
+
+    private StandardDeviations calculateStandardDeviations(Pose2d estimatedRobotPose) {
         final double averageDistanceFromTags = calculateAverageDistanceFromTags();
-        final double translationStandardDeviation = calculateStandardDeviation(standardDeviations.translationStandardDeviation(), averageDistanceFromTags, inputs.visibleTagIDs.length);
-        final double thetaStandardDeviation = calculateStandardDeviation(standardDeviations.thetaStandardDeviation(), averageDistanceFromTags, inputs.visibleTagIDs.length);
+        double translationStandardDeviation = calculateStandardDeviation(standardDeviations.translationStandardDeviation(), averageDistanceFromTags, inputs.visibleTagIDs.length);
+        double thetaStandardDeviation = calculateStandardDeviation(standardDeviations.thetaStandardDeviation(), averageDistanceFromTags, inputs.visibleTagIDs.length);
+        final double tooFarTranslationStandardDeviation = isUpdateTooFarFetched(estimatedRobotPose) ? Double.POSITIVE_INFINITY : 0;
+
+        translationStandardDeviation += tooFarTranslationStandardDeviation;
+        thetaStandardDeviation += tooFarTranslationStandardDeviation;
 
         Logger.recordOutput("StandardDeviations/" + name + "/translations", translationStandardDeviation);
         Logger.recordOutput("StandardDeviations/" + name + "/theta", thetaStandardDeviation);
 
         return new StandardDeviations(translationStandardDeviation, thetaStandardDeviation);
+    }
+
+    private boolean isUpdateTooFarFetched(Pose2d estimatedRobotPose) {
+        final Pose2d previousEstimatedRobotPose = this.previousEstimatedRobotPose;
+        final double previousResultTimestampSeconds = this.previousResultTimestampSeconds;
+        if (hasValidResult())
+            updatePreviousResultInfo();
+
+        if (inputs.latestResultTimestampSeconds - previousResultTimestampSeconds > 3 || previousEstimatedRobotPose == null)
+            return false;
+
+        return previousEstimatedRobotPose.getTranslation().getDistance(estimatedRobotPose.getTranslation()) > 3 && estimatedRobotPose.getTranslation().getDistance(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation()) > 2;
+    }
+
+    private void updatePreviousResultInfo() {
+        previousResultTimestampSeconds = inputs.latestResultTimestampSeconds;
+        previousEstimatedRobotPose = estimatedRobotPose;
     }
 
     private Pose2d calculateRobotPose() {
@@ -130,7 +155,7 @@ public class AprilTagCamera {
 
         if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose))
             return bestPose;
-        if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1 || DriverStation.isDisabled())
+        if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1)
             return bestPose;
 
         final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose, getLatestResultTimestampSeconds());
@@ -156,7 +181,7 @@ public class AprilTagCamera {
      * @return the standard deviation
      */
     private double calculateStandardDeviation(double exponent, double distance, int numberOfVisibleTags) {
-        return exponent * (distance * distance) / numberOfVisibleTags;
+        return exponent * (distance * distance) / (numberOfVisibleTags * numberOfVisibleTags);
     }
 
     private void logCameraInfo() {

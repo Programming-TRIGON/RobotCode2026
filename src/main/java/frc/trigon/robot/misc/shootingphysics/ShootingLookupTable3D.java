@@ -1,5 +1,7 @@
 package frc.trigon.robot.misc.shootingphysics;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import java.io.*;
 
 /**
@@ -61,14 +63,31 @@ public class ShootingLookupTable3D {
         return isLoaded && velocityData != null && velocityData.length > 0;
     }
 
+    public static final LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 1.15);
+    private static final LoggedNetworkNumber velInterceptConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityInterceptConstant", 0);
+    private static final LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0);
+
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
         validateLoaded();
-        return interpolate(velocityData, distance, radialVelocity, Math.abs(tangentialVelocity));
+        return calcActualVel(interpolate(velocityData, distance, radialVelocity, Math.abs(tangentialVelocity)));
+    }
+
+    private static double calcActualVel(double velWanted) {
+        return (velSlopeConst.get() * velWanted) + velInterceptConst.get();
     }
 
     public static double calculatePitch(final double distance, final double radialVelocity, final double tangentialVelocity) {
         validateLoaded();
-        return interpolate(pitchData, distance, radialVelocity, Math.abs(tangentialVelocity));
+        return calcActualPit(interpolate(pitchData, distance, radialVelocity, Math.abs(tangentialVelocity)));
+    }
+
+    private static double calcActualPit(double pitWanted) {
+//        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
+//        final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
+//        Logger.recordOutput("Shooting/VelocityDifference", velDifference);
+//        Logger.recordOutput("Shooting/AngleAdditionDegrees", Math.toDegrees(Math.toRadians(pitConst.get()) * velDifference));
+//        return (Math.toRadians(pitConst.get()) * velDifference) + pitWanted;
+        return Math.toRadians(pitConst.get()) + pitWanted;
     }
 
     public static double calculateYaw(final double distance, final double radialVelocity, final double tangentialVelocity) {

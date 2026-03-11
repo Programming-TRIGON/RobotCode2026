@@ -18,12 +18,12 @@ import frc.trigon.robot.subsystems.swerve.SwerveConstants;
  */
 public class ShootingSafeDriveCommand extends SequentialCommandGroup {
     private static final double
-            TRANSLATION_SLEW_RATE = 2,
-            MAXIMUM_DRIVE_POWER_TOWARDS_HUB = 3 / SwerveConstants.MAXIMUM_SPEED_METERS_PER_SECOND;
+            TRANSLATION_SLEW_RATE = 1.5,
+            MAXIMUM_DRIVE_POWER_TOWARDS_HUB = 2.5 / SwerveConstants.MAXIMUM_SPEED_METERS_PER_SECOND;
     private static final SlewRateLimiter
             X_SLEW_RATE_LIMITER = new SlewRateLimiter(TRANSLATION_SLEW_RATE),
             Y_SLEW_RATE_LIMITER = new SlewRateLimiter(TRANSLATION_SLEW_RATE),
-            ROTATION_SLEW_RATE_LIMITER = new SlewRateLimiter(1);
+            ROTATION_SLEW_RATE_LIMITER = new SlewRateLimiter(0.9);
 
     public ShootingSafeDriveCommand() {
         addCommands(

@@ -7,7 +7,7 @@ package frc.trigon.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
@@ -89,7 +89,7 @@ public class RobotContainer {
         SHOOTER.setDefaultCommand(ShooterCommands.getStopCommand());
         SPINDEXER.setDefaultCommand(SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP));
         TURRET.setDefaultCommand(TurretCommands.getAlignToClosestAprilTagCommand());
-        CLIMBER.setDefaultCommand(ClimbCommands.getClimberDefaultCommand());
+//        CLIMBER.setDefaultCommand(ClimbCommands.getClimberDefaultCommand());
     }
 
     private void bindControllerCommands() {
@@ -115,10 +115,15 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
-
         OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
-        OperatorConstants.UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER.onTrue(new InstantCommand(OperatorConstants::updateAutoShootClause).ignoringDisable(true));
+        OperatorConstants.UNJAM_TRIGGER.whileTrue(ShootingCommands.getUnjamCommand());
+
+        OperatorConstants.RESET_HOOD_TRIGGER.whileTrue(HoodCommands.getResetHoodCommand());
+        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand().alongWith(LoaderCommands.getDebuggingCommand(), SpindexerCommands.getDebuggingCommand(), IntakeCommands.getDebuggingCommand(), HoodCommands.getDebuggingCommand()));
+//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(ShooterCommands.getDebuggingCommand());
+//        OperatorConstants.DEBUGGING_TRIGGER.whileTrue(CommandConstants.WHEEL_RADIUS_CHARACTERIZATION_COMMAND);
+        OperatorConstants.UPDATE_AUTO_SHOOT_CLAUSE_TRIGGER.whileTrue(new RunCommand(OperatorConstants::updateAutoShootClause).ignoringDisable(true));
     }
 
     private void configureSysIDBindings(MotorSubsystem subsystem) {

@@ -17,7 +17,7 @@ import frc.trigon.lib.utilities.mechanisms.ElevatorMechanism2d;
 
 public class ClimberConstants {
     private static final int MOTOR_ID = 19;
-    private static final String MOTOR_NAME = "ClimberMasterMotor";
+    private static final String MOTOR_NAME = "ClimberMotor";
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     private static final double GEAR_RATIO = 28;

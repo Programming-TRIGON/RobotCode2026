@@ -34,7 +34,7 @@ public class CommandConstants {
             INDICATE_ALLIANCE_SHIFT_RUMBLE_POWER = 0.5;
 
     public static final Command //General Commands
-            RESET_HEADING_COMMAND = new InstantCommand(RobotContainer.ROBOT_POSE_ESTIMATOR::resetHeading),
+            RESET_HEADING_COMMAND = new InstantCommand(RobotContainer.ROBOT_POSE_ESTIMATOR::resetHeading).ignoringDisable(true),
             INDICATE_CAMERAS_DISCONNECTED_COMMAND = new InstantCommand(() -> OperatorConstants.DRIVER_CONTROLLER.rumble(
                     INDICATE_CAMERAS_DISCONNECTED_RUMBLE_DURATION_SECONDS,
                     INDICATE_CAMERAS_DISCONNECTED_RUMBLE_POWER

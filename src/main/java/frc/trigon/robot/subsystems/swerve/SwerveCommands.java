@@ -168,7 +168,8 @@ public class SwerveCommands {
     private static Command getFollowPathCommand(PathPlannerPath path) {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
-                AutoBuilder.followPath(path)
+                AutoBuilder.followPath(path),
+                getPIDToPoseCommand(new FlippablePose2d(path.getPathPoses().get(path.getPathPoses().size() - 1).getTranslation(), path.getGoalEndState().rotation().getRadians(), false)).onlyIf(() -> path.getGoalEndState().velocityMPS() < 1e-3)
         );
     }
 
@@ -176,8 +177,7 @@ public class SwerveCommands {
         return new FunctionalCommand(
                 RobotContainer.SWERVE::resetRotationController,
                 () -> RobotContainer.SWERVE.pidToPose(targetPose),
-                (interrupted) -> {
-                },
+                (interrupted) -> RobotContainer.SWERVE.stop(),
                 () -> RobotContainer.SWERVE.atPose(targetPose)
         );
     }

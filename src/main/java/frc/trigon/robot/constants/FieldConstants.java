@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
@@ -18,8 +19,8 @@ import java.util.List;
 
 public class FieldConstants {
     public static final double
-            FIELD_WIDTH_METERS = FlippingUtil.fieldSizeY,
-            FIELD_LENGTH_METERS = FlippingUtil.fieldSizeX;
+            FIELD_WIDTH_METERS = 8.069326,
+            FIELD_LENGTH_METERS = 16.540988;
 
     private static final List<Integer> I_HATE_YOU = List.of(
             1, 6, 7, 12, 13, 14, 15, 16, 17, 22, 23, 28, 29, 30, 31, 32
@@ -29,20 +30,20 @@ public class FieldConstants {
     private static final Transform3d TAG_OFFSET = new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
     public static final HashMap<Integer, Pose3d> TAG_ID_TO_POSE = fieldLayoutToTagIDToPoseMap();
 
-    public static final double LEFT_TRENCH_Y_POSITION_METERS = 7.4;
-    private static final double
+    public static final double
             CLIMB_X = 1.57,
             LEFT_CLIMB_Y = 4.25,
             RIGHT_CLIMB_Y = 3.28,
             DEPOT_X = 0.45,
             DEPOT_Y = 7.0,
-            INTAKE_X = 7.4,
-            INTAKE_Y = 7.3,
-            IDEAL_SHOOTING_X = 2.7,
-            IDEAL_SHOOTING_Y = 5.8,
-            TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.9,
-            TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.53,
-            TRENCH_ENTRY_Y = 7.4,
+            INTAKE_X = 7.5,
+            INTAKE_Y = FIELD_WIDTH_METERS / 2,
+            FIRST_INTAKE_Y = 6.8,
+            IDEAL_SHOOTING_X = 4.3,
+            IDEAL_SHOOTING_Y = 7.48,
+            TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.4,
+            TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.58,
+            TRENCH_ENTRY_Y = 7.48,
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
 
@@ -51,10 +52,10 @@ public class FieldConstants {
             RIGHT_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, RIGHT_CLIMB_Y, Rotation2d.kZero, true),
             CENTER_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, LEFT_CLIMB_Y, Rotation2d.kZero, true),
             DEPOT_POSITION = new FlippablePose2d(DEPOT_X, DEPOT_Y, Rotation2d.fromDegrees(-90), true),
-            LEFT_INTAKE_POSITION = new FlippablePose2d(INTAKE_X, INTAKE_Y, Rotation2d.fromDegrees(-90), true),
+            LEFT_INTAKE_POSITION = new FlippablePose2d(INTAKE_X, INTAKE_Y, Rotation2d.fromDegrees(-80), true),
             RIGHT_INTAKE_POSITION = mirror(LEFT_INTAKE_POSITION),
-            LEFT_START_INTAKING_FOR_DELIVERY_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2.0, INTAKE_Y, Rotation2d.fromDegrees(-100), true),
-            RIGHT_START_INTAKING_FOR_DELIVERY_POSITION = mirror(LEFT_START_INTAKING_FOR_DELIVERY_POSITION),
+            LEFT_FIRST_INTAKE_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2.0, FIRST_INTAKE_Y, Rotation2d.fromDegrees(-100), true),
+            RIGHT_FIRST_INTAKE_POSITION = mirror(LEFT_FIRST_INTAKE_POSITION),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(IDEAL_SHOOTING_X, IDEAL_SHOOTING_Y, Rotation2d.kZero, true),
             RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),
             LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE = new FlippablePose2d(TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
@@ -62,22 +63,28 @@ public class FieldConstants {
             LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = new FlippablePose2d(TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X, TRENCH_ENTRY_Y, Rotation2d.kZero, true),
             RIGHT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE = mirror(LEFT_TRENCH_ENTRY_POSITION_FROM_NEUTRAL_ZONE);
     public static final FlippableTranslation2d
-            HUB_POSITION = new FlippableTranslation2d(4.7, FIELD_WIDTH_METERS / 2, true),
+            HUB_POSITION = new FlippableTranslation2d(TAG_ID_TO_POSE.get(26).getX() + (Units.inchesToMeters(47) / 2), FIELD_WIDTH_METERS / 2, true),
             RIGHT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) - DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true),
             LEFT_DELIVERY_POSITION = new FlippableTranslation2d(BLUE_RELATIVE_DELIVERY_POSITION_X, (FIELD_WIDTH_METERS / 2) + DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS, true);
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
-            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 1,
+            DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.93,
             TRENCH_ZONE_MINIMUM_X = 4.4,
             TRENCH_ZONE_MAXIMUM_X = 4.9,
-            LEFT_TRENCH_MIN_Y = 7.2,
+            LEFT_TRENCH_MIN_Y = 6.9,
             RIGHT_TRENCH_MAX_Y = FIELD_WIDTH_METERS - LEFT_TRENCH_MIN_Y;
-    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.2;
+    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.23;
+
+    static {
+        Logger.recordOutput("IMPORTANT/HUB_POSE_BLUE", HUB_POSITION.getBlueObject());
+        Logger.recordOutput("IMPORTANT/HUB_POSE_RED", FlippingUtil.flipFieldPosition(HUB_POSITION.getBlueObject()));
+        Logger.recordOutput("IMPORTANT/TAG_Y", TAG_ID_TO_POSE.get(26).getY());
+    }
 
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
             return SHOULD_USE_HOME_TAG_LAYOUT ?
-                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "field_calibration.json") :
+                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "2026-frc-welded-home3.json") :
                     AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -1,13 +1,12 @@
 package frc.trigon.robot.misc.objectdetection;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.objectdetection.objectdetectioncamera.ObjectDetectionCamera;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
+import frc.trigon.robot.subsystems.MotorSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.ArrayList;
@@ -48,7 +47,8 @@ public class ObjectPoseEstimator extends SubsystemBase {
     public void periodic() {
         updateTrackedObjectsPositions();
         removeOldObjects();
-        Logger.recordOutput("ObjectPoseEstimator/knownObjectPositions", getObjectsOnField().toArray(Translation2d[]::new));
+        if (MotorSubsystem.isExtensiveLoggingEnabled())
+            Logger.recordOutput("ObjectPoseEstimator/knownObjectPositions", getObjectsOnField().stream().map((object) -> new Pose3d(new Translation3d(object.getX(), object.getY(), SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters), new Rotation3d())).toArray(Pose3d[]::new));
     }
 
     /**

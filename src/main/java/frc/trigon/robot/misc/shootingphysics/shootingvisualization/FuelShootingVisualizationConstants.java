@@ -1,11 +1,10 @@
 package frc.trigon.robot.misc.shootingphysics.shootingvisualization;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 import frc.trigon.robot.subsystems.shooter.ShooterConstants;
 
 public class FuelShootingVisualizationConstants {
-    static final double G_FORCE = 9.81;
+    static final double G_FORCE = 9.794;
     static final double
             TOP_TRACTION_COEFFICIENT = ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER / ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER,
             BOTTOM_TRACTION_COEFFICIENT = 1;
@@ -15,11 +14,10 @@ public class FuelShootingVisualizationConstants {
             GAME_PIECE_AREA = Math.PI * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS,
             MOMENT_OF_INERTIA = 2.0 / 5.0 * GAME_PIECE_MASS_KG * GAME_PIECE_RADIUS_METERS * GAME_PIECE_RADIUS_METERS;
     static final double
-            AIR_DENSITY = 1.205,
-            DRAG_COEFFICIENT = 0.5,
-            MAGNUS_LIFT_FACTOR = 0.6,
+            AIR_DENSITY = 1.225,
+            DRAG_COEFFICIENT = 0.55,
+            MAGNUS_LIFT_FACTOR = 0.25,
             SPIN_DECAY_COEFFICIENT = 0.01;
-    static final Translation3d MAGNUS_SPIN_AXIS = new Translation3d(0, 1, 0);
 
     static final double SIMULATION_TIME_STEP_SECONDS = 0.001;
     static final double END_SIMULATION_HEIGHT_METERS = SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters;
