@@ -38,8 +38,8 @@ public class IntakeConstants {
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     private static final double
-            ANGLE_MOTOR_GEAR_RATIO = 62.5,
-            INTAKE_MOTOR_GEAR_RATIO = 2.6;
+            ANGLE_MOTOR_GEAR_RATIO = (3.0) * (4.0) * (30.0 / 12.0),
+            INTAKE_MOTOR_GEAR_RATIO = 2.25;
     static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
     private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 30;

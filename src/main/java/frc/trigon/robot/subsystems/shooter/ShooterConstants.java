@@ -27,8 +27,8 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double
-            LOWER_WHEEL_GEAR_RATIO = 1.61,
-            UPPER_WHEEL_GEAR_RATIO = 0.47495;
+            LOWER_WHEEL_GEAR_RATIO = (28.0 / 20.0),
+            UPPER_WHEEL_GEAR_RATIO = (28.0 / 20.0) * (24.0 / 54.0) * (18.0 / 27.0);
     public static final double
             LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / LOWER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
             UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / UPPER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));

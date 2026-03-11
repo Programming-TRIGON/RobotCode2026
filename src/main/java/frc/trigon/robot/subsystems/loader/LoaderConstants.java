@@ -21,7 +21,7 @@ public class LoaderConstants {
     static final boolean FOC_ENABLED = true;
 
     private static final double
-            GEAR_RATIO = 0.96,
+            GEAR_RATIO = 1,
             ROTATIONS_PER_METER = 1 / ((1 / GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
 
     private static final int MOTOR_AMOUNT = 1;

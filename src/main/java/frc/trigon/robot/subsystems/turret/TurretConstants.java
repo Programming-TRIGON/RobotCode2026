@@ -34,8 +34,8 @@ public class TurretConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double
-            GEAR_RATIO = (5) * (30 / 20.0) * (34 / 32.0) * (9),
-            ENCODER_GEAR_RATIO = 112.20977533;
+            GEAR_RATIO = (5) * (30.0 / 20.0) * (90.0 / 10.0),
+            ENCODER_GEAR_RATIO = (5) * (30.0 / 20.0) * (42.0 / 18.0) * (42.0 / 18.0) * (47.0 / 18.0);
     private static final double CURRENT_LIMIT_AMPS = 55;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
