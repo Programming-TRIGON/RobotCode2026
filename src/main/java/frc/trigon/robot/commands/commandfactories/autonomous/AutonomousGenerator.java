@@ -112,7 +112,7 @@ public class AutonomousGenerator {
             if (nextStates[i] != null)
                 return getExpectedEndPose(nextStates, i).get();
 
-        return (SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION).getTranslation().get();
+        return (SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_FIRST_INTAKE_POSITION : FieldConstants.LEFT_FIRST_INTAKE_POSITION).getTranslation().get();
     }
 
     private static Flippable<Translation2d> getExpectedEndPose(AutonomousState[] states, int validIndex) {

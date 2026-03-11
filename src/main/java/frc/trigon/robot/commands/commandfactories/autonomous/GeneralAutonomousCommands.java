@@ -43,8 +43,8 @@ public class GeneralAutonomousCommands {
                         getDriveToFuelInNeutralZoneCommand(
                                 previousState == null,
                                 collectionTimeout.get(),
-                                true,
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_START_INTAKING_FOR_DELIVERY_POSITION : FieldConstants.LEFT_START_INTAKING_FOR_DELIVERY_POSITION,
+                                previousState == null,
+                                getIntakingPoseInNeutralZone(previousState),
                                 true
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
@@ -61,8 +61,8 @@ public class GeneralAutonomousCommands {
                         getDriveToFuelInNeutralZoneCommand(
                                 previousState == null,
                                 collectionTimeout,
-                                false,
-                                SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION,
+                                previousState == null,
+                                getIntakingPoseInNeutralZone(previousState),
                                 false
                         ),
                         () -> previousState != null && !previousState.isInAllianceZone
@@ -150,10 +150,6 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static boolean isAngleCloserTo180(Rotation2d angle) {
-        return Math.abs(angle.getDegrees()) > 90;
-    }
-
     private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
@@ -186,6 +182,12 @@ public class GeneralAutonomousCommands {
         );
     }
 
+    private static FlippablePose2d getIntakingPoseInNeutralZone(AutonomousGenerator.AutonomousState previousState) {
+        if (previousState == null)
+            return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_FIRST_INTAKE_POSITION : FieldConstants.LEFT_FIRST_INTAKE_POSITION;
+        return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION;
+    }
+
     private static boolean isInTrench() {
         final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
         return currentRobotPose.getX() < FieldConstants.TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X;
@@ -214,8 +216,6 @@ public class GeneralAutonomousCommands {
     static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
         if (nextState == null && AutonomousGenerator.shouldClimb())
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
-//        if (nextState != null && !nextState.isInAllianceZone)
-//            return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE : FieldConstants.LEFT_TRENCH_ENTRY_POSITION_FROM_ALLIANCE_ZONE;
         if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
             return FieldConstants.DEPOT_POSITION;
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
