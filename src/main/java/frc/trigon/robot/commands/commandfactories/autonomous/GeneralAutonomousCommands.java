@@ -27,6 +27,7 @@ import frc.trigon.robot.subsystems.shooter.ShooterCommands;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import java.io.IOException;
 import java.util.function.BooleanSupplier;
@@ -73,6 +74,7 @@ public class GeneralAutonomousCommands {
 
     public static Command getScoreCommand(AutonomousGenerator.AutonomousState nextState, double timeout) {
         return new ParallelDeadlineGroup(
+                GeneralCommands.runWhen(new WaitCommand(timeout), FieldConstants::isRobotInAllianceZone),
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> getScoringPose(nextState),
                         AutonomousConstants.DRIVE_IN_AUTONOMOUS_CONSTRAINTS,
@@ -80,7 +82,7 @@ public class GeneralAutonomousCommands {
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1000,
                         false
-                ).andThen(new WaitCommand(timeout)),
+                ).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/TargetScoringPose", getScoringPose(nextState).get()))),
                 getShootAtHubWhileDrivingCommand()
         ).withTimeout(timeout + AutonomousConstants.NORMAL_DRIVE_TIMEOUT);
     }
