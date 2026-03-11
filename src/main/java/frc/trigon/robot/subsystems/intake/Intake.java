@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.trigon.lib.hardware.phoenix6.Phoenix6SignalThread;
 import frc.trigon.lib.hardware.phoenix6.cancoder.CANcoderEncoder;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
@@ -43,10 +44,10 @@ public class Intake extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
-//        IntakeConstants.ANGLE_MECHANISM.update(
-//                getCurrentArmAngle(),
-//                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
-//        );
+        IntakeConstants.ANGLE_MECHANISM.update(
+                getCurrentArmAngle(),
+                Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE))
+        );
         IntakeConstants.INTAKE_MOTOR_MECHANISM.update(
                 getCurrentIntakeVoltage()
         );
@@ -56,7 +57,7 @@ public class Intake extends MotorSubsystem {
 
     @Override
     public void sysIDDrive(double targetVoltage) {
-//        angleMotor.setControl(voltageRequest.withOutput(targetVoltage));
+        angleMotor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     @Override
@@ -66,20 +67,20 @@ public class Intake extends MotorSubsystem {
 
     @Override
     public void setBrake(boolean brake) {
-//        angleMotor.setBrake(brake);
+        angleMotor.setBrake(brake);
     }
 
     @Override
     public void updatePeriodically() {
         masterIntakeMotor.update();
         followerIntakeMotor.update();
-//        angleEncoder.update();
+        angleEncoder.update();
         Logger.recordOutput("Intake/CurrentPositionDegrees", getCurrentArmAngle().getDegrees());
     }
 
     @Override
     public void stop() {
-//        angleMotor.stopMotor();
+        angleMotor.stopMotor();
         masterIntakeMotor.stopMotor();
         IntakeConstants.INTAKE_MOTOR_MECHANISM.setTargetVelocity(0);
     }
@@ -89,17 +90,15 @@ public class Intake extends MotorSubsystem {
     }
 
     public void updateLatestThreadedPositions() { // TODO: This function and logic are ugly. Find a better way to do this, perhaps in the Phoenix6SignalThread class itself.
-//        angleMotor.update();
-//        latestThreadedAngles = angleMotor.getThreadedSignal(TalonFXSignal.POSITION);
+        angleMotor.update();
+        latestThreadedAngles = angleMotor.getThreadedSignal(TalonFXSignal.POSITION);
     }
 
     public void updateCameraTransforms() {
         intakeCameraTransformCalculator.update(
-                new double[]{0},
-//                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
-                new double[]{0},
-                0
-//                angleMotor.getSignal(TalonFXSignal.VELOCITY)
+                latestThreadedAngles,
+                Phoenix6SignalThread.getInstance().getLatestTimestamps(),
+                angleMotor.getSignal(TalonFXSignal.VELOCITY)
         );
     }
 
@@ -128,7 +127,7 @@ public class Intake extends MotorSubsystem {
     }
 
     private void setTargetAngle(Rotation2d targetAngle) {
-//        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
+        angleMotor.setControl(positionRequest.withPosition(targetAngle.getRotations()));
     }
 
     private void setTargetIntakeVoltage(double targetVoltage) {
@@ -149,7 +148,6 @@ public class Intake extends MotorSubsystem {
     }
 
     private Rotation2d getCurrentArmAngle() {
-        return new Rotation2d();
-//        return Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.POSITION));
+        return Rotation2d.fromRotations(angleMotor.getSignal(TalonFXSignal.POSITION));
     }
 }

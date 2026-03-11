@@ -13,6 +13,7 @@ import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
+import frc.trigon.robot.misc.shootingphysics.ShootingLookupTable3D;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePiece;
 import frc.trigon.robot.misc.simulatedfield.SimulatedGamePieceConstants;
 
@@ -78,7 +79,7 @@ public class VisualizeFuelShootingCommand extends Command {
     }
 
     private Translation3d calculateShootingVelocityVector() {
-        final double fuelExitSpeedMetersPerSecond = RobotContainer.SHOOTER.getCurrentVelocityMetersPerSecond();
+        final double fuelExitSpeedMetersPerSecond = RobotContainer.SHOOTER.getCurrentVelocityMetersPerSecond() / ShootingLookupTable3D.velSlopeConst.get();
         final Rotation2d fuelExitPitch = RobotContainer.HOOD.getCurrentAngle();
         final Rotation2d turretFieldRelativeAngle = RobotContainer.TURRET.getCurrentFieldRelativeAngle();
         return new Translation3d(fuelExitSpeedMetersPerSecond, new Rotation3d(0, -fuelExitPitch.getRadians(), turretFieldRelativeAngle.getRadians()));
