@@ -11,7 +11,7 @@ public class SpindexerCommands {
         return new NetworkTablesCommand(
                 SpindexerCommands::getSetTargetVelocityCommand,
                 false,
-                "Debugging/SpindexerTargetVelocitMetersPerSecond"
+                "Debugging/SpindexerTargetVelocityMetersPerSecond"
         );
     }
 

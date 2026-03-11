@@ -2,7 +2,6 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
@@ -180,7 +179,7 @@ public class GeneralAutonomousCommands {
                         SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
                         new ChassisSpeeds()
                 ),
-                () -> !GeneralAutonomousCommands.isInTrench()
+                () -> !GeneralAutonomousCommands.isAfterTrenchX()
         );
     }
 
@@ -190,7 +189,7 @@ public class GeneralAutonomousCommands {
         return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION : FieldConstants.LEFT_INTAKE_POSITION;
     }
 
-    private static boolean isInTrench() {
+    private static boolean isAfterTrenchX() {
         final Pose2d currentRobotPose = new FlippablePose2d(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose(), true).get();
         return currentRobotPose.getX() < FieldConstants.TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X;
     }
