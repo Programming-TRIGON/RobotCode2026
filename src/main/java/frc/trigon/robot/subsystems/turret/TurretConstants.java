@@ -35,7 +35,8 @@ public class TurretConstants {
     static final boolean FOC_ENABLED = true;
     private static final double
             GEAR_RATIO = (5) * (30.0 / 20.0) * (90.0 / 10.0),
-            ENCODER_GEAR_RATIO = (5) * (30.0 / 20.0) * (42.0 / 18.0) * (42.0 / 18.0) * (47.0 / 18.0);
+    //                ENCODER_GEAR_RATIO = (5) * (30.0 / 20.0) * (42.0 / 18.0) * (42.0 / 18.0) * (46.0 / 18.0);
+    ENCODER_GEAR_RATIO = GEAR_RATIO / (0.629);
     private static final double CURRENT_LIMIT_AMPS = 55;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
     static final double RESIST_SWERVE_ROTATION_FEEDFORWARD_GAIN = RobotHardwareStats.isSimulation() ? 0 : 0;
@@ -71,11 +72,11 @@ public class TurretConstants {
             MINIMUM_ANGLE = Rotation2d.fromDegrees(-380);
     static final Rotation2d
             NORMAL_TOLERANCE = Rotation2d.fromDegrees(3),
-            WIDE_TOLERANCE = Rotation2d.fromDegrees(15);
+            WIDE_TOLERANCE = Rotation2d.fromDegrees(8);
     static final double ROBOT_VELOCITY_TO_FUTURE_ANGLE_SECONDS = 0.2;
     static final double RESIST_Y_MOVEMENT_FOR_DELIVERY_COEFFICIENT = 10;
     static final Rotation2d SELF_RELATIVE_EJECTION_ANGLE = Rotation2d.fromDegrees(0);
-    static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.1;
+    static final double ROBOT_ROTATION_PREDICTION_TIME_SECONDS = 0.07;
     static final double SLOW_SCAN_FOR_APRILTAGS_VOLTAGE = 1.5;
 
     static final double TURRET_ANGLE_HISTORY_SIZE_SECONDS = 2;
@@ -106,7 +107,7 @@ public class TurretConstants {
         config.Audio.BeepOnConfig = false;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.RotorToSensorRatio = ENCODER_GEAR_RATIO;
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO / ENCODER_GEAR_RATIO;
@@ -117,12 +118,12 @@ public class TurretConstants {
 //        config.ClosedLoopGeneral.GainSchedKpBehavior = GainSchedKpBehaviorValue.Discontinuous;
 //        config.ClosedLoopGeneral.GainSchedErrorThreshold = 0;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 70;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 270 : 40;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.5;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.2;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 8.0362;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0;
+        config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0.6 : 0.7;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.01 : 0.32959;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 7.5 : 7.4036;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.0005 : 0; //0.25538
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
         config.Slot0.GainSchedBehavior = GainSchedBehaviorValue.Inactive;
 
@@ -134,8 +135,8 @@ public class TurretConstants {
 //        config.Slot1.kA = 0;
 //        config.Slot1.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 1.49270441;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 4 : 10;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 1.4 : 1.5; // 1.62083311
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 4 : 40;
         config.MotionMagic.MotionMagicJerk = RobotHardwareStats.isSimulation() ? 0 : config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -149,8 +150,8 @@ public class TurretConstants {
         MASTER_MOTOR.applyConfiguration(config);
         MASTER_MOTOR.setPhysicsSimulation(SIMULATION);
 
+        MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 50);
         MASTER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        MASTER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
         MASTER_MOTOR.registerSignal(TalonFXSignal.ROTOR_POSITION, 100);
@@ -165,15 +166,15 @@ public class TurretConstants {
         config.Audio.BeepOnConfig = false;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = CURRENT_LIMIT_AMPS;
 
         FOLLOWER_MOTOR.applyConfiguration(config);
 
+        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 50);
         FOLLOWER_MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        FOLLOWER_MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
 
         final Follower followRequest = new Follower(MASTER_MOTOR.getID(), FOLLOWER_ALIGNMENT_TO_MASTER);
         FOLLOWER_MOTOR.setControl(followRequest);
@@ -183,7 +184,7 @@ public class TurretConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -0.036865234375;
+        config.MagnetSensor.MagnetOffset = 0.440185546875;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.2;
 
         ENCODER.applyConfiguration(config);

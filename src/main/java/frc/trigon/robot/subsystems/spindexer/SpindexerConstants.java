@@ -70,12 +70,12 @@ public class SpindexerConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.10229;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 1.7821 * (5 / 9.0);
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.049243;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.078898;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0.97865;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.021767;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 6.73362886 / (5 / 9.0);
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 243.689458 / (5 / 9.0);
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 12.2617891994;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 551.293242;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 80;
@@ -86,11 +86,11 @@ public class SpindexerConstants {
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);
 
-        MOTOR.registerSignal(TalonFXSSignal.POSITION, 100);
-        MOTOR.registerSignal(TalonFXSSignal.VELOCITY, 100);
-        MOTOR.registerSignal(TalonFXSSignal.MOTOR_VOLTAGE, 100);
-        MOTOR.registerSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE, 100);
-        MOTOR.registerSignal(TalonFXSSignal.STATOR_CURRENT, 100);
+        MOTOR.registerSignal(TalonFXSSignal.POSITION, 50);
+        MOTOR.registerSignal(TalonFXSSignal.VELOCITY, 50);
+        MOTOR.registerSignal(TalonFXSSignal.MOTOR_VOLTAGE, 50);
+        MOTOR.registerSignal(TalonFXSSignal.CLOSED_LOOP_REFERENCE, 50);
+        MOTOR.registerSignal(TalonFXSSignal.STATOR_CURRENT, 50);
     }
 
     public enum SpindexerState {

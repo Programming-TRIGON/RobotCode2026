@@ -20,5 +20,6 @@ public class GamePieceAutoDriveConstants {
 
     public static final double ROBOT_HALF_WIDTH = 0.37;  // half-side of the robot square
     public static final double INTAKE_REACH = 0.4;  // how far the intake extends past the body
-    public static final double ALLIANCE_WALL_X_METERS = 0.0;  // field X coordinate of the alliance wall
+    public static final double ALLIANCE_WALL_X_METERS = 0.0;  // field X coordinate of the alliance wall TODO: THIS ASSUMES THE ALLIANCE IS BLUE?
+    public static final double Y_WALL_PERPENDICULAR_TOLERANCE_METERS = 0.35;
 }

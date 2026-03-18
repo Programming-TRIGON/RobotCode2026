@@ -168,6 +168,10 @@ public class RobotPoseEstimator implements AutoCloseable {
         return getEstimatedRobotPose().exp(robotVelocityTwist);
     }
 
+    public void setFuelPosesOnFieldWidget(Pose2d... poses) {
+        field.getObject("Fuel").setPoses(poses);
+    }
+
     private void initializeFieldWidget() {
         putAprilTagsOnFieldWidget();
         SmartDashboard.putData("Field", field);

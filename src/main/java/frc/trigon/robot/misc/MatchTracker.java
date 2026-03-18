@@ -13,7 +13,7 @@ public final class MatchTracker {
     private static final LoggedNetworkBoolean
             OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false),
             DID_WE_WIN_AUTONOMOUS = new LoggedNetworkBoolean("MatchTracker/DidWeWinAutonomous", false);
-    private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 5;
+    private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 8;
     private static String LAST_GAME_MESSAGE = "";
 
     static {

@@ -35,7 +35,7 @@ public class FieldConstants {
             LEFT_CLIMB_Y = 4.25,
             RIGHT_CLIMB_Y = 3.28,
             DEPOT_X = 0.45,
-            DEPOT_Y = 7.0,
+            DEPOT_Y = 4,
             INTAKE_X = 7.5,
             INTAKE_Y = FIELD_WIDTH_METERS / 2,
             FIRST_INTAKE_Y = 6.8,
@@ -43,7 +43,7 @@ public class FieldConstants {
             IDEAL_SHOOTING_Y = 7.48,
             TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.4,
             TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.58,
-            TRENCH_ENTRY_Y = 7.48,
+            TRENCH_ENTRY_Y = 7.4,
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
 
@@ -69,11 +69,11 @@ public class FieldConstants {
     public static final double
             ALLIANCE_ZONE_LENGTH = 4.5,
             DELIVERY_ZONE_START_BLUE_X = ALLIANCE_ZONE_LENGTH + 0.93,
-            TRENCH_ZONE_MINIMUM_X = 4.4,
-            TRENCH_ZONE_MAXIMUM_X = 4.9,
+            TRENCH_ZONE_MINIMUM_X = 4.35,
+            TRENCH_ZONE_MAXIMUM_X = 4.95,
             LEFT_TRENCH_MIN_Y = 6.9,
             RIGHT_TRENCH_MAX_Y = FIELD_WIDTH_METERS - LEFT_TRENCH_MIN_Y;
-    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.23;
+    private static final double TRENCH_POSE_PREDICTION_TIME_SECONDS = 0.26;
 
     static {
         Logger.recordOutput("IMPORTANT/HUB_POSE_BLUE", HUB_POSITION.getBlueObject());
@@ -84,7 +84,7 @@ public class FieldConstants {
     private static AprilTagFieldLayout createAprilTagFieldLayout() {
         try {
             return SHOULD_USE_HOME_TAG_LAYOUT ?
-                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "2026-frc-welded-home3.json") :
+                    new AprilTagFieldLayout(FilesHandler.DEPLOY_PATH + "2026-frc-welded-home.json") :
                     AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
         } catch (IOException e) {
             throw new RuntimeException(e);

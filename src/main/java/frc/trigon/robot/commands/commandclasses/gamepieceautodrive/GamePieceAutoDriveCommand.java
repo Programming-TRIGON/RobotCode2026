@@ -76,7 +76,8 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
             // orientation during brief vision gaps instead of spinning freely.
             return;
 
-        FlippableRotation2d target = new FlippableRotation2d(cluster.getApproachHeading(), false);
+        FlippableRotation2d target = new FlippableRotation2d(
+                snapToYWallPerpendicular(cluster.getApproachHeading(), cluster.getCentroid()), false);
 
         if (!slowIntake || !isWithinIntakeDistance()) {
             commandedHeading.set(target);
@@ -100,6 +101,28 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
         FlippableRotation2d result = new FlippableRotation2d(Rotation2d.fromDegrees(prev.get().getDegrees() + deltaDeg), false);
         commandedHeading.set(result);
         lastValidHeading = result;
+    }
+
+    /**
+     * When the target game piece is within {@link GamePieceAutoDriveConstants#Y_WALL_PERPENDICULAR_TOLERANCE_METERS}
+     * of the top (y = {@link FieldConstants#FIELD_WIDTH_METERS}) or bottom (y = 0) wall,
+     * the approach heading is snapped to 0° or 180° (whichever is closer) so the
+     * robot drives perpendicular to that wall and avoids scraping it with a corner.
+     * The snap is applied before rate-limiting so that slowIntake mode still
+     * transitions smoothly into the perpendicular heading.
+     */
+    private Rotation2d snapToYWallPerpendicular(Rotation2d heading, Translation2d targetPos) {
+        double tol = GamePieceAutoDriveConstants.Y_WALL_PERPENDICULAR_TOLERANCE_METERS;
+        boolean nearWall = targetPos.getY() < tol
+                || targetPos.getY() > FieldConstants.FIELD_WIDTH_METERS - tol;
+        if (!nearWall)
+            return heading;
+
+        // 0° or 180° — whichever requires the smaller rotation from the raw heading.
+        double deg = Math.IEEEremainder(heading.getDegrees(), 360.0);
+        return Math.abs(deg) <= 90.0
+                ? Rotation2d.fromDegrees(0)
+                : Rotation2d.fromDegrees(180);
     }
 
     /**
@@ -201,7 +224,6 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
      * lock it in the unsafe position.
      */
     private boolean shouldDrive() {
-        // FIX: Check if we actually have a valid cluster in the reference
         if (currentTargetCluster.get() == null)
             return false;
 
@@ -253,16 +275,16 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
     }
 
     /**
-     * Cluster centroid clamped in X so the robot is safe at ANY heading.
+     * Cluster centroid clamped in X so the robot is safe at ANY heading,
+     * and clamped in Y so the robot centre never clips either side wall.
      * <p>
-     * Uses the worst-case heading (0° = intake pointing directly at the wall,
-     * because the intake is at the back).  This is the global maximum of minX
-     * across all headings, so it guarantees safety regardless of what heading
-     * the robot passes through while rotating.  Only pieces near the wall are
-     * affected; pieces further out are unclamped.
+     * X clamp uses the worst-case heading (0° = intake pointing directly at
+     * the alliance wall) which is the global maximum of minX across all
+     * headings, guaranteeing safety regardless of what heading the robot
+     * passes through while rotating.
      * <p>
-     * If the robot has overshot (is closer than the clamped target), the
-     * target is behind it and the PID drives it back automatically.
+     * Y clamp keeps the robot centre at least ROBOT_HALF_WIDTH from y = 0
+     * and y = FIELD_WIDTH_METERS at all times.
      */
     private Translation2d getEffectiveTarget() {
         GamePieceCluster cluster = currentTargetCluster.get();
@@ -270,11 +292,17 @@ public class GamePieceAutoDriveCommand extends ParallelCommandGroup {
             return null;
 
         Translation2d target = cluster.getCentroid();
-        // Worst case heading for intake-at-back is 0° (intake straight at wall).
-        double minX = getMinSafeRobotX(Rotation2d.fromDegrees(0));
 
+        // X clamp — worst-case heading (0°, intake straight at alliance wall).
+        double minX = getMinSafeRobotX(Rotation2d.fromDegrees(0));
         if (target.getX() < minX)
             target = new Translation2d(minX, target.getY());
+
+        // Y clamp — robot centre must stay at least ROBOT_HALF_WIDTH from each side wall.
+        double minY = GamePieceAutoDriveConstants.ROBOT_HALF_WIDTH;
+        double maxY = FieldConstants.FIELD_WIDTH_METERS - GamePieceAutoDriveConstants.ROBOT_HALF_WIDTH;
+        target = new Translation2d(target.getX(), Math.max(minY, Math.min(maxY, target.getY())));
+
         return target;
     }
 

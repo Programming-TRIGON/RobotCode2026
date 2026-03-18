@@ -78,7 +78,7 @@ public class RobotContainer {
     private void configureBindings() {
         bindDefaultCommands();
         bindControllerCommands();
-//        configureSysIDBindings(SWERVE);
+//        configureSysIDBindings(SHOOTER);
     }
 
     private void bindDefaultCommands() {
@@ -97,8 +97,8 @@ public class RobotContainer {
         OperatorConstants.DRIVE_FROM_DPAD_TRIGGER.whileTrue(CommandConstants.SELF_RELATIVE_DRIVE_FROM_DPAD_COMMAND);
         OperatorConstants.TOGGLE_BRAKE_TRIGGER.onTrue(GeneralCommands.getToggleBrakeCommand());
         OperatorConstants.RESET_TURRET_VISION_TRIGGER.whileTrue(GeneralCommands.getResetTurretCamerasCommand());
-        OperatorConstants.TRENCH_ASSIST_TRIGGER.whileTrue(new TrenchAssistCommand());
         OperatorConstants.SHOOTING_SAFE_DRIVE_TRIGGER.whileTrue(new ShootingSafeDriveCommand());
+        OperatorConstants.TRENCH_ASSIST_TRIGGER.whileTrue(new TrenchAssistCommand());
         OperatorConstants.CAMERAS_DISCONNECTED_TRIGGER.onTrue(CommandConstants.INDICATE_CAMERAS_DISCONNECTED_COMMAND);
         OperatorConstants.INDICATE_ALLIANCE_SHIFT_TRIGGER.onTrue(CommandConstants.INDICATE_ALLIANCE_SHIFT_COMMAND);
 

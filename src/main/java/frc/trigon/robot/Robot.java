@@ -6,8 +6,6 @@
 package frc.trigon.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,11 +26,6 @@ public class Robot extends LoggedRobot {
     private final CommandScheduler commandScheduler = CommandScheduler.getInstance();
     private Command autonomousCommand;
     private final RobotContainer robotContainer;
-    private final StringPublisher driverStationStatePublisher =
-            NetworkTableInstance.getDefault()
-                    .getTable("DSBridge")
-                    .getStringTopic("matchState")
-                    .publish();
 
     Robot() {
         RobotConstants.init();
@@ -51,8 +44,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-        driverStationStatePublisher.set("auto");
-
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null)
@@ -61,8 +52,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        driverStationStatePublisher.set("teleop");
-
         if (autonomousCommand != null)
             autonomousCommand.cancel();
     }
@@ -76,11 +65,6 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         SimulationFieldHandler.update();
 //        AprilTagCameraConstants.VISION_SIMULATION.update(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedOdometryPose());
-    }
-
-    @Override
-    public void disabledInit() {
-        driverStationStatePublisher.set("disabled");
     }
 
     @Override
@@ -114,5 +98,7 @@ public class Robot extends LoggedRobot {
 
         Logger.start();
         SignalLogger.enableAutoLogging(false);
+//        SignalLogger.setPath("/media/sda1/");
+//        SignalLogger.start();
     }
 }

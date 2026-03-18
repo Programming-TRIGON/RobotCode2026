@@ -60,13 +60,13 @@ public class SwerveConstants {
     private static final PIDConstants
             TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
             new PIDConstants(5, 0, 0) :
-            new PIDConstants(7.4, 0, 0),
+            new PIDConstants(5, 0, 0),
             PROFILED_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(4, 0, 0) :
                     new PIDConstants(6, 0, 0.1);
     private static final double
             MAXIMUM_PROFILED_ROTATION_VELOCITY = RobotHardwareStats.isSimulation() ? 720 : Units.radiansToDegrees(MAXIMUM_ROTATIONAL_SPEED_RADIANS_PER_SECOND),
-            MAXIMUM_PROFILED_ROTATION_ACCELERATION = RobotHardwareStats.isSimulation() ? 720 : 900;
+            MAXIMUM_PROFILED_ROTATION_ACCELERATION = RobotHardwareStats.isSimulation() ? 720 : 1200;
     private static final TrapezoidProfile.Constraints PROFILED_ROTATION_CONSTRAINTS = new TrapezoidProfile.Constraints(
             MAXIMUM_PROFILED_ROTATION_VELOCITY,
             MAXIMUM_PROFILED_ROTATION_ACCELERATION
@@ -92,7 +92,7 @@ public class SwerveConstants {
     private static final double
             ROTATION_PID_TOLERANCE_DEGREES = 1,
             TRANSLATION_PID_TOLERANCE_METERS = 0.02;
-    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.05;
+    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0;
 
     static {
         configureGyro();

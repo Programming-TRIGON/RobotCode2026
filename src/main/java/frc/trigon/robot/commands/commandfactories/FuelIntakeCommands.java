@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.trigon.robot.commands.commandclasses.IntakeAssistCommand;
+import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
@@ -21,7 +22,7 @@ public class FuelIntakeCommands {
     public static Command getIntakeCommand() {
         return new ParallelCommandGroup(
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.INTAKE),
-                getIntakeAssistCommand().onlyWhile(SHOULD_ASSIST_INTAKE).repeatedly()
+                getIntakeAssistCommand().onlyWhile(() -> SHOULD_ASSIST_INTAKE.getAsBoolean() && !OperatorConstants.TRENCH_ASSIST_TRIGGER.getAsBoolean())
         );
     }
 

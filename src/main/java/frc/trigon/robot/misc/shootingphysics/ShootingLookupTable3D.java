@@ -14,7 +14,7 @@ import java.io.*;
 public class ShootingLookupTable3D {
     private static final int BUFFER_SIZE = 65536;
     private static final int BYTES_PER_DOUBLE = 8;
-    private static final int BYTES_PER_MEGABYTE = 1024 * 1024;
+    private static final double BYTES_PER_MEGABYTE = 1024 * 1024;
     private static final double SYMMETRY_THRESHOLD = 0.0;
 
     private static int distanceDivisions;
@@ -63,7 +63,7 @@ public class ShootingLookupTable3D {
         return isLoaded && velocityData != null && velocityData.length > 0;
     }
 
-    public static final LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 1.15);
+    public static final LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 1.42);
     private static final LoggedNetworkNumber velInterceptConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityInterceptConstant", 0);
     private static final LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0);
 
@@ -82,7 +82,7 @@ public class ShootingLookupTable3D {
     }
 
     private static double calcActualPit(double pitWanted) {
-//        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.GEAR_RATIO;
+//        final double rotorVel = RobotContainer.SHOOTER.getTargetVelocityMetersPerSecond() * ShooterConstants.SYSTEM_ROTATIONS_PER_METER;
 //        final double velDifference = rotorVel * (ShooterConstants.LOWER_WHEEL_ROTATIONS_PER_METER - ShooterConstants.UPPER_WHEEL_ROTATIONS_PER_METER);
 //        Logger.recordOutput("Shooting/VelocityDifference", velDifference);
 //        Logger.recordOutput("Shooting/AngleAdditionDegrees", Math.toDegrees(Math.toRadians(pitConst.get()) * velDifference));
@@ -275,7 +275,7 @@ public class ShootingLookupTable3D {
         if (!verbose) return;
 
         final long elapsedMs = System.currentTimeMillis() - startTime;
-        final int memoryMB = calculateTotalElements() * 3 * BYTES_PER_DOUBLE / BYTES_PER_MEGABYTE;
+        final double memoryMB = calculateTotalElements() * 3.0 * BYTES_PER_DOUBLE / BYTES_PER_MEGABYTE;
 
         System.out.println("[SUCCESS] ShootingLookupTable3D loaded in " + elapsedMs + "ms");
         System.out.println("  Memory: " + memoryMB + " MB");

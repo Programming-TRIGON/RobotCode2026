@@ -47,6 +47,8 @@ public class ObjectPoseEstimator extends SubsystemBase {
     public void periodic() {
         updateTrackedObjectsPositions();
         removeOldObjects();
+
+        addObjectsToFieldWidget();
         if (MotorSubsystem.isExtensiveLoggingEnabled())
             Logger.recordOutput("ObjectPoseEstimator/knownObjectPositions", getObjectsOnField().stream().map((object) -> new Pose3d(new Translation3d(object.getX(), object.getY(), SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters), new Rotation3d())).toArray(Pose3d[]::new));
     }
@@ -212,6 +214,17 @@ public class ObjectPoseEstimator extends SubsystemBase {
 
     private void removeOldObjects() {
         objectPositionsToDetectionTimestamp.entrySet().removeIf(entry -> hasObjectExpired(entry.getValue()));
+    }
+
+    private void addObjectsToFieldWidget() {
+        final Pose2d[] objectPoses = new Pose2d[objectPositionsToDetectionTimestamp.size()];
+
+        for (int i = 0; i < objectPositionsToDetectionTimestamp.size(); i++) {
+            final Translation2d objectPosition = (Translation2d) objectPositionsToDetectionTimestamp.keySet().toArray()[i];
+            objectPoses[i] = new Pose2d(objectPosition, new Rotation2d());
+        }
+
+        RobotContainer.ROBOT_POSE_ESTIMATOR.setFuelPosesOnFieldWidget(objectPoses);
     }
 
     private boolean hasObjectExpired(double timestamp) {

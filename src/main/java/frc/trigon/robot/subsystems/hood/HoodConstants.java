@@ -67,7 +67,7 @@ public class HoodConstants {
 
     static final Rotation2d ANGLE_TOLERANCE = Rotation2d.fromDegrees(1);
     static final Rotation2d
-            REST_ANGLE = Rotation2d.fromDegrees(87),
+            REST_ANGLE = Rotation2d.fromDegrees(86),
             DELIVERY_ANGLE = Rotation2d.fromDegrees(51),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
     static final double HOOD_RESET_VOLTAGE = 1;
@@ -87,22 +87,22 @@ public class HoodConstants {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-        config.Feedback.VelocityFilterTimeConstant = 0.1;
+        config.Feedback.VelocityFilterTimeConstant = 0.04;
 
-        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 500;
+        config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 230;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.42;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 4.6448;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : -0.083787;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.3504;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 5.778;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0; // 0.59021
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : 0.048897;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        config.Slot0.GravityArmPositionOffset = -0.07425999999999999;
-        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
+        config.Slot0.GravityArmPositionOffset = 0.24452;
+        config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2; // 2.44299674267
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 13; // 15.3028042
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 20 : 2; // 2.11252729
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 20 : 15; // 20.3317463
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -116,11 +116,11 @@ public class HoodConstants {
         MOTOR.applyConfiguration(config);
         MOTOR.setPhysicsSimulation(SIMULATION);
 
-        MOTOR.registerSignal(TalonFXSignal.POSITION, 100);
-        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 100);
-        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
-        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 100);
-        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 100);
+        MOTOR.registerSignal(TalonFXSignal.POSITION, 50);
+        MOTOR.registerSignal(TalonFXSignal.VELOCITY, 50);
+        MOTOR.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 50);
+        MOTOR.registerSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE, 50);
+        MOTOR.registerSignal(TalonFXSignal.STATOR_CURRENT, 50);
 
         if (!RobotHardwareStats.isSimulation())
             resetHoodPositionIfFirstBoot();

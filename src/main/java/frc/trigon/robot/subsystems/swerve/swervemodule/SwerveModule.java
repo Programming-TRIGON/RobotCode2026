@@ -92,11 +92,11 @@ public class SwerveModule {
     }
 
     public void setTargetDriveVoltage(double targetVoltage) {
-        driveMotor.setControl(driveVoltageRequest.withOutput(targetVoltage));
+//        driveMotor.setControl(driveVoltageRequest.withOutput(targetVoltage));
     }
 
     public void setTargetSteerAngle(Rotation2d angle) {
-        steerMotor.setControl(steerPositionRequest.withPosition(angle.getRotations()));
+//        steerMotor.setControl(steerPositionRequest.withPosition(angle.getRotations()));
     }
 
     public SwerveModuleState getCurrentState() {
@@ -159,13 +159,13 @@ public class SwerveModule {
     }
 
     private void setTargetClosedLoopDriveVelocity(double targetVelocityRotationsPerSecond) {
-        driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocityRotationsPerSecond));
+//        driveMotor.setControl(driveVelocityRequest.withVelocity(targetVelocityRotationsPerSecond));
     }
 
     private void setTargetOpenLoopDriveVelocity(double targetVelocityRotationsPerSecond) {
         final double targetDrivePower = targetVelocityRotationsPerSecond / metersToDriveWheelRotations(SwerveConstants.MAXIMUM_SPEED_METERS_PER_SECOND);
         final double targetDriveVoltage = Conversions.compensatedPowerToVoltage(targetDrivePower, SwerveModuleConstants.VOLTAGE_COMPENSATION_SATURATION);
-        driveMotor.setControl(driveVoltageRequest.withOutput(targetDriveVoltage));
+//        driveMotor.setControl(driveVoltageRequest.withOutput(targetDriveVoltage));
     }
 
     private Rotation2d getCurrentSteerAngle() {
@@ -202,9 +202,9 @@ public class SwerveModule {
         driveMotor.applyConfiguration(SwerveModuleConstants.generateDriveMotorConfiguration());
         driveMotor.setPhysicsSimulation(SwerveModuleConstants.createDriveMotorSimulation());
 
+        driveMotor.registerSignal(TalonFXSignal.TORQUE_CURRENT, 50);
+        driveMotor.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 50);
         driveMotor.registerSignal(TalonFXSignal.VELOCITY, 100);
-        driveMotor.registerSignal(TalonFXSignal.TORQUE_CURRENT, 100);
-        driveMotor.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         driveMotor.registerThreadedSignal(TalonFXSignal.POSITION, RobotPoseEstimatorConstants.ODOMETRY_FREQUENCY_HERTZ);
     }
 
@@ -212,9 +212,9 @@ public class SwerveModule {
         steerMotor.applyConfiguration(SwerveModuleConstants.generateSteerMotorConfiguration(steerMotor.getID()));
         steerMotor.setPhysicsSimulation(SwerveModuleConstants.createSteerMotorSimulation());
 
+        steerMotor.registerSignal(TalonFXSignal.TORQUE_CURRENT, 50);
+        steerMotor.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 50);
         steerMotor.registerSignal(TalonFXSignal.VELOCITY, 100);
-        steerMotor.registerSignal(TalonFXSignal.TORQUE_CURRENT, 100);
-        steerMotor.registerSignal(TalonFXSignal.MOTOR_VOLTAGE, 100);
         steerMotor.registerThreadedSignal(TalonFXSignal.POSITION, RobotPoseEstimatorConstants.ODOMETRY_FREQUENCY_HERTZ);
     }
 

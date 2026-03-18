@@ -2,7 +2,6 @@ package frc.trigon.robot.poseestimation.apriltagcamera;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.constants.FieldConstants;
@@ -125,10 +124,10 @@ public class AprilTagCamera {
         if (hasValidResult())
             updatePreviousResultInfo();
 
-        if (inputs.latestResultTimestampSeconds - previousResultTimestampSeconds > 3 || previousEstimatedRobotPose == null)
+        if (inputs.latestResultTimestampSeconds - previousResultTimestampSeconds > 0.5 || previousEstimatedRobotPose == null)
             return false;
 
-        return previousEstimatedRobotPose.getTranslation().getDistance(estimatedRobotPose.getTranslation()) > 3 && estimatedRobotPose.getTranslation().getDistance(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation()) > 2;
+        return previousEstimatedRobotPose.getTranslation().getDistance(estimatedRobotPose.getTranslation()) > 1.5 && estimatedRobotPose.getTranslation().getDistance(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getTranslation()) > 1;
     }
 
     private void updatePreviousResultInfo() {
@@ -152,23 +151,23 @@ public class AprilTagCamera {
 
     private Pose2d chooseBestNormalSolvePNPPose() {
         final Pose2d bestPose = cameraPoseToRobotPose(inputs.bestCameraSolvePNPPose, getLatestResultTimestampSeconds());
-
-        if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose))
-            return bestPose;
-        if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1)
-            return bestPose;
-
-        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose, getLatestResultTimestampSeconds());
-        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(getLatestResultTimestampSeconds()).getRotation();
-
-        final double bestAngleDifference = Math.abs(bestPose.getRotation().minus(robotAngleAtResultTime).getRadians());
-        final double alternateAngleDifference = Math.abs(alternatePose.getRotation().minus(robotAngleAtResultTime).getRadians());
-
-        return bestAngleDifference > alternateAngleDifference ? alternatePose : bestPose;
+        return bestPose;
+//        if (inputs.bestCameraSolvePNPPose.equals(inputs.alternateCameraSolvePNPPose) || DriverStation.isDisabled())
+//            return bestPose;
+//        if (inputs.alternateCameraSolvePNPPose.getTranslation().toTranslation2d().getDistance(FieldConstants.TAG_ID_TO_POSE.get(inputs.visibleTagIDs[0]).getTranslation().toTranslation2d()) < 0.1)
+//            return bestPose;
+//
+//        final Pose2d alternatePose = cameraPoseToRobotPose(inputs.alternateCameraSolvePNPPose, getLatestResultTimestampSeconds());
+//        final Rotation2d robotAngleAtResultTime = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(getLatestResultTimestampSeconds()).getRotation();
+//
+//        final double bestAngleDifference = Math.abs(bestPose.getRotation().minus(robotAngleAtResultTime).getRadians());
+//        final double alternateAngleDifference = Math.abs(alternatePose.getRotation().minus(robotAngleAtResultTime).getRadians());
+//
+//        return bestAngleDifference > alternateAngleDifference ? alternatePose : bestPose;
     }
 
     private Pose2d cameraPoseToRobotPose(Pose3d cameraPose, double resultTimestampSeconds) {
-        return dynamicCameraTransform.calculate2dRobotPose(cameraPose.toPose2d(), resultTimestampSeconds);
+        return dynamicCameraTransform.calculate3dRobotPose(cameraPose, resultTimestampSeconds).toPose2d();
     }
 
     /**

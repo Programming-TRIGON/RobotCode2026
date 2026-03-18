@@ -151,16 +151,16 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldWaitUntilAtPose, FlippablePose2d targetPose, boolean intakeSlowly) {
+    private static Command getDriveToFuelInNeutralZoneCommand(boolean shootPreload, double timeout, boolean shouldIntakeFromMiddle, FlippablePose2d targetPose, boolean intakeSlowly) {
         return new SequentialCommandGroup(
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> targetPose,
                         AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS,
-                        0,
+                        3,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0,
                         true
-                ).until(shouldWaitUntilAtPose ? () -> RobotContainer.SWERVE.atPose(targetPose) : GeneralAutonomousCommands::shouldRobotStartIntaking),
+                ).until(() -> GeneralAutonomousCommands.shouldRobotStartIntaking(shouldIntakeFromMiddle ? AutonomousConstants.FIRST_START_INTAKING_X : AutonomousConstants.GENERAL_START_INTAKING_X)),
                 getDriveToFuelCommand(intakeSlowly).withTimeout(timeout)
         ).withTimeout(AutonomousConstants.NORMAL_DRIVE_TIMEOUT + timeout);
     }
@@ -207,11 +207,11 @@ public class GeneralAutonomousCommands {
         );
     }
 
-    private static boolean shouldRobotStartIntaking() {
+    private static boolean shouldRobotStartIntaking(double startIntakingX) {
         final Pose2d currentRobotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
         if (Flippable.isRedAlliance())
-            return currentRobotPose.getX() < (FieldConstants.FIELD_LENGTH_METERS - AutonomousConstants.START_INTAKING_X);
-        return currentRobotPose.getX() > AutonomousConstants.START_INTAKING_X;
+            return currentRobotPose.getX() < (FieldConstants.FIELD_LENGTH_METERS - startIntakingX);
+        return currentRobotPose.getX() > startIntakingX;
     }
 
     static FlippablePose2d getScoringPose(AutonomousGenerator.AutonomousState nextState) {
