@@ -24,7 +24,7 @@ import java.io.IOException;
  */
 public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
-    public static final double FEEDFORWARD_SCALAR = 0.55;
+    public static final double FEEDFORWARD_SCALAR = 1;
     public static final PathConstraints
             DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2, 2, Units.degreesToRadians(500), Units.degreesToRadians(900)),
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.3, Units.degreesToRadians(100), Units.degreesToRadians(100)),
