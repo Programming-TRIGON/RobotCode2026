@@ -176,7 +176,7 @@ public class GeneralAutonomousCommands {
     private static Command getPrepareForShootingCommand() {
         return getAimWithTargetShootingState(
                 () -> ShootingCalculations.getInstance().calculateTargetShootingState(
-                        SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
+                        AutonomousGenerator.shouldGoToRightSide() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION.get() : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION.get(),
                         new ChassisSpeeds()
                 ),
                 () -> !GeneralAutonomousCommands.isAfterTrenchX()
@@ -219,7 +219,7 @@ public class GeneralAutonomousCommands {
             return AutonomousGenerator.CLIMB_POSITION_CHOOSER.get().climbPose;
         if (nextState == AutonomousGenerator.AutonomousState.COLLECT_FROM_DEPOT)
             return FieldConstants.DEPOT_POSITION;
-        return SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
+        return AutonomousGenerator.shouldGoToRightSide() ? FieldConstants.RIGHT_IDEAL_SHOOTING_POSITION : FieldConstants.LEFT_IDEAL_SHOOTING_POSITION;
     }
 
     /**

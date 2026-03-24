@@ -3,10 +3,7 @@ package frc.trigon.robot.commands.commandfactories.autonomous;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
 import frc.trigon.robot.RobotContainer;
@@ -28,8 +25,10 @@ public class AutonomousGenerator {
             SIXTH_AUTONOMOUS_CHOOSER = new LoggedDashboardChooser<>("SixthAutonomousChooser", new SendableChooser<>());
     public static final LoggedDashboardChooser<AutonomousClimbPosition> CLIMB_POSITION_CHOOSER = new LoggedDashboardChooser<>("AutonomousClimbChooser", new SendableChooser<>());
     public static final LoggedNetworkBoolean
-            IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("IsClimbHighestPriority", true),
-            SHOULD_SHOOT_PRELOAD = new LoggedNetworkBoolean("ShouldShootPreload", true);
+            IS_AUTONOMOUS_CLIMB_HIGHEST_PRIORITY = new LoggedNetworkBoolean("Autonomous/IsClimbHighestPriority", true),
+            SHOULD_SHOOT_PRELOAD = new LoggedNetworkBoolean("Autonomous/ShouldShootPreload", true),
+            SHOULD_STICK_TO_ONE_SIDE = new LoggedNetworkBoolean("Autonomous/ShouldStickToOneSide", false);
+    static boolean HAS_STARTED_ON_RIGHT_SIDE = true;
 
     public static void init() {
         configureAutonomousChooser(FIRST_AUTONOMOUS_CHOOSER);
@@ -43,6 +42,7 @@ public class AutonomousGenerator {
 
     public static Command getAutonomousCommand() {
         return new SequentialCommandGroup(
+                new InstantCommand(() -> HAS_STARTED_ON_RIGHT_SIDE = SafeAutonomousDriveCommands.isRight()),
                 getAutonomousStateSequenceCommand().until(AutonomousGenerator::shouldStartDrivingToClimb),
                 GeneralAutonomousCommands.getClimbCommand(() -> CLIMB_POSITION_CHOOSER.get().climbPose).onlyIf(AutonomousGenerator::shouldClimb),
                 SwerveCommands.getClosedLoopSelfRelativeDriveCommand(() -> 0, () -> 0, () -> 0)
@@ -114,13 +114,13 @@ public class AutonomousGenerator {
             if (nextStates[i] != null)
                 return getExpectedEndPose(nextStates, i).get();
 
-        return (SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_FIRST_INTAKE_POSITION : FieldConstants.LEFT_FIRST_INTAKE_POSITION).getTranslation().get();
+        return (shouldGoToRightSide() ? FieldConstants.RIGHT_FIRST_INTAKE_POSITION : FieldConstants.LEFT_FIRST_INTAKE_POSITION).getTranslation().get();
     }
 
     private static Flippable<Translation2d> getExpectedEndPose(AutonomousState[] states, int validIndex) {
         return switch (states[validIndex]) {
-            case DELIVERY -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION;
-            case COLLECT_FROM_NEUTRAL_ZONE -> SafeAutonomousDriveCommands.isRight() ? FieldConstants.RIGHT_INTAKE_POSITION.getTranslation() : FieldConstants.LEFT_INTAKE_POSITION.getTranslation();
+            case DELIVERY -> shouldGoToRightSide() ? FieldConstants.RIGHT_DELIVERY_POSITION : FieldConstants.LEFT_DELIVERY_POSITION;
+            case COLLECT_FROM_NEUTRAL_ZONE -> shouldGoToRightSide() ? FieldConstants.RIGHT_INTAKE_POSITION.getTranslation() : FieldConstants.LEFT_INTAKE_POSITION.getTranslation();
             case COLLECT_FROM_DEPOT -> FieldConstants.DEPOT_POSITION.getTranslation();
             case SCORE -> GeneralAutonomousCommands.getScoringPose(states.length > validIndex + 1 ? states[validIndex + 1] : null).getTranslation();
         };
@@ -134,6 +134,8 @@ public class AutonomousGenerator {
         Logger.recordOutput("Autonomous/ShouldClimb", shouldClimb());
         Logger.recordOutput("Autonomous/ShouldStartDrivingToClimb", shouldStartDrivingToClimb());
         Logger.recordOutput("Autonomous/IsRight", SafeAutonomousDriveCommands.isRight());
+        Logger.recordOutput("Autonomous/ShouldGoToRightSide", shouldGoToRightSide());
+        Logger.recordOutput("Autonomous/HasStartedOnRightSide", HAS_STARTED_ON_RIGHT_SIDE);
     }
 
     private static boolean shouldStartDrivingToClimb() {
@@ -154,8 +156,12 @@ public class AutonomousGenerator {
         return AutonomousConstants.ESTIMATED_CLIMBING_TIME_SECONDS + estimatedDriveTimeSeconds + AutonomousConstants.CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS;
     }
 
-    public static boolean shouldClimb() {
+    static boolean shouldClimb() {
         return CLIMB_POSITION_CHOOSER.get() != AutonomousClimbPosition.NO_CLIMB;
+    }
+
+    static boolean shouldGoToRightSide() {
+        return SHOULD_STICK_TO_ONE_SIDE.get() ? HAS_STARTED_ON_RIGHT_SIDE : SafeAutonomousDriveCommands.isRight();
     }
 
     private static void configureAutonomousChooser(LoggedDashboardChooser<AutonomousState> chooser) {
