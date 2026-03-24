@@ -74,7 +74,7 @@ public class SafeAutonomousDriveCommands {
             Supplier<FlippablePose2d> targetPose, PathConstraints normalPathConstrains, double endVelocity,
             PathConstraints driveSlowlyInAllianceZoneConstraints, double driveSlowlyInAllianceZoneTimeSeconds, boolean shouldRotateAsFastAsPossible) {
         return new SequentialCommandGroup(
-                getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS(), shouldRotateAsFastAsPossible).until(FieldConstants::isRobotInAllianceZone),
+                getDriveThroughTrenchCommand(targetPose, normalPathConstrains, normalPathConstrains.maxVelocityMPS() / 2, shouldRotateAsFastAsPossible).until(FieldConstants::isRobotInAllianceZone),
                 getDriveThroughTrenchCommand(targetPose, driveSlowlyInAllianceZoneConstraints, endVelocity, shouldRotateAsFastAsPossible).withTimeout(driveSlowlyInAllianceZoneTimeSeconds),
                 getDriveThroughTrenchCommand(targetPose, normalPathConstrains, endVelocity, shouldRotateAsFastAsPossible)
         ).onlyIf(() -> targetPose != null);
