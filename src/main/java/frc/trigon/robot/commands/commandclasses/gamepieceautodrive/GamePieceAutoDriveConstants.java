@@ -4,7 +4,7 @@ import frc.trigon.robot.constants.FieldConstants;
 
 public class GamePieceAutoDriveConstants {
     static final double CLUSTER_RADIUS_METERS = 1.0;
-    static final double MAX_COLLECTION_X_METERS = (FieldConstants.FIELD_LENGTH_METERS / 2.0) + 0.5; // 0.5m buffer beyond mid-field line
+    static final double MAX_COLLECTION_X_METERS = FieldConstants.FIELD_LENGTH_METERS;// (FieldConstants.FIELD_LENGTH_METERS / 2.0) + 0.5; // 0.5m buffer beyond mid-field line
     static final double SCORE_WEIGHT_COUNT = 1;
     static final double SCORE_PENALTY_DISTANCE = 4;
     static final double LINEARITY_THRESHOLD = 6.0;
