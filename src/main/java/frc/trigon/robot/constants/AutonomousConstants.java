@@ -26,10 +26,10 @@ public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 1;
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2, 2, Units.degreesToRadians(500), Units.degreesToRadians(900)),
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(500), Units.degreesToRadians(900)),
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.3, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 1, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(500), Units.degreesToRadians(900));
+            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(3.4, 3.3, Units.degreesToRadians(500), Units.degreesToRadians(900));
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 2,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
