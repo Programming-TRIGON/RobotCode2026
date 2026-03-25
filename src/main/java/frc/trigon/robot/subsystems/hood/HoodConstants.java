@@ -25,7 +25,7 @@ public class HoodConstants {
     static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = (3.0) * (28.0 / 18.0) * (275.0 / 26.0);
+    private static final double GEAR_RATIO = (3.0) * (28.0 / 18.0) * (275.0 / 27.0);
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getKrakenX44Foc(MOTOR_AMOUNT);
@@ -70,7 +70,7 @@ public class HoodConstants {
             REST_ANGLE = Rotation2d.fromDegrees(81),
             DELIVERY_ANGLE = Rotation2d.fromDegrees(51),
             EJECTION_ANGLE = Rotation2d.fromDegrees(75);
-    static final double HOOD_RESET_VOLTAGE = 1;
+    static final double HOOD_RESET_VOLTAGE = 0.8;
     static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(82);
 
     static {

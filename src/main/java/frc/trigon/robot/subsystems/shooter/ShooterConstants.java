@@ -27,11 +27,11 @@ public class ShooterConstants {
 
     static final boolean FOC_ENABLED = true;
     private static final double
-            LOWER_WHEEL_GEAR_RATIO = (28.0 / 20.0),
-            UPPER_WHEEL_GEAR_RATIO = (28.0 / 20.0) * (24.0 / 54.0) * (18.0 / 27.0);
+            LOWER_WHEEL_GEAR_RATIO = (30.0 / 20.0),
+            UPPER_WHEEL_GEAR_RATIO = (30.0 / 20.0) * (30.0 / 54.0);
     public static final double
             LOWER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / LOWER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(4))),
-            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / UPPER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(1)));
+            UPPER_WHEEL_ROTATIONS_PER_METER = 1 / ((1 / UPPER_WHEEL_GEAR_RATIO) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
     public static final double SYSTEM_ROTATIONS_PER_METER = (LOWER_WHEEL_ROTATIONS_PER_METER + UPPER_WHEEL_ROTATIONS_PER_METER) / 2;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
     private static final double STATOR_CURRENT_LIMIT_AMPS = 100;
