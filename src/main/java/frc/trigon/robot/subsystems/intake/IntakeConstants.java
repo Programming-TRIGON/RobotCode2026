@@ -214,7 +214,7 @@ public class IntakeConstants {
     public enum IntakeState {
         REST(Rotation2d.fromDegrees(90), 0),
         PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0),
-        INTAKE(Rotation2d.fromDegrees(0), 9),
+        INTAKE(Rotation2d.fromDegrees(0), 10),
         EJECT(Rotation2d.fromDegrees(0), -6);
 
         public final Rotation2d targetAngle;

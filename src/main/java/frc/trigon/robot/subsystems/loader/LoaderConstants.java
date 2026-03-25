@@ -47,7 +47,7 @@ public class LoaderConstants {
     );
 
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
-    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 0.8;
+    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 1.25;
 
     static {
         final TalonFXConfiguration config = new TalonFXConfiguration();
