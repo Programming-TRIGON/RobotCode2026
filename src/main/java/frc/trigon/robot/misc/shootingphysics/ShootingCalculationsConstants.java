@@ -12,11 +12,11 @@ public class ShootingCalculationsConstants {
             new Rotation3d(0, 0, 0)
     ),
             ROBOT_RELATIVE_HOOD_ORIGIN_AT_ZEROED_TURRET = new Pose3d(
-                    new Translation3d(-0.07279, 0.1454, 0.45624),
+                    new Translation3d(-0.056859, 0.1454, 0.42947),
                     new Rotation3d(0, Math.toRadians(90), 0)
             );
-    private static final double X_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.11808;
-    private static final double Z_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.04101;
+    private static final double X_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.11942;
+    private static final double Z_FUEL_EXIT_DISTANCE_FROM_HOOD_ORIGIN_METERS = 0.03955;
     static final Transform3d
             TURRET_TO_HOOD = ROBOT_RELATIVE_HOOD_ORIGIN_AT_ZEROED_TURRET.minus(ROBOT_RELATIVE_TURRET_ORIGIN),
             HOOD_TO_FUEL_EXIT_POSITION = new Transform3d(
