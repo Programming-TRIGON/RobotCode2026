@@ -2,7 +2,6 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.commands.WaitUntilChangeCommand;
@@ -166,11 +165,11 @@ public class ShootingCommands {
 
     private static boolean isShotHittingTower() {
         final Pose2d turretPose = RobotContainer.TURRET.getCurrentTurretFieldRelativePosition();
-        Logger.recordOutput("Shooting/ShotHittingTower/IsInTowerYRange", (turretPose.getY() < FieldConstants.TOWER_MAXIMUM_Y) && (turretPose.getY() > FieldConstants.TOWER_MINIMUM_Y));
-        Logger.recordOutput("Shooting/ShotHittingTower/IsInTowerXRange", (turretPose.getX() < FieldConstants.TOWER_MAXIMUM_X || turretPose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.TOWER_MAXIMUM_X));
 
         final double minimumY = !Flippable.isRedAlliance() ? FieldConstants.TOWER_MINIMUM_Y : FieldConstants.FIELD_WIDTH_METERS - FieldConstants.TOWER_MAXIMUM_Y;
         final double maximumY = !Flippable.isRedAlliance() ? FieldConstants.TOWER_MAXIMUM_Y : FieldConstants.FIELD_WIDTH_METERS - FieldConstants.TOWER_MINIMUM_Y;
+        Logger.recordOutput("Shooting/IsShotHittingTower/InYRange", turretPose.getY() < maximumY && turretPose.getY() > minimumY);
+        Logger.recordOutput("Shooting/IsShotHittingTower/InXRange", turretPose.getX() < FieldConstants.TOWER_MAXIMUM_X || turretPose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.TOWER_MAXIMUM_X);
         return (turretPose.getY() < maximumY) &&
                 (turretPose.getY() > minimumY) &&
                 (turretPose.getX() < FieldConstants.TOWER_MAXIMUM_X || turretPose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.TOWER_MAXIMUM_X);
