@@ -4,7 +4,7 @@
 
 # RobotCode2026
 
-TRIGON 5990's robot code for the 2026 season robot, "PLACEHOLDER".
+TRIGON 5990's robot code for the 2026 season robot, "TURBO".
 
 # External Programs
 
