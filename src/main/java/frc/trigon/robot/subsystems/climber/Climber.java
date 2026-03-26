@@ -37,12 +37,12 @@ public class Climber extends MotorSubsystem {
 
     @Override
     public void setBrake(boolean brake) {
-        motor.setBrake(brake);
+//        motor.setBrake(brake);
     }
 
     @Override
     public void stop() {
-        motor.stopMotor();
+//        motor.stopMotor();
     }
 
     @Override
@@ -55,22 +55,22 @@ public class Climber extends MotorSubsystem {
 
     @Override
     public void updateMechanism() {
-        ClimberConstants.MECHANISM.update(
-                getPositionRotations(),
-                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
-        );
+//        ClimberConstants.MECHANISM.update(
+//                getPositionRotations(),
+//                motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE)
+//        );
 
         Logger.recordOutput("Poses/Components/ClimberPose", calculateComponentPose());
     }
 
     @Override
     public void updatePeriodically() {
-        motor.update();
+//        motor.update();
     }
 
     @Override
     public void sysIDDrive(double targetVoltage) {
-        motor.setControl(voltageRequest.withOutput(targetVoltage));
+//        motor.setControl(voltageRequest.withOutput(targetVoltage));
     }
 
     public boolean isClimbing() {
@@ -96,12 +96,12 @@ public class Climber extends MotorSubsystem {
     }
 
     void setTargetPositionRotations(double targetPositionRotations, int slot) {
-        motor.setControl(positionRequest.withPosition(targetPositionRotations).withSlot(slot));
+//        motor.setControl(positionRequest.withPosition(targetPositionRotations).withSlot(slot));
     }
 
     void setTargetVoltageToResetVoltage() {
         targetState = ClimberConstants.ClimberState.REST;
-        motor.setControl(voltageRequest.withOutput(ClimberConstants.CLIMBER_RESET_VOLTAGE));
+//        motor.setControl(voltageRequest.withOutput(ClimberConstants.CLIMBER_RESET_VOLTAGE));
     }
 
     private void scalePositionRequestSpeed(double speedScalar) {
@@ -133,7 +133,8 @@ public class Climber extends MotorSubsystem {
     }
 
     private double getPositionRotations() {
-        return motor.getSignal(TalonFXSignal.POSITION);
+        return 0;
+//        return motor.getSignal(TalonFXSignal.POSITION);
     }
 
     private double rotationsToMeters(double positionRotations) {

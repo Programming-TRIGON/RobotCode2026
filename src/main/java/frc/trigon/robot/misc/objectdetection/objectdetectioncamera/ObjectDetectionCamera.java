@@ -68,9 +68,15 @@ public class ObjectDetectionCamera extends SubsystemBase {
     public Translation2d[] getObjectPositionsOnField(SimulatedGamePieceConstants.GamePieceType targetGamePiece) {
         final Rotation3d[] visibleObjectRotations = getObjectsRotations(targetGamePiece);
         final Translation2d[] objectPositionsOnField = new Translation2d[visibleObjectRotations.length];
+        final Transform3d robotCenterToCamera = dynamicCameraTransform.get3dRobotCenterToCamera(objectDetectionCameraInputs.latestResultTimestamp);
+        final Pose2d robotPoseAtResultTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(objectDetectionCameraInputs.latestResultTimestamp);
+
+        if (robotPoseAtResultTimestamp == null || robotCenterToCamera == null)
+            return new Translation2d[0];
+        final Pose3d cameraPoseAtTimestamp = new Pose3d(robotPoseAtResultTimestamp).plus(robotCenterToCamera);
 
         for (int i = 0; i < visibleObjectRotations.length; i++)
-            objectPositionsOnField[i] = calculateObjectPositionFromRotation(visibleObjectRotations[i]);
+            objectPositionsOnField[i] = calculateObjectPositionFromRotation(visibleObjectRotations[i], cameraPoseAtTimestamp);
 
         Logger.recordOutput("ObjectDetectionCamera/Visible" + targetGamePiece.name(), objectPositionsOnField);
         return objectPositionsOnField;
@@ -89,20 +95,17 @@ public class ObjectDetectionCamera extends SubsystemBase {
      * @param objectRotation the object's 3D rotation relative to the camera
      * @return the object's 2D position on the field (z is assumed to be 0)
      */
-    private Translation2d calculateObjectPositionFromRotation(Rotation3d objectRotation) {
-        final Pose2d robotPoseAtResultTimestamp = RobotContainer.ROBOT_POSE_ESTIMATOR.samplePoseAtTimestamp(objectDetectionCameraInputs.latestResultTimestamp);
-        if (robotPoseAtResultTimestamp == null)
-            return new Translation2d();
-        final Transform3d robotCenterToCamera = dynamicCameraTransform.get3dRobotCenterToCamera(objectDetectionCameraInputs.latestResultTimestamp);
-        final Pose3d cameraPose = new Pose3d(robotPoseAtResultTimestamp).plus(robotCenterToCamera);
-        final Pose3d objectRotationStart = cameraPose.plus(new Transform3d(0, 0, 0, objectRotation));
+    private Translation2d calculateObjectPositionFromRotation(Rotation3d objectRotation, Pose3d cameraPoseAtTime) {
+        final Pose3d objectRotationStart = cameraPoseAtTime.plus(new Transform3d(0, 0, 0, objectRotation));
 
-        final double cameraZ = cameraPose.getTranslation().getZ();
+        final double cameraZ = cameraPoseAtTime.getTranslation().getZ();
+        final double zDifference = cameraZ - SimulatedGamePieceConstants.GamePieceType.FUEL.originPointHeightOffGroundMeters;
         final double objectPitchSin = Math.sin(objectRotationStart.getRotation().getY());
-        final double xTransform = cameraZ / objectPitchSin;
+        final double xTransform = Math.abs(zDifference / objectPitchSin);
         final Transform3d objectRotationStartToGround = new Transform3d(xTransform, 0, 0, new Rotation3d());
 
-        return objectRotationStart.transformBy(objectRotationStartToGround).getTranslation().toTranslation2d();
+        final Translation3d objectTranslation3d = objectRotationStart.transformBy(objectRotationStartToGround).getTranslation();
+        return objectTranslation3d.toTranslation2d();
     }
 
     private ObjectDetectionCameraIO generateIO(String hostname, DynamicCameraTransform dynamicCameraTransform) {

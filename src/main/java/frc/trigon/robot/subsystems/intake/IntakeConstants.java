@@ -27,22 +27,22 @@ public class IntakeConstants {
             ANGLE_MOTOR_ID = 11,
             ANGLE_ENCODER_ID = 11;
     private static final String
-            MASTER_INTAKE_MOTOR_NAME = "MasterIntakeMotor",
-            FOLLOWER_INTAKE_MOTOR_NAME = "FollowerIntakeMotor",
+            MASTER_INTAKE_MOTOR_NAME = "IntakeMasterMotor",
+            FOLLOWER_INTAKE_MOTOR_NAME = "IntakeFollowerMotor",
             ANGLE_MOTOR_NAME = "IntakeAngleMotor",
             ANGLE_ENCODER_NAME = "IntakeAngleEncoder";
     static final TalonFXMotor
             MASTER_INTAKE_MOTOR = new TalonFXMotor(MASTER_INTAKE_MOTOR_ID, MASTER_INTAKE_MOTOR_NAME, RobotConstants.CANIVORE_NAME),
             FOLLOWER_INTAKE_MOTOR = new TalonFXMotor(FOLLOWER_INTAKE_MOTOR_ID, FOLLOWER_INTAKE_MOTOR_NAME, RobotConstants.CANIVORE_NAME),
-            ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME);
+            ANGLE_MOTOR = new TalonFXMotor(ANGLE_MOTOR_ID, ANGLE_MOTOR_NAME, RobotConstants.CANIVORE_NAME);
     static final CANcoderEncoder ANGLE_ENCODER = new CANcoderEncoder(ANGLE_ENCODER_ID, ANGLE_ENCODER_NAME, RobotConstants.CANIVORE_NAME);
 
     private static final double
             ANGLE_MOTOR_GEAR_RATIO = 62.5,
             INTAKE_MOTOR_GEAR_RATIO = 2.6;
     static final boolean FOC_ENABLED = true;
-    private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Aligned;
-    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 60;
+    private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
+    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 30;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
@@ -105,8 +105,8 @@ public class IntakeConstants {
             new Rotation3d(0, 0, 0)
     );
     static final Transform3d ORIGIN_TO_CAMERA_TRANSFORM = new Transform3d(
-            new Translation3d(0.33205, -0.29525, 0.199934),
-            new Rotation3d(0, Math.toRadians(8.9), Math.toRadians(19.8))
+            new Translation3d(0.33205, -0.27225, 0.199934),
+            new Rotation3d(0, Math.toRadians(13), Math.toRadians(19.8))
     );
 
     static {
@@ -158,7 +158,7 @@ public class IntakeConstants {
         final TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = INTAKE_MOTOR_GEAR_RATIO;
 
@@ -199,7 +199,7 @@ public class IntakeConstants {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
         config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = 0;
+        config.MagnetSensor.MagnetOffset = 0.318115234375;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);

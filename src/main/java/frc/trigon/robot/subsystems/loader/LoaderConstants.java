@@ -11,14 +11,15 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.lib.hardware.simulation.SimpleMotorSimulation;
 import frc.trigon.lib.utilities.mechanisms.SpeedMechanism2d;
+import frc.trigon.robot.constants.RobotConstants;
 
 public class LoaderConstants {
     private static final int MOTOR_ID = 13;
     private static final String MOTOR_NAME = "LoaderMotor";
-    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME);
+    static final TalonFXMotor MOTOR = new TalonFXMotor(MOTOR_ID, MOTOR_NAME, RobotConstants.CANIVORE_NAME);
 
     static final boolean FOC_ENABLED = true;
-    private static final double GEAR_RATIO = 7.76976888;
+    private static final double GEAR_RATIO = 1 / ((1 / 0.96) * (Math.PI * edu.wpi.first.math.util.Units.inchesToMeters(2)));
 
     private static final int MOTOR_AMOUNT = 1;
     private static final DCMotor GEARBOX = DCMotor.getFalcon500Foc(MOTOR_AMOUNT);
@@ -43,7 +44,7 @@ public class LoaderConstants {
     );
 
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
-    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 0.7;
+    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 1;
 
     static {
         final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -52,21 +53,21 @@ public class LoaderConstants {
         config.Audio.BeepOnConfig = false;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.29065;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 1.5957 * (0.96 / 2.14);
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.064829;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 7.520210565895845 / (0.96 / 2.14);
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 185.10234617223773 / (0.96 / 2.14);
 
-        config.CurrentLimits.StatorCurrentLimit = 50;
+        config.CurrentLimits.StatorCurrentLimit = 90;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
 
         MOTOR.applyConfiguration(config);
@@ -80,8 +81,9 @@ public class LoaderConstants {
     }
 
     public enum LoaderState {
-        LOAD(6),
-        LOAD_FOR_EJECT(2),
+        LOAD_FOR_DELIVERY(6),
+        LOAD_FOR_EJECT(4),
+        UNJAM(-4),
         STOP(0);
 
         public final double targetVelocityMetersPerSecond;

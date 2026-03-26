@@ -11,13 +11,14 @@ import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Hood extends MotorSubsystem {
     private final ShootingCalculations shootingCalculations = ShootingCalculations.getInstance();
     private final TalonFXMotor motor = HoodConstants.MOTOR;
     private final VoltageOut voltageRequest = new VoltageOut(0).withEnableFOC(HoodConstants.FOC_ENABLED);
-    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED);
+    private final MotionMagicVoltage positionRequest = new MotionMagicVoltage(0).withEnableFOC(HoodConstants.FOC_ENABLED).withUpdateFreqHz(1000);
     private Rotation2d targetAngle = Rotation2d.fromDegrees(0);
 
     public Hood() {
@@ -56,22 +57,25 @@ public class Hood extends MotorSubsystem {
                 targetProfiledAngle
         );
         Logger.recordOutput("Poses/Components/HoodPose", calculateVisualizationPose());
+    }
 
+    @Override
+    public void updatePeriodically() {
+        motor.update();
+
+        final Rotation2d currentAngle = getCurrentAngle();
+        final Rotation2d targetProfiledAngle = Rotation2d.fromRotations(motor.getSignal(TalonFXSignal.CLOSED_LOOP_REFERENCE));
         Logger.recordOutput("Hood/TargetAngleDegrees", targetAngle.getDegrees());
         Logger.recordOutput("Hood/CurrentAngleDegrees", currentAngle.getDegrees());
         Logger.recordOutput("Hood/TargetProfiledAngleDegrees", targetProfiledAngle.getDegrees());
     }
 
     @Override
-    public void updatePeriodically() {
-        motor.update();
-    }
-
-    @Override
     public void sysIDDrive(double targetVoltage) {
-        motor.setControl(voltageRequest.withOutput(targetVoltage));
+        motor.setControl(voltageRequest.withOutput(targetVoltage).withIgnoreSoftwareLimits(false));
     }
 
+    @AutoLogOutput(key = "Shooting/Conditions/HoodAtTargetAngle")
     public boolean atTargetAngle() {
         return atAngle(targetAngle);
     }
@@ -111,11 +115,12 @@ public class Hood extends MotorSubsystem {
     }
 
     void setTargetVoltageToResetVoltage() {
-        motor.setControl(voltageRequest.withOutput(HoodConstants.HOOD_RESET_VOLTAGE));
+        motor.setControl(voltageRequest.withOutput(HoodConstants.HOOD_RESET_VOLTAGE).withIgnoreSoftwareLimits(true));
     }
 
     void zeroPosition() {
         motor.setPosition(HoodConstants.RESET_ANGLE.getRotations());
+        motor.stopMotor();
     }
 
     private Pose3d calculateVisualizationPose() {

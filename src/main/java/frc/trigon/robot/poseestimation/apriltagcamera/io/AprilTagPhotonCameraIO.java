@@ -100,9 +100,10 @@ public class AprilTagPhotonCameraIO extends AprilTagCameraIO {
 
     private void updateSolvePNPPoses(AprilTagCameraInputsAutoLogged inputs, PhotonPipelineResult latestResult, PhotonTrackedTarget bestTag) {
         if (latestResult.getMultiTagResult().isPresent()) {
-            final Transform3d tagToCamera = latestResult.getMultiTagResult().get().estimatedPose.best;
-            inputs.bestCameraSolvePNPPose = FieldConstants.APRIL_TAG_FIELD_LAYOUT.getOrigin().transformBy(tagToCamera);
-            inputs.alternateCameraSolvePNPPose = inputs.bestCameraSolvePNPPose;
+            final Transform3d bestTagToCamera = latestResult.getMultiTagResult().get().estimatedPose.best;
+            final Transform3d alternateTagToCamera = latestResult.getMultiTagResult().get().estimatedPose.alt;
+            inputs.bestCameraSolvePNPPose = FieldConstants.APRIL_TAG_FIELD_LAYOUT.getOrigin().transformBy(bestTagToCamera);
+            inputs.alternateCameraSolvePNPPose = FieldConstants.APRIL_TAG_FIELD_LAYOUT.getOrigin().transformBy(alternateTagToCamera);
             return;
         }
 

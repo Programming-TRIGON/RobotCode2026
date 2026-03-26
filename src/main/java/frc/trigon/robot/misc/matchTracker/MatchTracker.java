@@ -4,6 +4,7 @@ package frc.trigon.robot.misc.matchTracker;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.trigon.lib.utilities.Elastic;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -17,6 +18,16 @@ public final class MatchTracker {
 
     static {
         new Trigger(MatchTracker::didGameMessageChange).onTrue(new InstantCommand(MatchTracker::setAutonomousWinner).ignoringDisable(true));
+        new Trigger(
+                () -> DriverStation.isTeleopEnabled() && DriverStation.isFMSAttached() && !isValidGameMessage(LAST_GAME_MESSAGE)
+        ).onTrue(
+                new InstantCommand(
+                        () -> {
+                            System.out.println("NO GAME MESSAGE! Starting Teleop without a game message! Make sure to set it manually.");
+                            Elastic.sendNotification(new Elastic.Notification(Elastic.NotificationLevel.WARNING, "NO GAME MESSAGE!", "Starting Teleop without a game message! Make sure to set it manually."));
+                        }
+                ).ignoringDisable(true)
+        );
     }
 
     public static boolean shouldIndicateAllianceShift() {
@@ -85,8 +96,17 @@ public final class MatchTracker {
     }
 
     private static void setAutonomousWinner() {
+        final String gameMessage = DriverStation.getGameSpecificMessage();
+        if (!isValidGameMessage(gameMessage))
+            return;
+
         final boolean didRedAllianceWinAutonomous = "R".equalsIgnoreCase(DriverStation.getGameSpecificMessage());
+        Elastic.sendNotification(new Elastic.Notification(Elastic.NotificationLevel.INFO, "Autonomous Winner Determined", "The " + (didRedAllianceWinAutonomous ? "Red" : "Blue") + " Alliance won autonomous!"));
         DID_WE_WIN_AUTONOMOUS.set(didRedAllianceWinAutonomous && Flippable.isRedAlliance() || !didRedAllianceWinAutonomous && !Flippable.isRedAlliance());
+    }
+
+    private static boolean isValidGameMessage(String gameMessage) {
+        return gameMessage != null && (gameMessage.equalsIgnoreCase("R") || gameMessage.equalsIgnoreCase("B"));
     }
 
     private static int getShiftNumber(double matchTimeSeconds) {

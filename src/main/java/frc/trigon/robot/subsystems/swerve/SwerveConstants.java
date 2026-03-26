@@ -27,15 +27,15 @@ public class SwerveConstants {
             REAR_LEFT_ID = 3,
             REAR_RIGHT_ID = 4;
     private static final double
-            FRONT_LEFT_STEER_ENCODER_OFFSET_ROTATIONS = 0,
-            FRONT_RIGHT_STEER_ENCODER_OFFSET_ROTATIONS = 0,
-            REAR_LEFT_STEER_ENCODER_OFFSET_ROTATIONS = 0,
-            REAR_RIGHT_STEER_ENCODER_OFFSET_ROTATIONS = 0;
+            FRONT_LEFT_STEER_ENCODER_OFFSET_ROTATIONS = -0.04541015625,
+            FRONT_RIGHT_STEER_ENCODER_OFFSET_ROTATIONS = -0.149169921875,
+            REAR_LEFT_STEER_ENCODER_OFFSET_ROTATIONS = -0.389404296875,
+            REAR_RIGHT_STEER_ENCODER_OFFSET_ROTATIONS = -0.241943359375;
     private static final double//TODO:Calibrate
-            FRONT_LEFT_WHEEL_DIAMETER = 0.05 * 2,
-            FRONT_RIGHT_WHEEL_DIAMETER = 0.05 * 2,
-            REAR_LEFT_WHEEL_DIAMETER = 0.05 * 2,
-            REAR_RIGHT_WHEEL_DIAMETER = 0.05 * 2;
+            FRONT_LEFT_WHEEL_DIAMETER = 0.050628 * 2,
+            FRONT_RIGHT_WHEEL_DIAMETER = 0.050647 * 2,
+            REAR_LEFT_WHEEL_DIAMETER = 0.050327 * 2,
+            REAR_RIGHT_WHEEL_DIAMETER = 0.050609 * 2;
     static final SwerveModule[] SWERVE_MODULES = new SwerveModule[]{
             new SwerveModule(FRONT_LEFT_ID, FRONT_LEFT_STEER_ENCODER_OFFSET_ROTATIONS, FRONT_LEFT_WHEEL_DIAMETER),
             new SwerveModule(FRONT_RIGHT_ID, FRONT_RIGHT_STEER_ENCODER_OFFSET_ROTATIONS, FRONT_RIGHT_WHEEL_DIAMETER),
@@ -60,10 +60,10 @@ public class SwerveConstants {
     private static final PIDConstants
             TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
             new PIDConstants(5, 0, 0) :
-            new PIDConstants(6.3, 0, 0),
+            new PIDConstants(7.4, 0, 0),
             PROFILED_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(4, 0, 0) :
-                    new PIDConstants(10, 0, 0.1);
+                    new PIDConstants(6, 0, 0.1);
     private static final double
             MAXIMUM_PROFILED_ROTATION_VELOCITY = RobotHardwareStats.isSimulation() ? 720 : Units.radiansToDegrees(MAXIMUM_ROTATIONAL_SPEED_RADIANS_PER_SECOND),
             MAXIMUM_PROFILED_ROTATION_ACCELERATION = RobotHardwareStats.isSimulation() ? 720 : 900;
@@ -92,7 +92,7 @@ public class SwerveConstants {
     private static final double
             ROTATION_PID_TOLERANCE_DEGREES = 1,
             TRANSLATION_PID_TOLERANCE_METERS = 0.02;
-    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.13;//TODO:Calibrate
+    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.05;
 
     static {
         configureGyro();
@@ -103,9 +103,9 @@ public class SwerveConstants {
     private static void configureGyro() {
         final Pigeon2Configuration config = new Pigeon2Configuration();
         //TODO:Calibrate
-        config.MountPose.MountPoseYaw = 0;
-        config.MountPose.MountPosePitch = 0;
-        config.MountPose.MountPoseRoll = 0;
+        config.MountPose.MountPoseYaw = 0.8371232151985168;
+        config.MountPose.MountPosePitch = 0.4867132604122162;
+        config.MountPose.MountPoseRoll = -178.99557495117188;
 
         GYRO.applyConfiguration(config);
         GYRO.setSimulationYawVelocitySupplier(() -> RobotContainer.SWERVE.getRotationalVelocityRadiansPerSecond());//IMPORTANT: Leave as lambda expression, method reference will crash code

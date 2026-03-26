@@ -16,7 +16,6 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.commandfactories.autonomous.AutonomousGenerator;
 import org.json.simple.parser.ParseException;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import java.io.IOException;
 
@@ -25,12 +24,12 @@ import java.io.IOException;
  */
 public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
-    public static final double FEEDFORWARD_SCALAR = 0.7;//TODO: Calibrate
+    public static final double FEEDFORWARD_SCALAR = 1;//TODO: Calibrate
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(4, 7, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(2.5, 2, Units.degreesToRadians(100), Units.degreesToRadians(100)),
-            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(4, 7, Units.degreesToRadians(200), Units.degreesToRadians(200));
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.3, 0.5, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 1, Units.degreesToRadians(100), Units.degreesToRadians(100)),
+            DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(3, 3, Units.degreesToRadians(500), Units.degreesToRadians(900));
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
@@ -39,20 +38,21 @@ public class AutonomousConstants {
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1,
-            SCORING_TIMEOUT_SECONDS = 4,
-            ESTIMATED_CLIMBING_TIME_SECONDS = 3;
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 2,
+            SCORING_TIMEOUT_SECONDS = 2.5,
+            ESTIMATED_CLIMBING_TIME_SECONDS = 3,
+            NORMAL_DRIVE_TIMEOUT = 4;
     public static final double
             ROBOT_AVERAGE_SPEED_METERS_PER_SECOND = 1,
             CLIMB_DRIVE_TIME_SAFETY_MARGIN_SECONDS = 0.5;
-    public static final double START_INTAKING_X = 6.2;
+    public static final double START_INTAKING_X = 6.3;
 
     private static final PIDConstants
             AUTO_TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-            new PIDConstants(9, 0, 0) :
+            new PIDConstants(0, 0, 0) :
             new PIDConstants(0, 0, 0),
             AUTO_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
-                    new PIDConstants(2, 0, 0) :
+                    new PIDConstants(0, 0, 0) :
                     new PIDConstants(0, 0, 0);
 
     public static final PIDController GAME_PIECE_AUTO_DRIVE_Y_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
@@ -60,7 +60,7 @@ public class AutonomousConstants {
             new PIDController(0.3, 0, 0.03);
     public static final PIDController GAME_PIECE_AUTO_DRIVE_X_PID_CONTROLLER = RobotHardwareStats.isSimulation() ?
             new PIDController(0.5, 0, 0) :
-            new PIDController(1, 0, 0);
+            new PIDController(0.6, 0, 0);
     public static final double AUTO_COLLECTION_INTAKE_OPEN_CHECK_DISTANCE_METERS = 0.01;
 
     private static final PPHolonomicDriveController AUTO_PATH_FOLLOWING_CONTROLLER = new PPHolonomicDriveController(
@@ -81,7 +81,8 @@ public class AutonomousConstants {
     private static void configureAutoBuilder() {
         AutoBuilder.configure(
                 RobotContainer.ROBOT_POSE_ESTIMATOR::getEstimatedRobotPose,
-                RobotContainer.ROBOT_POSE_ESTIMATOR::resetPose,
+                (a) -> {
+                },
                 RobotContainer.SWERVE::getSelfRelativeChassisSpeeds,
                 RobotContainer.SWERVE::drivePathPlanner,
                 AUTO_PATH_FOLLOWING_CONTROLLER,

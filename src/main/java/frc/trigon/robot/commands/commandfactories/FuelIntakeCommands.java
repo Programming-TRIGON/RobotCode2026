@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 public class FuelIntakeCommands {
     public static final LoggedNetworkBoolean
             SHOULD_KEEP_INTAKE_OPEN = new LoggedNetworkBoolean("/SmartDashboard/ShouldKeepIntakeOpen", true),
-            SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", true);
+            SHOULD_ASSIST_INTAKE = new LoggedNetworkBoolean("/SmartDashboard/ShouldAssistIntake", false);
 
     private static final boolean
             SHOULD_ASSIST_X = false,
