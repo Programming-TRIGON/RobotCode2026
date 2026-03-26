@@ -1,4 +1,5 @@
-package frc.trigon.robot.misc;
+package frc.trigon.robot.misc.matchTracker;
+
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,7 +14,6 @@ public final class MatchTracker {
     private static final LoggedNetworkBoolean
             OVERRIDE_IS_HUB_ACTIVE = new LoggedNetworkBoolean("MatchTracker/OverrideIsHubActive", false),
             DID_WE_WIN_AUTONOMOUS = new LoggedNetworkBoolean("MatchTracker/DidWeWinAutonomous", false);
-    private static final double TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS = 8;
     private static String LAST_GAME_MESSAGE = "";
 
     static {
@@ -30,13 +30,20 @@ public final class MatchTracker {
         );
     }
 
-    @AutoLogOutput(key = "Assists/ShouldIndicateAllianceShift")
     public static boolean shouldIndicateAllianceShift() {
-        return getTimeUntilAllianceShiftSeconds() <= TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS;
+        return getTimeUntilAllianceShiftSeconds() <= MatchTrackerConstants.TIME_BEFORE_ALLIANCE_SHIFT_TO_INDICATE_SECONDS;
     }
 
     public static boolean isHubActive() {
-        return isHubActive(getMatchTimeSeconds()) || OVERRIDE_IS_HUB_ACTIVE.get();
+        final double matchTimeSeconds = getMatchTimeSeconds();
+
+        if (isHubActive(matchTimeSeconds) || OVERRIDE_IS_HUB_ACTIVE.get())
+            return true;
+
+        if (getTimeUntilAllianceShiftSeconds(matchTimeSeconds) <= MatchTrackerConstants.MINIMUM_FUEL_DETECTION_DELAY + MatchTrackerConstants.FUEL_FLIGHT_TIME_SECONDS)
+            return true;
+
+        return getTimeSinceLastAllianceShiftSeconds(matchTimeSeconds) <= MatchTrackerConstants.HUB_DEACTIVATION_TIME_SECONDS - MatchTrackerConstants.MAXIMUM_FUEL_DETECTION_DELAY - MatchTrackerConstants.FUEL_FLIGHT_TIME_SECONDS;
     }
 
     public static double getTimeUntilAllianceShiftSeconds() {
@@ -56,8 +63,6 @@ public final class MatchTracker {
     }
 
     public static double getTimeUntilAllianceShiftSeconds(double matchTimeSeconds) {
-        if (!isHubActive(matchTimeSeconds))
-            matchTimeSeconds -= 1;
         return matchTimeSeconds - getNextShiftTimeSeconds(matchTimeSeconds);
     }
 
@@ -73,6 +78,10 @@ public final class MatchTracker {
 
     public static double getMatchTimeSeconds() {
         return DriverStation.getMatchTime();
+    }
+
+    private static double getTimeSinceLastAllianceShiftSeconds(double matchTimeSeconds) {
+        return MatchTrackerConstants.ALLIANCE_SHIFT_DURATION_SECONDS - getTimeUntilAllianceShiftSeconds(matchTimeSeconds);
     }
 
     private static boolean didGameMessageChange() {
