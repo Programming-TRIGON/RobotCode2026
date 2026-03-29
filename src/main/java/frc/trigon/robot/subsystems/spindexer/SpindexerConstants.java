@@ -62,7 +62,7 @@ public class SpindexerConstants {
     static {
         final TalonFXSConfiguration config = new TalonFXSConfiguration();
 
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         config.ExternalFeedback.withSensorToMechanismRatio(ROTATIONS_PER_METER);
@@ -70,9 +70,9 @@ public class SpindexerConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.005 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.078898;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0.97865;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.021767;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.0069036 : 0.14915;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.83307599933 : 0.98341;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.046475 : 0.028039;
 
         config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 12.2617891994;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 551.293242;

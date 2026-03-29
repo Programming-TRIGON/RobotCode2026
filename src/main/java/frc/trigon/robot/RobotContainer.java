@@ -13,7 +13,6 @@ import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.robot.commands.CommandConstants;
 import frc.trigon.robot.commands.commandclasses.ShootingSafeDriveCommand;
 import frc.trigon.robot.commands.commandclasses.TrenchAssistCommand;
-import frc.trigon.robot.commands.commandfactories.ClimbCommands;
 import frc.trigon.robot.commands.commandfactories.FuelIntakeCommands;
 import frc.trigon.robot.commands.commandfactories.GeneralCommands;
 import frc.trigon.robot.commands.commandfactories.ShootingCommands;
@@ -115,7 +114,7 @@ public class RobotContainer {
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_LEFT_CORNER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.LEFT_CORNER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_TOWER_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_TOWER));
         OperatorConstants.SET_FIXED_SHOOTING_POSITION_CLOSE_TO_OUTPOST_TRIGGER.onTrue(ShootingCommands.getChangeFixedShootingPositionCommand(ShootingCommands.FixedShootingPosition.CLOSE_TO_OUTPOST));
-        OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
+//        OperatorConstants.OPEN_CLIMBER_TRIGGER.onTrue(ClimbCommands.getClimbToL1Command());
         OperatorConstants.SHORT_EJECTION_TRIGGER.whileTrue(ShootingCommands.getShortEjectFuelCommand());
         OperatorConstants.UNJAM_TRIGGER.whileTrue(ShootingCommands.getUnjamCommand());
 

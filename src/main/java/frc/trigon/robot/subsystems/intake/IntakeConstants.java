@@ -43,7 +43,7 @@ public class IntakeConstants {
             INTAKE_MOTOR_GEAR_RATIO = 2.25;
     static final boolean FOC_ENABLED = true;
     private static final MotorAlignmentValue FOLLOWER_ALIGNMENT_TO_MASTER = MotorAlignmentValue.Opposed;
-    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 65;
+    private static final double INTAKE_MOTORS_CURRENT_LIMIT_AMPS = 100;
 
     private static final int
             ANGLE_MOTOR_AMOUNT = 1,
@@ -127,21 +127,22 @@ public class IntakeConstants {
         config.Feedback.SensorToMechanismRatio = ANGLE_MOTOR_GEAR_RATIO / ANGLE_ENCODER_GEAR_RATIO;
         config.Feedback.FeedbackRemoteSensorID = ANGLE_ENCODER.getID();
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        config.Feedback.VelocityFilterTimeConstant = 0.01;
 
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 30 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.048463 : 0;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.048463 : 0.02;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 5 : 3.8;
         config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.066678 : 0;
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.066678 : 0.3;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.GravityArmPositionOffset = 0;
         config.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 0;
-        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 0;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 5 : 5;
+        config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 5 : 5;
         config.MotionMagic.MotionMagicJerk = config.MotionMagic.MotionMagicAcceleration * 10;
 
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -200,8 +201,8 @@ public class IntakeConstants {
     private static void configureAngleEncoder() {
         final CANcoderConfiguration config = new CANcoderConfiguration();
 
-        config.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        config.MagnetSensor.MagnetOffset = -0.361328125;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        config.MagnetSensor.MagnetOffset = 0.357666015625;
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
 
         ANGLE_ENCODER.applyConfiguration(config);
@@ -212,7 +213,7 @@ public class IntakeConstants {
     }
 
     public enum IntakeState {
-        REST(Rotation2d.fromDegrees(90), 0),
+        REST(Rotation2d.fromDegrees(66), 0),
         PREPARE_TO_INTAKE(Rotation2d.fromDegrees(0), 0),
         INTAKE(Rotation2d.fromDegrees(0), 10),
         EJECT(Rotation2d.fromDegrees(0), -6);

@@ -42,7 +42,7 @@ public class FieldConstants {
             IDEAL_SHOOTING_X = 4.3,
             IDEAL_SHOOTING_Y = 7.48,
             TRENCH_ALLIANCE_ENTRY_AUTONOMOUS_X = 3.4,
-            TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.58,
+            TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.62,
             TRENCH_ENTRY_Y = 7.4,
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
             DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
@@ -54,7 +54,7 @@ public class FieldConstants {
             DEPOT_POSITION = new FlippablePose2d(DEPOT_X, DEPOT_Y, Rotation2d.fromDegrees(-90), true),
             LEFT_INTAKE_POSITION = new FlippablePose2d(INTAKE_X, INTAKE_Y, Rotation2d.fromDegrees(-80), true),
             RIGHT_INTAKE_POSITION = mirror(LEFT_INTAKE_POSITION),
-            LEFT_FIRST_INTAKE_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2.0, FIRST_INTAKE_Y, Rotation2d.fromDegrees(-100), true),
+            LEFT_FIRST_INTAKE_POSITION = new FlippablePose2d(FIELD_LENGTH_METERS / 2.0, FIRST_INTAKE_Y, Rotation2d.fromDegrees(-90), true),
             RIGHT_FIRST_INTAKE_POSITION = mirror(LEFT_FIRST_INTAKE_POSITION),
             LEFT_IDEAL_SHOOTING_POSITION = new FlippablePose2d(IDEAL_SHOOTING_X, IDEAL_SHOOTING_Y, Rotation2d.kZero, true),
             RIGHT_IDEAL_SHOOTING_POSITION = mirror(LEFT_IDEAL_SHOOTING_POSITION),

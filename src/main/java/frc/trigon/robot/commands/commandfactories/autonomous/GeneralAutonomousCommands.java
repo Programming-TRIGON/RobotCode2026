@@ -80,6 +80,7 @@ public class GeneralAutonomousCommands {
                         0,
                         AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                         1000,
+                        false,
                         false
                 ).alongWith(new RunCommand(() -> Logger.recordOutput("Autonomous/TargetScoringPose", getScoringPose(nextState).get()))),
                 getShootAtHubWhileDrivingCommand()
@@ -95,6 +96,7 @@ public class GeneralAutonomousCommands {
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                                 shootWhileDriving ? 1000 : 0,
+                                false,
                                 false
                         ),
                         getShootAtHubWhileDrivingCommand()
@@ -111,6 +113,7 @@ public class GeneralAutonomousCommands {
                                 0,
                                 AutonomousConstants.DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS,
                                 1000,
+                                false,
                                 false
                         ).raceWith(getShootAtHubWhileDrivingCommand())
                         .until(() -> RobotContainer.SWERVE.atPose(climbPosition.get()))
@@ -156,9 +159,10 @@ public class GeneralAutonomousCommands {
                 SafeAutonomousDriveCommands.getSafeDriveToPoseCommand(
                         () -> targetPose,
                         AutonomousConstants.DRIVE_FOR_INTAKING_CONSTRAINTS,
-                        3,
+                        4,
                         AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS,
                         shootPreload ? AutonomousConstants.SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS : 0,
+                        true,
                         true
                 ).until(() -> GeneralAutonomousCommands.shouldRobotStartIntaking(shouldIntakeFromMiddle ? AutonomousConstants.FIRST_START_INTAKING_X : AutonomousConstants.GENERAL_START_INTAKING_X)),
                 getDriveToFuelCommand(intakeSlowly).withTimeout(timeout)

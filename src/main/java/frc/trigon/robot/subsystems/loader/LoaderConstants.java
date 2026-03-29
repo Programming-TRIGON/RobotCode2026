@@ -47,7 +47,7 @@ public class LoaderConstants {
     );
 
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
-    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 1.25;
+    static final double LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT = 0.68;
 
     static {
         final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -63,11 +63,11 @@ public class LoaderConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 0.075402 : 0;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 0 : 0;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.30712;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0.75117;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.029108;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.00071285 : 0.38816;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 0.915306001 : 0.7941;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0.029458 : 0.02032;
 
-        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 15.6152405;
+        config.MotionMagic.MotionMagicCruiseVelocity = RobotHardwareStats.isSimulation() ? 10 : 15.1114469;
         config.MotionMagic.MotionMagicAcceleration = RobotHardwareStats.isSimulation() ? 60 : 709.094132;
 
         config.CurrentLimits.StatorCurrentLimit = 90;

@@ -23,7 +23,7 @@ public class ShootingSafeDriveCommand extends SequentialCommandGroup {
     private static final SlewRateLimiter
             X_SLEW_RATE_LIMITER = new SlewRateLimiter(TRANSLATION_SLEW_RATE),
             Y_SLEW_RATE_LIMITER = new SlewRateLimiter(TRANSLATION_SLEW_RATE),
-            ROTATION_SLEW_RATE_LIMITER = new SlewRateLimiter(0.9);
+            ROTATION_SLEW_RATE_LIMITER = new SlewRateLimiter(0.8);
 
     public ShootingSafeDriveCommand() {
         addCommands(

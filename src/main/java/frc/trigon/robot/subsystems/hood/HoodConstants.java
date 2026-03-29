@@ -69,7 +69,7 @@ public class HoodConstants {
     static final Rotation2d
             REST_ANGLE = Rotation2d.fromDegrees(81),
             DELIVERY_ANGLE = Rotation2d.fromDegrees(51),
-            EJECTION_ANGLE = Rotation2d.fromDegrees(75);
+            EJECTION_ANGLE = Rotation2d.fromDegrees(55);
     static final double HOOD_RESET_VOLTAGE = 0.8;
     static final Rotation2d RESET_ANGLE = Rotation2d.fromDegrees(82);
 
@@ -92,10 +92,10 @@ public class HoodConstants {
         config.Slot0.kP = RobotHardwareStats.isSimulation() ? 150 : 230;
         config.Slot0.kI = RobotHardwareStats.isSimulation() ? 0 : 0;
         config.Slot0.kD = RobotHardwareStats.isSimulation() ? 2 : 1;
-        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.3504;
-        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 5.778;
-        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0; // 0.59021
-        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : 0.048897;
+        config.Slot0.kS = RobotHardwareStats.isSimulation() ? 0.07 : 0.30767;
+        config.Slot0.kV = RobotHardwareStats.isSimulation() ? 2.5 : 5.4127;
+        config.Slot0.kA = RobotHardwareStats.isSimulation() ? 0 : 0; // 0.15367
+        config.Slot0.kG = RobotHardwareStats.isSimulation() ? 0.065 : -0.048897;
 
         config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         config.Slot0.GravityArmPositionOffset = 0.24452;

@@ -63,9 +63,9 @@ public class ShootingLookupTable3D {
         return isLoaded && velocityData != null && velocityData.length > 0;
     }
 
-    public static final LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 1.42);
+    public static final LoggedNetworkNumber velSlopeConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocitySlopeConstant", 0.98);
     private static final LoggedNetworkNumber velInterceptConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/VelocityInterceptConstant", 0);
-    private static final LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", 0);
+    private static final LoggedNetworkNumber pitConst = new LoggedNetworkNumber("/SmartDashboard/ShootingLookupTable3D/PitchConstant", -3.7);
 
     public static double calculateVelocity(final double distance, final double radialVelocity, final double tangentialVelocity) {
         validateLoaded();

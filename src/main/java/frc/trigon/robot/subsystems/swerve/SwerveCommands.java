@@ -154,7 +154,7 @@ public class SwerveCommands {
     }
 
     public static Command getFollowPathCommand(Supplier<PathPlannerPath> path) {
-        return new DeferredCommand(() -> getFollowPathCommand(path.get()), Set.of(RobotContainer.SWERVE));
+        return new DeferredCommand(() -> getCurrentFollowPathCommand(path), Set.of(RobotContainer.SWERVE));
     }
 
     private static Command getCurrentDriveToPoseCommand(FlippablePose2d targetPose, PathConstraints constraints, double endVelocity) {
@@ -165,7 +165,8 @@ public class SwerveCommands {
         );
     }
 
-    private static Command getFollowPathCommand(PathPlannerPath path) {
+    private static Command getCurrentFollowPathCommand(Supplier<PathPlannerPath> pathSupplier) {
+        var path = pathSupplier.get();
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotContainer.SWERVE.initializeDrive(true)),
                 AutoBuilder.followPath(path),

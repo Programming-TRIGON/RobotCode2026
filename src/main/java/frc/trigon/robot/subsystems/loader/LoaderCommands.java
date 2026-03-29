@@ -21,7 +21,8 @@ public class LoaderCommands {
     public static Command getSetTargetStateCommand(LoaderConstants.LoaderState targetState) {
         return new StartEndCommand(
                 () -> RobotContainer.LOADER.setTargetState(targetState),
-                RobotContainer.LOADER::stop,
+                () -> {
+                },
                 RobotContainer.LOADER
         );
     }
@@ -29,7 +30,8 @@ public class LoaderCommands {
     public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
         return new StartEndCommand(
                 () -> RobotContainer.LOADER.setTargetVelocity(targetVelocityMetersPerSecond),
-                RobotContainer.LOADER::stop,
+                () -> {
+                },
                 RobotContainer.LOADER
         );
     }
@@ -37,7 +39,8 @@ public class LoaderCommands {
     public static Command getLoadToShooterCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.LOADER::loadToShooter,
-                RobotContainer.LOADER::stop,
+                () -> {
+                },
                 RobotContainer.LOADER
         );
     }

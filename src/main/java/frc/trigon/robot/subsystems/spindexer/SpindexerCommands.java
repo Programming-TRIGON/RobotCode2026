@@ -18,7 +18,8 @@ public class SpindexerCommands {
     public static Command getSetTargetStateCommand(SpindexerConstants.SpindexerState targetState) {
         return new StartEndCommand(
                 () -> RobotContainer.SPINDEXER.setTargetState(targetState),
-                RobotContainer.SPINDEXER::stop,
+                () -> {
+                },
                 RobotContainer.SPINDEXER
         );
     }
@@ -26,7 +27,8 @@ public class SpindexerCommands {
     public static Command getSetTargetVelocityCommand(double targetVelocityMetersPerSecond) {
         return new StartEndCommand(
                 () -> RobotContainer.SPINDEXER.setTargetVelocity(targetVelocityMetersPerSecond),
-                RobotContainer.SPINDEXER::stop,
+                () -> {
+                },
                 RobotContainer.SPINDEXER
         );
     }
@@ -34,7 +36,8 @@ public class SpindexerCommands {
     public static Command getLoadToShooterCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.SPINDEXER::loadToShooter,
-                RobotContainer.SPINDEXER::stop,
+                () -> {
+                },
                 RobotContainer.SPINDEXER
         );
     }

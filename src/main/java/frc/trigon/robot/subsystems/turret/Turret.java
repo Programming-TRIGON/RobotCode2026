@@ -40,6 +40,7 @@ public class Turret extends MotorSubsystem {
     private double[] latestThreadedPositions = new double[0];
     private Rotation2d targetSelfRelativeAngle = new Rotation2d();
     private int scanForAprilTagsSign = 1;
+    private boolean isRotatingToOtherSide = false;
 
     public Turret() {
         setName("Turret");
@@ -172,14 +173,20 @@ public class Turret extends MotorSubsystem {
 
     public boolean atFieldRelativeAngle(Rotation2d fieldRelativeAngle, boolean useWideTolerance) {
         final double differenceRadians = Math.abs(fieldRelativeAngle.minus(getCurrentFieldRelativeAngle()).getRadians());
+        Logger.recordOutput("ShootingCalculation/Turret/Field/TargetFieldRelativeAngleDegrees", fieldRelativeAngle.getDegrees());
+        Logger.recordOutput("ShootingCalculation/Turret/Field/CurrentFieldRelativeAngleDegrees", getCurrentFieldRelativeAngle().getDegrees());
+        Logger.recordOutput("ShootingCalculation/Turret/Field/FieldRelativeAngleDifferenceDegrees", Math.toDegrees(differenceRadians));
         final double toleranceRadians = useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians();
-        return differenceRadians < toleranceRadians;
+        return differenceRadians < toleranceRadians && !isRotatingToOtherSide;
     }
 
     public boolean atSelfRelativeAngle(Rotation2d selfRelativeAngle, boolean useWideTolerance) {
         final double differenceRadians = Math.abs(selfRelativeAngle.minus(getCurrentSelfRelativeAngle()).getRadians());
         final double toleranceRadians = useWideTolerance ? TurretConstants.WIDE_TOLERANCE.getRadians() : TurretConstants.NORMAL_TOLERANCE.getRadians();
-        return differenceRadians < toleranceRadians;
+        Logger.recordOutput("ShootingCalculation/Turret/Self/TargetSelfRelativeAngleDegrees", selfRelativeAngle.getDegrees());
+        Logger.recordOutput("ShootingCalculation/Turret/Self/CurrentSelfRelativeAngleDegrees", getCurrentSelfRelativeAngle().getDegrees());
+        Logger.recordOutput("ShootingCalculation/Turret/Self/SelfRelativeAngleDifferenceDegrees", Math.toDegrees(differenceRadians));
+        return differenceRadians < toleranceRadians && !isRotatingToOtherSide;
     }
 
     public Rotation2d getCurrentSelfRelativeAngle() {
@@ -187,7 +194,7 @@ public class Turret extends MotorSubsystem {
     }
 
     public Translation2d calculateClosestDeliveryPosition() {
-        final Pose2d currentPosition = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        final Pose2d currentPosition = getCurrentTurretFieldRelativePosition();
         final double
                 distanceFromRightDeliveryPosition = currentPosition.getTranslation().getDistance(FieldConstants.RIGHT_DELIVERY_POSITION.get()),
                 distanceFromLeftDeliveryPosition = currentPosition.getTranslation().getDistance(FieldConstants.LEFT_DELIVERY_POSITION.get());
@@ -208,7 +215,7 @@ public class Turret extends MotorSubsystem {
     }
 
     public Rotation2d calculateTargetAngleForDelivery() {
-        final Pose2d currentPosition = getPredictedRobotPose();
+        final Pose2d currentPosition = getCurrentTurretFieldRelativePosition();
         final Rotation2d angleToDeliveryPoint = calculateTargetAngleToPose(calculateClosestDeliveryPosition(), currentPosition);
         final double currentYVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vyMetersPerSecond;
         final double currentAllianceYVelocity = Flippable.isRedAlliance() ? -currentYVelocity : currentYVelocity;
@@ -232,7 +239,7 @@ public class Turret extends MotorSubsystem {
 
     void alignForDelivery() {
         final Rotation2d targetAngle = calculateTargetAngleForDelivery();
-        setTargetSelfRelativeAngle(targetAngle);
+        setTargetFieldRelativeAngle(targetAngle);
     }
 
     void alignForEjection() {
@@ -247,6 +254,7 @@ public class Turret extends MotorSubsystem {
 
     void setTargetSelfRelativeAngle(Rotation2d targetAngle) {
         targetSelfRelativeAngle = limitAngle(targetAngle, getCurrentSelfRelativeAngle());
+        isRotatingToOtherSide = Math.abs(targetSelfRelativeAngle.getRadians() - getCurrentSelfRelativeAngle().getRadians()) > Math.toRadians(10);
         final double resistSwerveRotationFeedforward = calculateResistSwerveRotationFeedforward();
         masterMotor.setControl(positionRequest
                 .withPosition(targetSelfRelativeAngle.getRotations())
@@ -271,7 +279,7 @@ public class Turret extends MotorSubsystem {
         return calculateTargetAngleToPose(
                 closestTagToRobotPose.get().getTranslation(),
                 robotPose
-        ).plus(robotPose.getRotation());
+        );
     }
 
     private FlippablePose2d calculateClosestAprilTagPose() {
@@ -316,7 +324,7 @@ public class Turret extends MotorSubsystem {
 
     private Rotation2d calculateTargetAngleToPose(Translation2d targetTranslation, Pose2d currentPosition) {
         final Translation2d difference = targetTranslation.minus(currentPosition.getTranslation());
-        return difference.getAngle().minus(currentPosition.getRotation());
+        return difference.getAngle();
     }
 
     private Rotation2d limitAngle(Rotation2d targetAngle, Rotation2d currentTurretAngle) {

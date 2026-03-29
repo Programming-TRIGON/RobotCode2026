@@ -60,7 +60,7 @@ public class SwerveConstants {
     private static final PIDConstants
             TRANSLATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
             new PIDConstants(5, 0, 0) :
-            new PIDConstants(5.8, 0, 0),
+            new PIDConstants(5.5, 0, 0),
             PROFILED_ROTATION_PID_CONSTANTS = RobotHardwareStats.isSimulation() ?
                     new PIDConstants(4, 0, 0) :
                     new PIDConstants(6, 0, 0.1);
@@ -92,7 +92,7 @@ public class SwerveConstants {
     private static final double
             ROTATION_PID_TOLERANCE_DEGREES = 1,
             TRANSLATION_PID_TOLERANCE_METERS = 0.02;
-    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0.03;
+    static final double PID_TO_POSE_PREDICTION_TIME_SECONDS = 0;
 
     static {
         configureGyro();

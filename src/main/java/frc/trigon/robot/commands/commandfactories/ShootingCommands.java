@@ -2,7 +2,6 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.commands.WaitUntilChangeCommand;
@@ -121,7 +120,10 @@ public class ShootingCommands {
 
     private static Command getLoadFuelWhenReadyCommand(boolean isAutoShootingAtHub, boolean isDelivery) {
         return new SequentialCommandGroup(
-                new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub) && (!isDelivery || !isDeliveryHittingHub())),
+                new ParallelCommandGroup(
+                        LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP),
+                        SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP)
+                ).until(() -> canShoot(isAutoShootingAtHub) && (!isDelivery || !isDeliveryHittingHub())),
                 getLoadFuelCommand(isAutoShootingAtHub).until(() -> ShootingCommands.shouldStopShooting(isAutoShootingAtHub, isDelivery))
         ).repeatedly().alongWith(new RunCommand(() -> logShouldStopShooting(isAutoShootingAtHub, isDelivery)));
     }
@@ -160,12 +162,12 @@ public class ShootingCommands {
         }
         return RobotContainer.SHOOTER.atTargetVelocity()
                 && RobotContainer.HOOD.atTargetAngle()
-                && RobotContainer.TURRET.atTargetAngle(false);
+                && RobotContainer.TURRET.atTargetAngle(true);
     }
 
     private static boolean isDeliveryHittingHub() {
         final Pose2d turretPose = RobotContainer.TURRET.getCurrentTurretFieldRelativePosition();
-        final Rotation2d fieldRelativeTurretAngle = RobotContainer.TURRET.calculateTargetAngleForDelivery().plus(RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose().getRotation());
+        final Rotation2d fieldRelativeTurretAngle = RobotContainer.TURRET.calculateTargetAngleForDelivery();
         final double slope = Math.tan(fieldRelativeTurretAngle.getRadians());
         final double b = turretPose.getTranslation().getY() - (slope * turretPose.getTranslation().getX());
         final double netYOutsideHub = 0.25;
@@ -188,7 +190,10 @@ public class ShootingCommands {
         Logger.recordOutput("Shooting/Delivery/HittingHub/slope", slope);
         Logger.recordOutput("Shooting/Delivery/HittingHub/b", b);
 
-        return (yAtTargetX <= maximumY) && (yAtTargetX >= minimumY);
+        var a = (yAtTargetX <= maximumY) && (yAtTargetX >= minimumY);
+        Logger.recordOutput("Shooting/Delivery/HittingHub/IsHittingHub", a);
+
+        return a;
     }
 
     private static boolean canShootAtHub() {
@@ -196,7 +201,7 @@ public class ShootingCommands {
     }
 
     private static boolean shouldStopShooting(boolean isShootingAtHub, boolean isDelivery) {
-        return (isShootingAtHub ? !RobotContainer.TURRET.atTargetShootingCalculationsAngle(true) : !RobotContainer.TURRET.atTargetAngle(true)) && (!isDelivery || isDeliveryHittingHub());
+        return (isShootingAtHub ? !RobotContainer.TURRET.atTargetShootingCalculationsAngle(true) : !RobotContainer.TURRET.atTargetAngle(true)) || (isDelivery && isDeliveryHittingHub());
     }
 
     private static void updateShootingCalculations() {

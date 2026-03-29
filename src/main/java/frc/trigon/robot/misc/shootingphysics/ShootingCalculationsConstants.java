@@ -25,9 +25,9 @@ public class ShootingCalculationsConstants {
             );
 
     static final double
-            HOOD_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.07,
-            SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.07,
+            HOOD_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.1,
+            SHOOTER_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.02 : 0.1,
             TURRET_POSE_PREDICTION_TIME_SECONDS = RobotHardwareStats.isSimulation() ? 0.06 : 0.07;
 
-    static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "lut_46_15_veldivflight.bin";
+    static final String SHOOTING_LOOKUP_TABLE_FILEPATH = FilesHandler.DEPLOY_PATH + "lut_30_10_veldivflight_lowmargin_lowlowdrag.bin";
 }

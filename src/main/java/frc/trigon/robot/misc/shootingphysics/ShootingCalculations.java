@@ -133,7 +133,7 @@ public class ShootingCalculations {
         final double distanceFromHub = hubPosition.minus(fuelExitPosition).getNorm();
 
         Logger.recordOutput("Shooting/DistanceToHub", distanceFromHub);
-        Logger.recordOutput("Shooting/TargetFuelExitPosition", new Pose3d(fuelExitPosition3d, new Rotation3d()));
+        Logger.recordOutput("Shooting/TargetFuelExitPosition", new Pose3d(fuelExitPosition3d, new Rotation3d(RobotContainer.TURRET.getCurrentFieldRelativeAngle())));
         Logger.recordOutput("Shooting/HubRelativeVelocityX", hubRelativeFuelVelocity.getX());
         Logger.recordOutput("Shooting/HubRelativeVelocityY", hubRelativeFuelVelocity.getY());
 
