@@ -26,7 +26,7 @@ public class AutonomousConstants {
     public static final RobotConfig ROBOT_CONFIG = getRobotConfig();
     public static final double FEEDFORWARD_SCALAR = 1;
     public static final PathConstraints
-            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3, 3.5, Units.degreesToRadians(500), Units.degreesToRadians(900)),
+            DRIVE_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(3, 3.3, Units.degreesToRadians(500), Units.degreesToRadians(900)),
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_DRIVE_CONSTRAINTS = new PathConstraints(0.2, 0.3, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_SLOWLY_IN_AUTONOMOUS_CONSTRAINTS = new PathConstraints(1.5, 1, Units.degreesToRadians(100), Units.degreesToRadians(100)),
             DRIVE_FOR_INTAKING_CONSTRAINTS = new PathConstraints(3.7, 5, Units.degreesToRadians(900), Units.degreesToRadians(900));
@@ -38,7 +38,7 @@ public class AutonomousConstants {
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
             DEPOT_COLLECTION_TIMEOUT_SECONDS = 4,
-            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.5,
+            NEUTRAL_ZONE_COLLECTION_TIMEOUT_SECONDS = 1.3,
             SCORING_TIMEOUT_SECONDS = 5,
             ESTIMATED_CLIMBING_TIME_SECONDS = 3,
             NORMAL_DRIVE_TIMEOUT = 4;

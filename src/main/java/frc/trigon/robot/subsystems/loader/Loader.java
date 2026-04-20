@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXMotor;
 import frc.trigon.lib.hardware.phoenix6.talonfx.TalonFXSignal;
+import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.misc.shootingphysics.ShootingCalculations;
 import frc.trigon.robot.subsystems.MotorSubsystem;
 
@@ -71,6 +72,12 @@ public class Loader extends MotorSubsystem {
 
     void loadToShooter() {
         final double targetShooterVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
+        final double targetLoadingVelocity = targetShooterVelocityFromShootingCalculations * LoaderConstants.LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT;
+        setTargetVelocity(targetLoadingVelocity);
+    }
+
+    void loadForDelivery() {
+        final double targetShooterVelocityFromShootingCalculations = RobotContainer.SHOOTER.calculateDeliveryShootingVelocity();
         final double targetLoadingVelocity = targetShooterVelocityFromShootingCalculations * LoaderConstants.LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT;
         setTargetVelocity(targetLoadingVelocity);
     }

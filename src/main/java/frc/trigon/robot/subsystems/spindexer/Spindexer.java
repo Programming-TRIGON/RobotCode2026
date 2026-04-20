@@ -81,7 +81,7 @@ public class Spindexer extends MotorSubsystem {
     void loadToShooter() {
         final double targetShooterVelocityFromShootingCalculations = shootingCalculations.getTargetShootingState().targetShootingVelocityMetersPerSecond();
         final double targetLoadingVelocity = targetShooterVelocityFromShootingCalculations * SpindexerConstants.LOADING_SPEED_RELATIVE_TO_SHOOTING_COEFFICIENT;
-        setTargetVelocity(9);
+        setTargetVelocity(11);
     }
 
     void setTargetState(SpindexerConstants.SpindexerState targetState) {

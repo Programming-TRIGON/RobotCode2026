@@ -58,8 +58,8 @@ public class ShooterConstants {
     static final double VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.3;
     static final double WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER = RobotHardwareStats.isSimulation() ? 1 : 1;
     static final double
-            DELIVERY_VELOCITY_SLOPE = 1,
-            DELIVERY_VELOCITY_INTERCEPT_POINT = 2.4;
+            DELIVERY_VELOCITY_SLOPE = 1.06,
+            DELIVERY_VELOCITY_INTERCEPT_POINT = 2.3;
 
     static {
         configureMasterMotor();

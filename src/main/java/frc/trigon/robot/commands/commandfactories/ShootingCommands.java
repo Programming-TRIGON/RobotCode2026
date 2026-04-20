@@ -40,8 +40,8 @@ public class ShootingCommands {
 
     public static Command getUnjamCommand() {
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.UNJAM),
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.UNJAM),
+//                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.UNJAM),
+//                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.UNJAM),
                 IntakeCommands.getSetTargetStateCommand(IntakeConstants.IntakeState.EJECT)
         );
     }
@@ -137,8 +137,8 @@ public class ShootingCommands {
         }
 
         return new ParallelCommandGroup(
-                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.LOAD_FOR_DELIVERY),
-                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.LOAD_FOR_DELIVERY)
+                SpindexerCommands.getLoadToShooterCommand(),
+                LoaderCommands.getLoadForDeliveryCommand()
         );
     }
 

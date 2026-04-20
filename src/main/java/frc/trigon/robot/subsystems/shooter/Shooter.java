@@ -112,7 +112,7 @@ public class Shooter extends MotorSubsystem {
         return targetVelocityFromShootingCalculations * ShooterConstants.WHEEL_SLIPPAGE_COMPENSATION_VELOCITY_MULTIPLIER;
     }
 
-    private double calculateDeliveryShootingVelocity() {
+    public double calculateDeliveryShootingVelocity() {
         final double currentXVelocity = RobotContainer.SWERVE.getFieldRelativeChassisSpeeds().vxMetersPerSecond;
         final double distanceToDeliveryPosition = RobotContainer.TURRET.getCurrentTurretFieldRelativePosition().getTranslation().getDistance(RobotContainer.TURRET.calculateClosestDeliveryPosition());
         final double distanceAimingVelocity = (distanceToDeliveryPosition * ShooterConstants.DELIVERY_VELOCITY_SLOPE) + ShooterConstants.DELIVERY_VELOCITY_INTERCEPT_POINT;

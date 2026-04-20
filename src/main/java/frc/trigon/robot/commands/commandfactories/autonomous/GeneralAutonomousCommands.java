@@ -22,7 +22,11 @@ import frc.trigon.robot.subsystems.climber.ClimberConstants;
 import frc.trigon.robot.subsystems.hood.HoodCommands;
 import frc.trigon.robot.subsystems.intake.IntakeCommands;
 import frc.trigon.robot.subsystems.intake.IntakeConstants;
+import frc.trigon.robot.subsystems.loader.LoaderCommands;
+import frc.trigon.robot.subsystems.loader.LoaderConstants;
 import frc.trigon.robot.subsystems.shooter.ShooterCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerCommands;
+import frc.trigon.robot.subsystems.spindexer.SpindexerConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
 import frc.trigon.robot.subsystems.turret.TurretCommands;
 import org.json.simple.parser.ParseException;
@@ -60,7 +64,7 @@ public class GeneralAutonomousCommands {
                         getDriveToFuelCommand(false).withTimeout(collectionTimeout),
                         getDriveToFuelInNeutralZoneCommand(
                                 AutonomousGenerator.SHOULD_SHOOT_PRELOAD.getAsBoolean() && previousState == null,
-                                collectionTimeout,
+                                previousState == null ? 0.8 : collectionTimeout,
                                 previousState == null,
                                 getIntakingPoseInNeutralZone(previousState),
                                 false
@@ -206,7 +210,9 @@ public class GeneralAutonomousCommands {
                         aimAtApriltags
                 ),
                 ShooterCommands.getSetTargetVelocityCommand(() -> targetShootingState.get().targetShootingVelocityMetersPerSecond()),
-                HoodCommands.getRestCommand()
+                HoodCommands.getRestCommand(),
+                LoaderCommands.getSetTargetStateCommand(LoaderConstants.LoaderState.STOP),
+                SpindexerCommands.getSetTargetStateCommand(SpindexerConstants.SpindexerState.STOP)
 //                HoodCommands.getSetTargetAngleCommand(() -> targetShootingState.get().targetPitch())
         );
     }

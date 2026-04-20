@@ -36,6 +36,15 @@ public class LoaderCommands {
         );
     }
 
+    public static Command getLoadForDeliveryCommand() {
+        return new ExecuteEndCommand(
+                RobotContainer.LOADER::loadForDelivery,
+                () -> {
+                },
+                RobotContainer.LOADER
+        );
+    }
+
     public static Command getLoadToShooterCommand() {
         return new ExecuteEndCommand(
                 RobotContainer.LOADER::loadToShooter,
