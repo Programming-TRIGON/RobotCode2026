@@ -40,7 +40,7 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
                 this::getRestrictedXValue,
                 this::getRestrictedYValue,
                 OperatorConstants.DRIVER_CONTROLLER::getRightX
-        );
+        ).asProxy();
     }
 
     private double getRestrictedXValue() {
