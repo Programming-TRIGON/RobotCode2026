@@ -23,7 +23,6 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
             MINIMUM_DISTANCE_TO_RESTRICTED_ZONE_METERS = 0.1,
             BRAKING_ZONE_DISTANCE_METERS = 0.5,
             BRAKING_ZONE_SIZE_METERS = BRAKING_ZONE_DISTANCE_METERS - MINIMUM_DISTANCE_TO_RESTRICTED_ZONE_METERS;
-
     private final BoundingBox restrictedZoneBoundingBox;
 
     /**
