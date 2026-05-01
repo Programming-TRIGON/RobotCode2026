@@ -17,11 +17,11 @@ import frc.trigon.robot.subsystems.swerve.SwerveCommands;
  */
 public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
     private static final double
-            ROBOT_X_WIDTH_METERS = 0.8,
-            ROBOT_Y_WIDTH_METERS = 0.8;
+            ROBOT_X_WIDTH_METERS = 1,
+            ROBOT_Y_WIDTH_METERS = 1;
     private static final double
             MINIMUM_DISTANCE_TO_RESTRICTED_ZONE_METERS = 0.1,
-            BRAKING_ZONE_DISTANCE_METERS = 0.5,
+            BRAKING_ZONE_DISTANCE_METERS = 0.3,
             BRAKING_ZONE_SIZE_METERS = BRAKING_ZONE_DISTANCE_METERS - MINIMUM_DISTANCE_TO_RESTRICTED_ZONE_METERS;
     private final BoundingBox restrictedZoneBoundingBox;
 
@@ -32,6 +32,7 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
      */
     public RestrictMoveIntoZoneCommand(BoundingBox restrictedZoneBoundingBox) {
         this.restrictedZoneBoundingBox = restrictedZoneBoundingBox;
+        restrictedZoneBoundingBox.log("RestrictedBox");
         addCommands(getRestrictedDriveCommand());
     }
 
@@ -64,7 +65,7 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
         );
         final double distanceToRestrictedZoneMeters = getRobotBoundingBox().distanceTo(restrictedZoneBoundingBox);
 
-        if (distanceToRestrictedZoneMeters == 0 || distanceToRestrictedZoneMeters >= BRAKING_ZONE_DISTANCE_METERS)
+        if (distanceToRestrictedZoneMeters == 0 || distanceToRestrictedZoneMeters > BRAKING_ZONE_DISTANCE_METERS)
             return fieldRelativeJoystickValue;
 
         return calculateSlowedTranslation(fieldRelativeJoystickValue, distanceToRestrictedZoneMeters);
@@ -79,7 +80,7 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
      * @return the slowed translation
      */
     private Translation2d calculateSlowedTranslation(Translation2d fieldRelativeJoystickValue, double distanceToRestrictedZone) {
-        final Translation2d unitVectorTowardsRestrictedZone = calculateUnitVectorTowardsRestrictedZone();
+        final Translation2d unitVectorTowardsRestrictedZone = calculateUnitVectorTowardsRestrictedZone().unaryMinus();
         final double translationComponentTowardRestrictedZone = dotProduct(fieldRelativeJoystickValue, unitVectorTowardsRestrictedZone);
 
         if (translationComponentTowardRestrictedZone <= 0)
@@ -142,7 +143,9 @@ public class RestrictMoveIntoZoneCommand extends ParallelCommandGroup {
      */
     private BoundingBox getRobotBoundingBox() {
         final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        return new BoundingBox(robotPose, ROBOT_X_WIDTH_METERS, ROBOT_Y_WIDTH_METERS);
+        var x = new BoundingBox(robotPose, ROBOT_X_WIDTH_METERS, ROBOT_Y_WIDTH_METERS);
+        x.log("RobotBoundingBox");
+        return x;
     }
 
     private static double dotProduct(Translation2d a, Translation2d b) {
