@@ -249,6 +249,14 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      */
     public record RestrictedZone(BoundingBox boundingBox, double minimumDistanceMeters,
                                  double brakingZoneDistanceMeters) implements ZoneRestriction {
+
+        public RestrictedZone {
+            if (minimumDistanceMeters < 0 || brakingZoneDistanceMeters < 0)
+                System.out.println("WARNING: RestrictedZone distances must be non-negative");
+            if (minimumDistanceMeters > brakingZoneDistanceMeters)
+                System.out.println("WARNING: RestrictedZone minimum distance cannot be greater than braking zone distance");
+        }
+
         @Override
         public double calculateDistanceToBoundary(BoundingBox robotBoundingBox) {
             return robotBoundingBox.distanceTo(boundingBox);
@@ -275,6 +283,13 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      */
     public record ContainmentZone(BoundingBox boundingBox, double minimumDistanceMeters,
                                   double brakingZoneDistanceMeters) implements ZoneRestriction {
+        public ContainmentZone {
+            if (minimumDistanceMeters < 0 || brakingZoneDistanceMeters < 0)
+                System.out.println("WARNING: ContainmentZone distances must be non-negative");
+            if (minimumDistanceMeters > brakingZoneDistanceMeters)
+                System.out.println("WARNING: ContainmentZone minimum distance cannot be greater than braking zone distance");
+        }
+
         @Override
         public double calculateDistanceToBoundary(BoundingBox robotBoundingBox) {
             if (!boundingBox.contains(robotBoundingBox))
