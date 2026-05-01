@@ -141,19 +141,19 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      * Splits the translation into a toward-boundary component and a perpendicular component,
      * scales the toward-boundary component by the braking scale, and recombines them.
      *
-     * @param fieldSpaceTranslation              the field-space translation to scale
+     * @param targetTranslation                  the target translation to scale
      * @param directionTowardBoundary            the unit vector pointing toward the zone boundary
      * @param translationComponentTowardBoundary the magnitude (-1 to 1) of the translation toward the boundary
      * @param distanceToBoundary                 the current distance to the zone boundary
      * @param zone                               the zone being applied
      * @return the scaled field-space translation
      */
-    private Translation2d calculateScaledTranslation(Translation2d fieldSpaceTranslation, Translation2d directionTowardBoundary, double translationComponentTowardBoundary, double distanceToBoundary, ZoneRestriction zone) {
+    private Translation2d calculateScaledTranslation(Translation2d targetTranslation, Translation2d directionTowardBoundary, double translationComponentTowardBoundary, double distanceToBoundary, ZoneRestriction zone) {
         final double brakingScale = calculateBrakingScale(distanceToBoundary, zone);
 
         final Translation2d
                 towardComponent = directionTowardBoundary.times(translationComponentTowardBoundary),
-                perpendicularComponent = fieldSpaceTranslation.minus(towardComponent);
+                perpendicularComponent = targetTranslation.minus(towardComponent);
 
         return perpendicularComponent.plus(towardComponent.times(brakingScale));
     }
@@ -183,7 +183,10 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      */
     private Translation2d calculateUnitVectorTowardBoundary(ZoneRestriction zone, BoundingBox robotBoundingBox) {
         final Translation2d robotCenter = robotBoundingBox.getCenter().getTranslation();
-        final Translation2d vectorTowardBoundary = zone.calculateNearestBoundaryPoint(robotCenter).minus(robotCenter);
+        Translation2d vectorTowardBoundary = zone.calculateNearestBoundaryPoint(robotCenter).minus(robotCenter);
+
+        if (zone.isInRestrictedArea(robotCenter))
+            vectorTowardBoundary = vectorTowardBoundary.unaryMinus();
 
         if (vectorTowardBoundary.getNorm() < 1e-6)
             return new Translation2d();
@@ -232,6 +235,8 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
          * @return the nearest boundary point
          */
         Translation2d calculateNearestBoundaryPoint(Translation2d robotCenter);
+
+        boolean isInRestrictedArea(Translation2d robotCenter);
     }
 
     /**
@@ -251,7 +256,12 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
 
         @Override
         public Translation2d calculateNearestBoundaryPoint(Translation2d robotCenter) {
-            return boundingBox.nearest(robotCenter);
+            return boundingBox.nearestPerimeterPoint(robotCenter);
+        }
+
+        @Override
+        public boolean isInRestrictedArea(Translation2d robotCenter) {
+            return boundingBox.contains(robotCenter);
         }
     }
 
@@ -274,8 +284,12 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
 
         @Override
         public Translation2d calculateNearestBoundaryPoint(Translation2d robotCenter) {
-            var x = boundingBox.nearestPerimeterPoint(robotCenter);
-            return boundingBox.contains(robotCenter) ? x : x.unaryMinus();
+            return boundingBox.nearestPerimeterPoint(robotCenter);
+        }
+
+        @Override
+        public boolean isInRestrictedArea(Translation2d robotCenter) {
+            return !boundingBox.contains(robotCenter);
         }
     }
 }
