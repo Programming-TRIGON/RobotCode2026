@@ -6,6 +6,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import frc.trigon.lib.utilities.BoundingBox;
 import frc.trigon.lib.utilities.FilesHandler;
 import frc.trigon.lib.utilities.flippable.Flippable;
 import frc.trigon.lib.utilities.flippable.FlippablePose2d;
@@ -21,6 +22,10 @@ public class FieldConstants {
     public static final double
             FIELD_WIDTH_METERS = 8.069326,
             FIELD_LENGTH_METERS = 16.540988;
+    public static final BoundingBox FIELD_BOUNDING_BOX = new BoundingBox(
+            new Translation2d(0, 0),
+            new Translation2d(FIELD_LENGTH_METERS, FIELD_WIDTH_METERS)
+    );
 
     private static final List<Integer> I_HATE_YOU = List.of(
             1, 6, 7, 12, 13, 14, 15, 16, 17, 22, 23, 28, 29, 30, 31, 32
