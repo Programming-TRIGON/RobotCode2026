@@ -42,7 +42,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      * @param zoneRestrictions      the zones to restrict movement relative to
      */
     public ZoneRestrictedDriveCommand(boolean shouldRestrictToField, ZoneRestriction... zoneRestrictions) {
-        this.zoneRestrictions = shouldRestrictToField ? zoneRestrictions : addFieldToZoneRestrictions(zoneRestrictions);
+        this.zoneRestrictions = shouldRestrictToField ? addFieldToZoneRestrictions(zoneRestrictions) : zoneRestrictions;
 
         addCommands(
                 getTranslationCacheUpdateCommand(),
