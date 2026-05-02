@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -146,9 +147,10 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
                                  double brakingZoneDistanceMeters) implements ZoneRestriction {
         public RestrictedZone {
             if (minimumDistanceMeters < 0 || brakingZoneDistanceMeters < 0)
-                System.out.println("WARNING: RestrictedZone distances must be non-negative");
+                DriverStation.reportWarning("RestrictedZone distances must be non-negative", false);
             if (minimumDistanceMeters > brakingZoneDistanceMeters)
-                System.out.println("WARNING: RestrictedZone minimum distance cannot be greater than braking zone distance");
+                DriverStation.reportWarning("RestrictedZone minimum distance cannot be greater than braking zone distance", false);
+
         }
 
         @Override
@@ -234,9 +236,9 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
                                   double brakingZoneDistanceMeters) implements ZoneRestriction {
         public ContainmentZone {
             if (minimumDistanceMeters < 0 || brakingZoneDistanceMeters < 0)
-                System.out.println("WARNING: ContainmentZone distances must be non-negative");
+                DriverStation.reportWarning("ContainmentZone distances must be non-negative", false);
             if (minimumDistanceMeters > brakingZoneDistanceMeters)
-                System.out.println("WARNING: ContainmentZone minimum distance cannot be greater than braking zone distance");
+                DriverStation.reportWarning("ContainmentZone minimum distance cannot be greater than braking zone distance", false);
         }
 
         @Override
