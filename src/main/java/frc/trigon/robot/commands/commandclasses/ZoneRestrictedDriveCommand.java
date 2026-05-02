@@ -42,27 +42,21 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      * @param zoneRestrictions      the zones to restrict movement relative to
      */
     public ZoneRestrictedDriveCommand(boolean shouldRestrictToField, ZoneRestriction... zoneRestrictions) {
-        this.zoneRestrictions = buildZoneRestrictions(shouldRestrictToField, zoneRestrictions);
-        logAllZoneBoundingBoxes();
+        this.zoneRestrictions = shouldRestrictToField ? zoneRestrictions : addFieldToZoneRestrictions(zoneRestrictions);
+
         addCommands(
                 getTranslationCacheUpdateCommand(),
                 getDriveCommand()
         );
     }
 
-    private ZoneRestriction[] buildZoneRestrictions(boolean shouldRestrictToField, ZoneRestriction[] zoneRestrictions) {
-        if (!shouldRestrictToField)
-            return zoneRestrictions;
+    private ZoneRestriction[] addFieldToZoneRestrictions(ZoneRestriction[] zoneRestrictions) {
         final ZoneRestriction[] allZones = new ZoneRestriction[zoneRestrictions.length + 1];
+
         allZones[0] = FIELD_BOUNDARY_ZONE;
         System.arraycopy(zoneRestrictions, 0, allZones, 1, zoneRestrictions.length);
 
         return allZones;
-    }
-
-    private void logAllZoneBoundingBoxes() {
-        for (int i = 0; i < zoneRestrictions.length; i++)
-            zoneRestrictions[i].boundingBox().log("RestrictedZones/" + i);
     }
 
     private Command getTranslationCacheUpdateCommand() {
@@ -80,7 +74,6 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
     /**
      * Calculates the target translation after applying all zone restrictions sequentially.
      * Each zone further restricts the translation produced by the previous zone.
-     * Input is converted to field coordinates for restriction, then back to joystick coordinates for output.
      *
      * @return the restricted target translation in joystick coordinates
      */
@@ -96,6 +89,16 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
             targetTranslation = applyZoneRestriction(targetTranslation, zone, robotBoundingBox);
 
         return targetTranslation;
+    }
+
+    /**
+     * Returns a bounding box representing the robot's current position and size on the field.
+     *
+     * @return the robot's current bounding box
+     */
+    private BoundingBox getRobotBoundingBox() {
+        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
+        return new BoundingBox(robotPose, ROBOT_X_WIDTH_METERS, ROBOT_Y_WIDTH_METERS);
     }
 
     /**
@@ -119,7 +122,6 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
     /**
      * Scales down the component of the translation pointing toward the zone boundary.
      * The perpendicular component is left unchanged, allowing the robot to move along the boundary normally.
-     * Both the translation and boundary direction are in field coordinates.
      *
      * @param targetTranslation  the target translation to slow
      * @param distanceToBoundary the current distance to the zone boundary
@@ -135,6 +137,27 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
             return targetTranslation;
 
         return calculateScaledTranslation(targetTranslation, directionTowardBoundary, translationComponentTowardBoundary, distanceToBoundary, zone);
+    }
+
+    /**
+     * Returns a unit vector pointing from the robot's current position toward the nearest zone boundary point.
+     * Returns a zero vector if the robot is exactly on the boundary.
+     *
+     * @param zone             the zone to calculate the direction toward
+     * @param robotBoundingBox the robot's current bounding box
+     * @return the unit vector pointing toward the zone boundary, in field coordinates
+     */
+    private Translation2d calculateUnitVectorTowardBoundary(ZoneRestriction zone, BoundingBox robotBoundingBox) {
+        final Translation2d robotCenter = robotBoundingBox.getCenter().getTranslation();
+        Translation2d vectorTowardBoundary = zone.calculateNearestBoundaryPoint(robotCenter).minus(robotCenter);
+
+        if (zone.isInRestrictedArea(robotCenter))
+            vectorTowardBoundary = vectorTowardBoundary.unaryMinus();
+
+        if (vectorTowardBoundary.getNorm() < 1e-6)
+            return new Translation2d();
+
+        return vectorTowardBoundary.times(1 / vectorTowardBoundary.getNorm());
     }
 
     /**
@@ -173,40 +196,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
         return MathUtil.clamp(distanceIntoBrakingZone / brakingZoneSize, 0, 1);
     }
 
-    /**
-     * Returns a unit vector pointing from the robot's current position toward the nearest zone boundary point.
-     * Returns a zero vector if the robot is exactly on the boundary.
-     *
-     * @param zone             the zone to calculate the direction toward
-     * @param robotBoundingBox the robot's current bounding box
-     * @return the unit vector pointing toward the zone boundary, in field coordinates
-     */
-    private Translation2d calculateUnitVectorTowardBoundary(ZoneRestriction zone, BoundingBox robotBoundingBox) {
-        final Translation2d robotCenter = robotBoundingBox.getCenter().getTranslation();
-        Translation2d vectorTowardBoundary = zone.calculateNearestBoundaryPoint(robotCenter).minus(robotCenter);
-
-        if (zone.isInRestrictedArea(robotCenter))
-            vectorTowardBoundary = vectorTowardBoundary.unaryMinus();
-
-        if (vectorTowardBoundary.getNorm() < 1e-6)
-            return new Translation2d();
-
-        return vectorTowardBoundary.times(1 / vectorTowardBoundary.getNorm());
-    }
-
-    /**
-     * Returns a bounding box representing the robot's current position and size on the field.
-     *
-     * @return the robot's current bounding box
-     */
-    private BoundingBox getRobotBoundingBox() {
-        final Pose2d robotPose = RobotContainer.ROBOT_POSE_ESTIMATOR.getEstimatedRobotPose();
-        final BoundingBox robotBoundingBox = new BoundingBox(robotPose, ROBOT_X_WIDTH_METERS, ROBOT_Y_WIDTH_METERS);
-        robotBoundingBox.log("RobotBoundingBox");
-        return robotBoundingBox;
-    }
-
-    private static double dotProduct(Translation2d a, Translation2d b) {
+    private double dotProduct(Translation2d a, Translation2d b) {
         return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
@@ -214,8 +204,6 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      * Represents a zone that restricts the robot's movement relative to its boundary.
      */
     public sealed interface ZoneRestriction permits RestrictedZone, ContainmentZone {
-        BoundingBox boundingBox();
-
         double minimumDistanceMeters();
 
         double brakingZoneDistanceMeters();
@@ -236,6 +224,12 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
          */
         Translation2d calculateNearestBoundaryPoint(Translation2d robotCenter);
 
+        /**
+         * Returns whether the center of the robot is currently within the restricted area of this zone (i.e. the area that movement is restricted toward).
+         *
+         * @param robotCenter the robot's current center position
+         * @return true if the center of the robot is within the restricted area, false otherwise
+         */
         boolean isInRestrictedArea(Translation2d robotCenter);
     }
 
