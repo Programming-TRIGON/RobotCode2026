@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.trigon.lib.utilities.BoundingBox;
 import frc.trigon.robot.RobotContainer;
+import frc.trigon.robot.commands.CommandConstants;
 import frc.trigon.robot.constants.FieldConstants;
 import frc.trigon.robot.constants.OperatorConstants;
 import frc.trigon.robot.subsystems.swerve.SwerveCommands;
@@ -68,7 +69,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
         return SwerveCommands.getClosedLoopFieldRelativeDriveCommand(
                 () -> cachedRestrictedTranslation.getX(),
                 () -> cachedRestrictedTranslation.getY(),
-                OperatorConstants.DRIVER_CONTROLLER::getRightX
+                () -> CommandConstants.calculateRotationStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getRightX())
         ).asProxy();
     }
 
@@ -81,8 +82,8 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
     private Translation2d calculateRestrictedTranslation() {
         final BoundingBox robotBoundingBox = getRobotBoundingBox();
         Translation2d targetTranslation = new Translation2d(
-                OperatorConstants.DRIVER_CONTROLLER.getLeftY(),
-                OperatorConstants.DRIVER_CONTROLLER.getLeftX()
+                CommandConstants.calculateDriveStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getLeftY()),
+                CommandConstants.calculateDriveStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getLeftX())
         );
 
         for (ZoneRestriction zone : zoneRestrictions)
