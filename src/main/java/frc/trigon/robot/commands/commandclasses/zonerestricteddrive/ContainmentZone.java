@@ -33,12 +33,17 @@ public class ContainmentZone implements ZoneRestriction {
     }
 
     @Override
-    public double minimumDistanceMeters() {
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    @Override
+    public double getMinimumDistanceMeters() {
         return minimumDistanceMeters;
     }
 
     @Override
-    public double brakingZoneDistanceMeters() {
+    public double getBrakingZoneDistanceMeters() {
         return brakingZoneDistanceMeters;
     }
 
@@ -71,7 +76,7 @@ public class ContainmentZone implements ZoneRestriction {
         final Translation2d
                 zoneRelativeTargetTranslation = toZoneRelativeDirection(targetTranslation.unaryMinus(), zoneCenter),
                 zoneRelativeRobotCenter = toZoneRelativePosition(robotBoundingBox.getCenter().getTranslation(), zoneCenter);
-        
+
         final Translation2d zoneRelativeRestrictedTranslation = applyZoneRelativeAxisBraking(zoneRelativeTargetTranslation, zoneRelativeRobotCenter, robotBoundingBox, zoneCenter);
         return fromZoneRelativeDirection(zoneRelativeRestrictedTranslation, zoneCenter).unaryMinus();
     }

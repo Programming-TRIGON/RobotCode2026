@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.trigon.lib.hardware.RobotHardwareStats;
 import frc.trigon.lib.utilities.BoundingBox;
 import frc.trigon.robot.RobotContainer;
 import frc.trigon.robot.commands.CommandConstants;
@@ -42,7 +43,10 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      * @param zoneRestrictions      the zones to restrict movement relative to
      */
     public ZoneRestrictedDriveCommand(boolean shouldRestrictToField, ZoneRestriction... zoneRestrictions) {
-        this.zoneRestrictions = shouldRestrictToField ? addFieldToZoneRestrictions(zoneRestrictions) : zoneRestrictions;
+        this.zoneRestrictions = shouldRestrictToField ? getZoneRestrictionsWithFieldRestriction(zoneRestrictions) : zoneRestrictions;
+
+        if (RobotHardwareStats.isSimulation())
+            logAllZoneBoundaries();
 
         addCommands(
                 getUpdateCachedTranslationCommand(),
@@ -50,13 +54,18 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
         );
     }
 
-    private ZoneRestriction[] addFieldToZoneRestrictions(ZoneRestriction[] zoneRestrictions) {
+    private ZoneRestriction[] getZoneRestrictionsWithFieldRestriction(ZoneRestriction[] zoneRestrictions) {
         final ZoneRestriction[] allZones = new ZoneRestriction[zoneRestrictions.length + 1];
 
         allZones[0] = FIELD_BOUNDARY_ZONE;
         System.arraycopy(zoneRestrictions, 0, allZones, 1, zoneRestrictions.length);
 
         return allZones;
+    }
+
+    private void logAllZoneBoundaries() {
+        for (int i = 0; i < zoneRestrictions.length; i++)
+            zoneRestrictions[i].getBoundingBox().log("ZoneRestrictions/Zone" + i);
     }
 
     private Command getUpdateCachedTranslationCommand() {

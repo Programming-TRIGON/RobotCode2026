@@ -31,12 +31,17 @@ public class RestrictedZone implements ZoneRestriction {
     }
 
     @Override
-    public double minimumDistanceMeters() {
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    @Override
+    public double getMinimumDistanceMeters() {
         return minimumDistanceMeters;
     }
 
     @Override
-    public double brakingZoneDistanceMeters() {
+    public double getBrakingZoneDistanceMeters() {
         return brakingZoneDistanceMeters;
     }
 
