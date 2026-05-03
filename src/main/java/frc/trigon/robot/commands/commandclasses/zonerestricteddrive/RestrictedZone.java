@@ -86,7 +86,7 @@ public class RestrictedZone implements ZoneRestriction {
         final Translation2d robotCenter = robotBoundingBox.getCenter().getTranslation();
         Translation2d vectorTowardBoundary = boundingBox.nearestPerimeterPoint(robotCenter).minus(robotCenter);
 
-        if (!boundingBox.contains(robotCenter))
+        if (boundingBox.contains(robotCenter))
             vectorTowardBoundary = vectorTowardBoundary.unaryMinus();
 
         if (vectorTowardBoundary.getNorm() < 1e-6)

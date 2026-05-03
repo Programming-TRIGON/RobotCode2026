@@ -74,11 +74,11 @@ public class ContainmentZone implements ZoneRestriction {
     private Translation2d calculateRestrictedTranslation(Translation2d targetTranslation, BoundingBox robotBoundingBox) {
         final Pose2d zoneCenter = boundingBox.getCenter();
         final Translation2d
-                zoneRelativeTargetTranslation = toZoneRelativeDirection(targetTranslation.unaryMinus(), zoneCenter),
+                zoneRelativeTargetTranslation = toZoneRelativeDirection(targetTranslation, zoneCenter),
                 zoneRelativeRobotCenter = toZoneRelativePosition(robotBoundingBox.getCenter().getTranslation(), zoneCenter);
 
         final Translation2d zoneRelativeRestrictedTranslation = applyZoneRelativeAxisBraking(zoneRelativeTargetTranslation, zoneRelativeRobotCenter, robotBoundingBox, zoneCenter);
-        return fromZoneRelativeDirection(zoneRelativeRestrictedTranslation, zoneCenter).unaryMinus();
+        return fromZoneRelativeDirection(zoneRelativeRestrictedTranslation, zoneCenter);
     }
 
     /**

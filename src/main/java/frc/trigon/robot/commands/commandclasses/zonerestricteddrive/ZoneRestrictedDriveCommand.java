@@ -88,12 +88,12 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      */
     private Translation2d calculateRestrictedTranslation() {
         final BoundingBox robotBoundingBox = getRobotBoundingBox();
-        Translation2d targetTranslation = calculateTargetTranslation();
+        Translation2d targetFieldRelativeTranslation = calculateTargetJoystickTranslation().unaryMinus();
 
         for (ZoneRestriction zone : zoneRestrictions)
-            targetTranslation = zone.applyRestriction(targetTranslation, robotBoundingBox);
+            targetFieldRelativeTranslation = zone.applyRestriction(targetFieldRelativeTranslation, robotBoundingBox);
 
-        return targetTranslation;
+        return targetFieldRelativeTranslation.unaryMinus();
     }
 
     /**
@@ -101,7 +101,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      *
      * @return the target translation
      */
-    private Translation2d calculateTargetTranslation() {
+    private Translation2d calculateTargetJoystickTranslation() {
         final double
                 rawXValue = OperatorConstants.DRIVER_CONTROLLER.getLeftY(),
                 rawYValue = OperatorConstants.DRIVER_CONTROLLER.getLeftX();
