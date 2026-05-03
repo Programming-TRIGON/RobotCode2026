@@ -25,7 +25,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
             ROBOT_Y_WIDTH_METERS = 1;
     private static final double
             FIELD_BOUNDARY_MINIMUM_DISTANCE_METERS = 0.1,
-            FIELD_BOUNDARY_BRAKING_ZONE_DISTANCE_METERS = 0.4;
+            FIELD_BOUNDARY_BRAKING_ZONE_DISTANCE_METERS = 0.3;
     private static final ContainmentZone FIELD_BOUNDARY_ZONE = new ContainmentZone(
             FieldConstants.FIELD_BOUNDING_BOX,
             FIELD_BOUNDARY_MINIMUM_DISTANCE_METERS,
@@ -33,7 +33,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
     );
 
     private final ZoneRestriction[] zoneRestrictions;
-    private Translation2d cachedRestrictedTranslation = new Translation2d();
+    private Translation2d cachedRestrictedTranslation;
 
     /**
      * Creates a new ZoneRestrictedDriveCommand.
@@ -45,7 +45,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
         this.zoneRestrictions = shouldRestrictToField ? addFieldToZoneRestrictions(zoneRestrictions) : zoneRestrictions;
 
         addCommands(
-                getTranslationCacheUpdateCommand(),
+                getUpdateCachedTranslationCommand(),
                 getDriveCommand()
         );
     }
@@ -59,7 +59,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
         return allZones;
     }
 
-    private Command getTranslationCacheUpdateCommand() {
+    private Command getUpdateCachedTranslationCommand() {
         return new RunCommand(() -> cachedRestrictedTranslation = calculateRestrictedTranslation());
     }
 
@@ -68,7 +68,7 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
                 () -> cachedRestrictedTranslation.getX(),
                 () -> cachedRestrictedTranslation.getY(),
                 () -> CommandConstants.calculateRotationStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getRightX())
-        ).asProxy();
+        ).onlyIf(() -> cachedRestrictedTranslation != null).repeatedly().asProxy();
     }
 
     /**
@@ -79,15 +79,28 @@ public class ZoneRestrictedDriveCommand extends ParallelCommandGroup {
      */
     private Translation2d calculateRestrictedTranslation() {
         final BoundingBox robotBoundingBox = getRobotBoundingBox();
-        Translation2d targetTranslation = new Translation2d(
-                CommandConstants.calculateDriveStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getLeftY()),
-                CommandConstants.calculateDriveStickAxisValue(OperatorConstants.DRIVER_CONTROLLER.getLeftX())
-        );
+        Translation2d targetTranslation = calculateTargetTranslation();
 
         for (ZoneRestriction zone : zoneRestrictions)
             targetTranslation = zone.applyRestriction(targetTranslation, robotBoundingBox);
 
         return targetTranslation;
+    }
+
+    /**
+     * Calculates the target translation based on driver input.
+     *
+     * @return the target translation
+     */
+    private Translation2d calculateTargetTranslation() {
+        final double
+                rawXValue = OperatorConstants.DRIVER_CONTROLLER.getLeftY(),
+                rawYValue = OperatorConstants.DRIVER_CONTROLLER.getLeftX();
+
+        return new Translation2d(
+                CommandConstants.calculateDriveStickAxisValue(rawXValue),
+                CommandConstants.calculateDriveStickAxisValue(rawYValue)
+        );
     }
 
     /**
