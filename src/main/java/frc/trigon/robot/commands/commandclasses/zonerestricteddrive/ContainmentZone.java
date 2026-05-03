@@ -9,7 +9,7 @@ import frc.trigon.lib.utilities.BoundingBox;
 /**
  * A class that represents a zone that the robot is not allowed to leave.
  * Movement toward the zone boundary is slowed and eventually blocked as the robot approaches the edge.
- * Each axis of the zone's local frame is restricted independently, ensuring correct corner behavior.
+ * Each axis of the zone's coordinate frame is restricted independently, ensuring correct corner behavior.
  */
 public class ContainmentZone implements ZoneRestriction {
     private final BoundingBox boundingBox;
@@ -31,7 +31,6 @@ public class ContainmentZone implements ZoneRestriction {
             DriverStation.reportWarning("ContainmentZone distances must be non-negative", false);
         if (minimumDistanceMeters > brakingZoneDistanceMeters)
             DriverStation.reportWarning("ContainmentZone minimum distance cannot be greater than braking zone distance", false);
-
     }
 
     @Override
@@ -69,27 +68,13 @@ public class ContainmentZone implements ZoneRestriction {
      * @return the restricted translation
      */
     private Translation2d calculateRestrictedTranslation(Translation2d targetTranslation, BoundingBox robotBoundingBox) {
-        final Pose2d boxCenter = boundingBox.getCenter();
-        final Translation2d localRobotCenter = toLocalPosition(robotBoundingBox.getCenter().getTranslation(), boxCenter);
-        final Translation2d localTranslation = toLocalDirection(targetTranslation.unaryMinus(), boxCenter);
+        final Pose2d zoneCenter = boundingBox.getCenter();
+        final Translation2d
+                zoneRelativeTargetTranslation = toZoneRelativeTranslation(targetTranslation.unaryMinus(), zoneCenter),
+                zoneRelativeRobotCenter = toZoneRelativePosition(robotBoundingBox.getCenter().getTranslation(), zoneCenter);
 
-        final double robotProjectedHalfX = calculateRobotProjectedHalfExtentX(robotBoundingBox, boxCenter);
-        final double robotProjectedHalfY = calculateRobotProjectedHalfExtentY(robotBoundingBox, boxCenter);
-        final double halfXWidth = boundingBox.getXWidth() / 2.0;
-        final double halfYWidth = boundingBox.getYWidth() / 2.0;
-
-        final double restrictedLocalVx = applyAxisBraking(
-                localTranslation.getX(),
-                halfXWidth - localRobotCenter.getX() - robotProjectedHalfX,
-                localRobotCenter.getX() + halfXWidth - robotProjectedHalfX
-        );
-        final double restrictedLocalVy = applyAxisBraking(
-                localTranslation.getY(),
-                halfYWidth - localRobotCenter.getY() - robotProjectedHalfY,
-                localRobotCenter.getY() + halfYWidth - robotProjectedHalfY
-        );
-
-        return fromLocalDirection(new Translation2d(restrictedLocalVx, restrictedLocalVy), boxCenter).unaryMinus();
+        final Translation2d zoneRelativeRestrictedTranslation = applyZoneRelativeAxisBraking(zoneRelativeTargetTranslation, zoneRelativeRobotCenter, robotBoundingBox, zoneCenter);
+        return fromZoneRelativeTranslation(zoneRelativeRestrictedTranslation, zoneCenter).unaryMinus();
     }
 
     /**
@@ -103,6 +88,64 @@ public class ContainmentZone implements ZoneRestriction {
         if (!boundingBox.contains(robotBoundingBox))
             return 0;
         return boundingBox.getMinimumDistanceToPerimeter(robotBoundingBox);
+    }
+
+    /**
+     * Applies braking independently to each axis of the given zone-relative translation.
+     *
+     * @param zoneRelativeTargetTranslation the translation in the zone's coordinate frame
+     * @param zoneRelativeRobotCenter       the robot's center in the zone's coordinate frame
+     * @param robotBoundingBox              the robot's bounding box
+     * @param zoneCenter                    the center pose of the containment zone
+     * @return the braked translation in the zone's coordinate frame
+     */
+    private Translation2d applyZoneRelativeAxisBraking(Translation2d zoneRelativeTargetTranslation, Translation2d zoneRelativeRobotCenter, BoundingBox robotBoundingBox, Pose2d zoneCenter) {
+        final double
+                restrictedXVelocity = applyXAxisBraking(zoneRelativeTargetTranslation.getX(), zoneRelativeRobotCenter.getX(), robotBoundingBox, zoneCenter),
+                restrictedYVelocity = applyYAxisBraking(zoneRelativeTargetTranslation.getY(), zoneRelativeRobotCenter.getY(), robotBoundingBox, zoneCenter);
+        return new Translation2d(restrictedXVelocity, restrictedYVelocity);
+    }
+
+    /**
+     * Applies braking to the X velocity component based on the robot's proximity to the zone's X walls.
+     *
+     * @param xVelocity           the X velocity component in the zone's coordinate frame
+     * @param zoneRelativeCenterX the robot's center X coordinate in the zone's coordinate frame
+     * @param robotBoundingBox    the robot's bounding box
+     * @param zoneCenter          the center pose of the containment zone
+     * @return the braked X velocity component
+     */
+    private double applyXAxisBraking(double xVelocity, double zoneRelativeCenterX, BoundingBox robotBoundingBox, Pose2d zoneCenter) {
+        final double
+                zoneHalfXWidth = boundingBox.getXWidth() / 2.0,
+                robotProjectedHalfXExtent = calculateRobotProjectedHalfExtentX(robotBoundingBox, zoneCenter);
+
+        final double
+                distanceToPositiveWall = calculateDistanceToPositiveWall(zoneRelativeCenterX, zoneHalfXWidth, robotProjectedHalfXExtent),
+                distanceToNegativeWall = calculateDistanceToNegativeWall(zoneRelativeCenterX, zoneHalfXWidth, robotProjectedHalfXExtent);
+
+        return applyAxisBraking(xVelocity, distanceToPositiveWall, distanceToNegativeWall);
+    }
+
+    /**
+     * Applies braking to the Y velocity component based on the robot's proximity to the zone's Y walls.
+     *
+     * @param yVelocity           the Y velocity component in the zone's coordinate frame
+     * @param zoneRelativeCenterY the robot's center Y coordinate in the zone's coordinate frame
+     * @param robotBoundingBox    the robot's bounding box
+     * @param zoneCenter          the center pose of the containment zone
+     * @return the braked Y velocity component
+     */
+    private double applyYAxisBraking(double yVelocity, double zoneRelativeCenterY, BoundingBox robotBoundingBox, Pose2d zoneCenter) {
+        final double
+                zoneHalfYWidth = boundingBox.getYWidth() / 2.0,
+                robotProjectedHalfYExtent = calculateRobotProjectedHalfExtentY(robotBoundingBox, zoneCenter);
+
+        final double
+                distanceToPositiveWall = calculateDistanceToPositiveWall(zoneRelativeCenterY, zoneHalfYWidth, robotProjectedHalfYExtent),
+                distanceToNegativeWall = calculateDistanceToNegativeWall(zoneRelativeCenterY, zoneHalfYWidth, robotProjectedHalfYExtent);
+
+        return applyAxisBraking(yVelocity, distanceToPositiveWall, distanceToNegativeWall);
     }
 
     /**
@@ -123,63 +166,87 @@ public class ContainmentZone implements ZoneRestriction {
     }
 
     /**
-     * Returns how far the robot extends from its center along the zone's local X axis.
+     * Returns how far the robot extends from its center along the zone's X axis.
      * Accounts for the relative rotation between the robot and the zone.
      *
      * @param robotBoundingBox the robot's bounding box
-     * @param boxCenter        the center pose of the containment zone
-     * @return the projected half-extent of the robot along the zone's local X axis
+     * @param zoneCenter       the center pose of the containment zone
+     * @return the projected half-extent of the robot along the zone's X axis
      */
-    private static double calculateRobotProjectedHalfExtentX(BoundingBox robotBoundingBox, Pose2d boxCenter) {
-        final Rotation2d relativeRotation = robotBoundingBox.getRotation().minus(boxCenter.getRotation());
+    private double calculateRobotProjectedHalfExtentX(BoundingBox robotBoundingBox, Pose2d zoneCenter) {
+        final Rotation2d relativeRotation = robotBoundingBox.getRotation().minus(zoneCenter.getRotation());
         return robotBoundingBox.getXWidth() / 2.0 * Math.abs(relativeRotation.getCos())
                 + robotBoundingBox.getYWidth() / 2.0 * Math.abs(relativeRotation.getSin());
     }
 
     /**
-     * Returns how far the robot extends from its center along the zone's local Y axis.
+     * Returns how far the robot extends from its center along the zone's Y axis.
      * Accounts for the relative rotation between the robot and the zone.
      *
      * @param robotBoundingBox the robot's bounding box
-     * @param boxCenter        the center pose of the containment zone
-     * @return the projected half-extent of the robot along the zone's local Y axis
+     * @param zoneCenter       the center pose of the containment zone
+     * @return the projected half-extent of the robot along the zone's Y axis
      */
-    private static double calculateRobotProjectedHalfExtentY(BoundingBox robotBoundingBox, Pose2d boxCenter) {
-        final Rotation2d relativeRotation = robotBoundingBox.getRotation().minus(boxCenter.getRotation());
+    private double calculateRobotProjectedHalfExtentY(BoundingBox robotBoundingBox, Pose2d zoneCenter) {
+        final Rotation2d relativeRotation = robotBoundingBox.getRotation().minus(zoneCenter.getRotation());
         return robotBoundingBox.getXWidth() / 2.0 * Math.abs(relativeRotation.getSin())
                 + robotBoundingBox.getYWidth() / 2.0 * Math.abs(relativeRotation.getCos());
     }
 
     /**
-     * Converts a field-space position into the zone's local coordinate frame.
+     * Returns the distance from the robot's edge to the zone wall in the positive axis direction.
      *
-     * @param position  the field-space position to convert
-     * @param boxCenter the center pose of the containment zone
-     * @return the position in the zone's local frame
+     * @param zoneRelativeCenter       the robot's center coordinate along the axis in the zone's coordinate frame
+     * @param zoneHalfWidth            the half-width of the zone along the axis
+     * @param robotProjectedHalfExtent the robot's projected half-extent along the axis
+     * @return the distance to the positive wall
      */
-    private static Translation2d toLocalPosition(Translation2d position, Pose2d boxCenter) {
-        return position.minus(boxCenter.getTranslation()).rotateBy(boxCenter.getRotation().unaryMinus());
+    private double calculateDistanceToPositiveWall(double zoneRelativeCenter, double zoneHalfWidth, double robotProjectedHalfExtent) {
+        return zoneHalfWidth - zoneRelativeCenter - robotProjectedHalfExtent;
     }
 
     /**
-     * Converts a field-space direction vector into the zone's local coordinate frame.
+     * Returns the distance from the robot's edge to the zone wall in the negative axis direction.
      *
-     * @param direction the field-space direction to convert
-     * @param boxCenter the center pose of the containment zone
-     * @return the direction in the zone's local frame
+     * @param zoneRelativeCenter       the robot's center coordinate along the axis in the zone's coordinate frame
+     * @param zoneHalfWidth            the half-width of the zone along the axis
+     * @param robotProjectedHalfExtent the robot's projected half-extent along the axis
+     * @return the distance to the negative wall
      */
-    private static Translation2d toLocalDirection(Translation2d direction, Pose2d boxCenter) {
-        return direction.rotateBy(boxCenter.getRotation().unaryMinus());
+    private double calculateDistanceToNegativeWall(double zoneRelativeCenter, double zoneHalfWidth, double robotProjectedHalfExtent) {
+        return zoneRelativeCenter + zoneHalfWidth - robotProjectedHalfExtent;
     }
 
     /**
-     * Converts a direction vector from the zone's local coordinate frame back to field space.
+     * Converts a field-space position into the zone's coordinate frame.
      *
-     * @param localDirection the local-frame direction to convert
-     * @param boxCenter      the center pose of the containment zone
+     * @param position   the field-space position to convert
+     * @param zoneCenter the center pose of the containment zone
+     * @return the position in the zone's coordinate frame
+     */
+    private Translation2d toZoneRelativePosition(Translation2d position, Pose2d zoneCenter) {
+        return position.minus(zoneCenter.getTranslation()).rotateBy(zoneCenter.getRotation().unaryMinus());
+    }
+
+    /**
+     * Converts a field-space direction vector into the zone's coordinate frame.
+     *
+     * @param direction  the field-space direction to convert
+     * @param zoneCenter the center pose of the containment zone
+     * @return the direction in the zone's coordinate frame
+     */
+    private Translation2d toZoneRelativeTranslation(Translation2d direction, Pose2d zoneCenter) {
+        return direction.rotateBy(zoneCenter.getRotation().unaryMinus());
+    }
+
+    /**
+     * Converts a direction vector from the zone's coordinate frame back to field space.
+     *
+     * @param zoneRelativeDirection the zone-relative direction to convert
+     * @param zoneCenter            the center pose of the containment zone
      * @return the direction in field space
      */
-    private static Translation2d fromLocalDirection(Translation2d localDirection, Pose2d boxCenter) {
-        return localDirection.rotateBy(boxCenter.getRotation());
+    private Translation2d fromZoneRelativeTranslation(Translation2d zoneRelativeDirection, Pose2d zoneCenter) {
+        return zoneRelativeDirection.rotateBy(zoneCenter.getRotation());
     }
 }
