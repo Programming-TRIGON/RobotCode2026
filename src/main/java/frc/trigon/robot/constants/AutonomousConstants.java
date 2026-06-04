@@ -33,6 +33,7 @@ public class AutonomousConstants {
     public static final double
             SHOOT_PRELOAD_BEFORE_NEUTRAL_ZONE_TIME_SECONDS = 1,
             SHOOT_PRELOAD_BEFORE_COLLECTING_FROM_DEPOT_TIME = 2;
+
     public static final double
             TOTAL_MATCH_TIME_SECONDS = 160,
             AUTONOMOUS_TIME_SECONDS = 20,
