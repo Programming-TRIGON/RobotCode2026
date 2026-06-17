@@ -2,7 +2,6 @@ package frc.trigon.robot.commands.commandfactories;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.trigon.lib.commands.WaitUntilChangeCommand;
@@ -121,7 +120,7 @@ public class ShootingCommands {
 
     private static Command getLoadFuelWhenReadyCommand(boolean isAutoShootingAtHub, boolean isDelivery) {
         return new SequentialCommandGroup(
-                new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub) && (!isDelivery || !isDeliveryHittingHub())),
+                new WaitUntilCommand(() -> canShoot(isAutoShootingAtHub) && (!isDelivery || !isDeliveryHittingHub()) && !isShotHittingTower()),
                 getLoadFuelCommand(isAutoShootingAtHub).until(() -> ShootingCommands.shouldStopShooting(isAutoShootingAtHub, isDelivery))
         ).repeatedly().alongWith(new RunCommand(() -> logShouldStopShooting(isAutoShootingAtHub, isDelivery)));
     }
@@ -147,7 +146,8 @@ public class ShootingCommands {
 
     private static void logShouldStopShooting(boolean isShootingAtHub, boolean isDelivery) {
         Logger.recordOutput("Shooting/ShouldStopShooting", shouldStopShooting(isShootingAtHub, isDelivery));
-        Logger.recordOutput("Shooting/isDeliveryHittingHub", isDeliveryHittingHub());
+        Logger.recordOutput("Shooting/IsDeliveryHittingHub", isDeliveryHittingHub());
+        Logger.recordOutput("Shooting/IsShotHittingTower", isShotHittingTower());
     }
 
     private static boolean canShoot(boolean isShootingAtHub) {
@@ -161,6 +161,18 @@ public class ShootingCommands {
         return RobotContainer.SHOOTER.atTargetVelocity()
                 && RobotContainer.HOOD.atTargetAngle()
                 && RobotContainer.TURRET.atTargetAngle(false);
+    }
+
+    private static boolean isShotHittingTower() {
+        final Pose2d turretPose = RobotContainer.TURRET.getCurrentTurretFieldRelativePosition();
+
+        final double minimumY = !Flippable.isRedAlliance() ? FieldConstants.TOWER_MINIMUM_Y : FieldConstants.FIELD_WIDTH_METERS - FieldConstants.TOWER_MAXIMUM_Y;
+        final double maximumY = !Flippable.isRedAlliance() ? FieldConstants.TOWER_MAXIMUM_Y : FieldConstants.FIELD_WIDTH_METERS - FieldConstants.TOWER_MINIMUM_Y;
+        Logger.recordOutput("Shooting/IsShotHittingTower/InYRange", turretPose.getY() < maximumY && turretPose.getY() > minimumY);
+        Logger.recordOutput("Shooting/IsShotHittingTower/InXRange", turretPose.getX() < FieldConstants.TOWER_MAXIMUM_X || turretPose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.TOWER_MAXIMUM_X);
+        return (turretPose.getY() < maximumY) &&
+                (turretPose.getY() > minimumY) &&
+                (turretPose.getX() < FieldConstants.TOWER_MAXIMUM_X || turretPose.getX() > FieldConstants.FIELD_LENGTH_METERS - FieldConstants.TOWER_MAXIMUM_X);
     }
 
     private static boolean isDeliveryHittingHub() {
@@ -181,12 +193,12 @@ public class ShootingCommands {
 
         double yAtTargetX = (slope * targetX) + b;
 
-        Logger.recordOutput("Shooting/Delivery/HittingHub/YAtTargetX", yAtTargetX);
-        Logger.recordOutput("Shooting/Delivery/HittingHub/MinimumY", minimumY);
-        Logger.recordOutput("Shooting/Delivery/HittingHub/MaximumY", maximumY);
-        Logger.recordOutput("Shooting/Delivery/HittingHub/TargetX", targetX);
-        Logger.recordOutput("Shooting/Delivery/HittingHub/slope", slope);
-        Logger.recordOutput("Shooting/Delivery/HittingHub/b", b);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/YAtTargetX", yAtTargetX);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/MinimumY", minimumY);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/MaximumY", maximumY);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/TargetX", targetX);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/slope", slope);
+        Logger.recordOutput("Shooting/Delivery/DeliveryHittingHub/b", b);
 
         return (yAtTargetX <= maximumY) && (yAtTargetX >= minimumY);
     }
@@ -196,7 +208,7 @@ public class ShootingCommands {
     }
 
     private static boolean shouldStopShooting(boolean isShootingAtHub, boolean isDelivery) {
-        return (isShootingAtHub ? !RobotContainer.TURRET.atTargetShootingCalculationsAngle(true) : !RobotContainer.TURRET.atTargetAngle(true)) && (!isDelivery || isDeliveryHittingHub());
+        return (isShootingAtHub ? !RobotContainer.TURRET.atTargetShootingCalculationsAngle(true) || isShotHittingTower() : !RobotContainer.TURRET.atTargetAngle(true)) && (!isDelivery || isDeliveryHittingHub());
     }
 
     private static void updateShootingCalculations() {

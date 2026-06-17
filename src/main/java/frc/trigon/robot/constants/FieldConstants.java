@@ -45,7 +45,10 @@ public class FieldConstants {
             TRENCH_NEUTRAL_ENTRY_AUTONOMOUS_X = 5.58,
             TRENCH_ENTRY_Y = 7.48,
             BLUE_RELATIVE_DELIVERY_POSITION_X = 3.0,
-            DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2;
+            DELIVERY_POSITION_Y_OFFSET_FROM_CENTER_METERS = 2.2,
+            TOWER_MINIMUM_Y = 2.9,
+            TOWER_MAXIMUM_Y = 4.5,
+            TOWER_MAXIMUM_X = 1.3;
 
     public static final FlippablePose2d
             LEFT_CLIMB_POSITION = new FlippablePose2d(CLIMB_X, LEFT_CLIMB_Y, Rotation2d.kZero, true),
